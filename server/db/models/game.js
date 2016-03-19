@@ -12,7 +12,7 @@ var schema = new mongoose.Schema({
     type: String,
     enum: ['decision', 'run'],
   },
-  deck: [],
+  deck: {default: newDeck}, //don't think this is valid
 });
 
 mongoose.model('Game', schema);
@@ -21,6 +21,10 @@ schema.method.toggleState = function(argument) {
   // body...
 }
 
+schema.method.dealCards = function(){
+    // splice cards from this.deck
+    // send to players where {game: this._id}
+}
 
 var newDeck = [
     {name: 'U-Turn', rotation: 180, forward: 0, magnitude: 0, priority: 10},
@@ -111,5 +115,6 @@ var newDeck = [
 
 
 schema.method.initializeGame = function(){
+  // may make more sense to make this in a separate module
   return this.update({deck: newDeck}).save()
 }

@@ -14,15 +14,17 @@ var playerSchema = new mongoose.Schema({
   robot: robotSchema,
   livesRemaining: Number,
   damage: Number,
-  hand: [mongoose.Schema.Type.ObjectId],
-  register: [mongoose.Schema.Type.ObjectId],
-  active: {type: Boolean, default: false},
+  hand: [mongoose.Schema.Type.ObjectId], //array of up to 9 cards
+  register: [mongoose.Schema.Type.ObjectId], //
+  active: {type: Boolean, default: false}, //false if powered down
   ready: {type: Boolean, default: false}
 });
 
-playerSchema.method.iAmReady = function(){ //updates player's own 'ready' status and checks all others in the same game
+// updates player's own 'ready' status and checks all others in the same game
+playerSchema.method.iAmReady = function(register){
   var myGame = this.game;
-  return this.update({ready: true}).save()
+  var player = this;
+  return player.update({ready: true, register: register}).save()
   .then(function(player){
     return mongoose.model('Player').find({game: myGame})
   })
@@ -36,6 +38,10 @@ playerSchema.method.iAmReady = function(){ //updates player's own 'ready' status
     return true;
   });
 };
+
+playerSchema.method.damamaged = function(hits){
+  // add to damage points
+}
 
 
 playerSchema.method.dealCards = function(gameId){
