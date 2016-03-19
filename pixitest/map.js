@@ -51,9 +51,21 @@ var map = {
 function buildMap(){
   for (var col = 0; col < map.cols; col ++){
     for (var row = 0; row < map.rows; row ++){
-      var texture = PIXI.Texture.fromImage(map.getTile(col, row));
+      var tileUrl = map.getTile(col, row);
+                                                          //150x150 is the actual image size
+      var tile = new PIXI.extras.TilingSprite.fromImage(tileUrl, 150, 150)
+      
+      //rescales the 150px tile image by 4 to fit a 480x640screen
+      tile.position.x = 37.5*col
+      tile.position.y = 37.5*row;
+      tile.scale.set(.25,.25);
 
-      stage.addChild()
+      stage.addChild(tile)
     }
   }
+}
+buildMap();
+
+function init(){
+  renderer.render(stage);
 }
