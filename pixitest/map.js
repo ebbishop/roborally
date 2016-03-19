@@ -26,7 +26,6 @@ var tileImg = {"0": {"image":"repair.jpg"},
 var map = {
   cols: 12,
   rows: 12,
-  tileSize: 150,
   tiles: [
     2,2,2,2,2,2,2,2,2,2,2,0,
     2,8,11,11,11,11,11,11,11,11,6,2,
@@ -43,7 +42,7 @@ var map = {
   ],
   getTile: function(col, row){
     var tileId = this.tiles[row * this.rows + col].toString();
-    var tileSrc = tileImg[tileId];
+    var tileSrc = tileImg[tileId].image;
     return tileSrc;
   }
 };
