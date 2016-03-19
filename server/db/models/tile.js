@@ -1,9 +1,6 @@
 var mongoose = require('mongoose');
 
-var edges = {
-  values: ['wall0', 'wall1', 'wall2', 'wall3', 'push1', 'push2'],
-  message: 'enum validator failed for path edges with value `{VALUE}`'
-};
+var edges = ['wall0', 'wall1', 'wall2', 'wall3', 'push1', 'push2'];
 
 var schema = new mongoose.Schema({
     edgeN: {
