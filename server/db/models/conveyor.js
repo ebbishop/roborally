@@ -1,27 +1,25 @@
-var Sequelize = require('sequelize');
+var mongoose = require('mongoose');
 
-function ConveyorBelt(db){
-  var ConveyorBelt = db.define('ConveyorBelt', {
-    id: {
-      type: Sequelize.SERIAL
-    },
-    type:{
-      type: Sequelize.ENUM('straight', 'clockwise', 'counterclock', 'merge1left', 'merge1right', 'merge2'),
-      allowNull: false,
-      defaultValue: 'straight'
-    },
-    magnitude: {
-      type: Sequelize.ENUM(1,2),
-      allowNull: false,
-      defaultValue: 1
-    },
-    destination:{
-      type: Sequelize.ENUM('N', 'E', 'S', 'W'),
-      allowNull: false,
-      defaultValue: 'N'
-    }
-  });
-  return ConveyorBelt;
-};
+var schema = new mongoose.Schema({
+  type:{
+    type: String,
+    enum: ['straight', 'clockwise', 'counterclock', 'merge1left', 'merge1right', 'merge2'],
+    required: true,
+    default: 'straight'
+  },
+  magnitude: {
+    type: Number,
+    enum: [1,2],
+    required: true,
+    default: 1
+  },
+  destination:{
+    type: String,
+    enum: ['N', 'E', 'S', 'W'],
+    required: true,
+    default: 'N'
+  }
+});
 
-module.exports = ConveyorBelt;
+
+mongoose.model('ConveyorBelt', schema);

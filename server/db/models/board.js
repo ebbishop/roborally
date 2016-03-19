@@ -1,26 +1,24 @@
-var Sequelize = require('sequelize');
+var mongoose = require('mongoose');
 
-function Board(db){
-  var Board = db.define('Board', {
-    name: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      defaultValue: 'Board'
-    },
-    row00: {type: Sequelize.ARRAY(Sequelize.UUID)},
-    row01: {type: Sequelize.ARRAY(Sequelize.UUID)},
-    row02: {type: Sequelize.ARRAY(Sequelize.UUID)},
-    row03: {type: Sequelize.ARRAY(Sequelize.UUID)},
-    row04: {type: Sequelize.ARRAY(Sequelize.UUID)},
-    row05: {type: Sequelize.ARRAY(Sequelize.UUID)},
-    row06: {type: Sequelize.ARRAY(Sequelize.UUID)},
-    row07: {type: Sequelize.ARRAY(Sequelize.UUID)},
-    row08: {type: Sequelize.ARRAY(Sequelize.UUID)},
-    row09: {type: Sequelize.ARRAY(Sequelize.UUID)},
-    row10: {type: Sequelize.ARRAY(Sequelize.UUID)},
-    row11: {type: Sequelize.ARRAY(Sequelize.UUID)}
-  });
-  return Board;
-}
 
-module.exports = Board;
+var schema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    default: 'Board'
+  },
+  row00: [mongoose.Schema.Types.ObjectId],
+  row01: [mongoose.Schema.Types.ObjectId],
+  row02: [mongoose.Schema.Types.ObjectId],
+  row03: [mongoose.Schema.Types.ObjectId],
+  row04: [mongoose.Schema.Types.ObjectId],
+  row05: [mongoose.Schema.Types.ObjectId],
+  row06: [mongoose.Schema.Types.ObjectId],
+  row07: [mongoose.Schema.Types.ObjectId],
+  row08: [mongoose.Schema.Types.ObjectId],
+  row09: [mongoose.Schema.Types.ObjectId],
+  row10: [mongoose.Schema.Types.ObjectId],
+  row11: [mongoose.Schema.Types.ObjectId]
+});
+
+mongoose.model('Board', schema);
