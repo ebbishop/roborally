@@ -24,6 +24,29 @@ schema.methods.toggleState = function(argument) {
 schema.methods.dealCards = function(){
     // splice cards from this.deck
     // send to players where {game: this._id}
+
+};
+
+//incomplete
+schema.methods.getPlayerCardCt = function(){
+  return mongoose.model('Player').find({game: this._id})
+  .then(function(players){
+    return Promise.map(players, function(player){
+      return 9 - player.damage;
+    });
+  });
+}
+
+// returns promise for true/false
+schema.methods.checkReady = function(){
+  return this.getPlayers()
+  .then(function(players){
+    var ready = players.map(function(player){
+      return player.ready;
+    })
+    if (ready.indexOf(false)>-1) return false
+    return true;
+  });
 }
 
 var newDeck = [
