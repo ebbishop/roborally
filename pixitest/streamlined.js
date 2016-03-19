@@ -26,10 +26,8 @@ var tileImg = {
 "11": {"image":"roller-express-east.jpg"},
 "12": {"image":"roller-east.png"},
 "13": {"image":"roller-west.png"},
-"14": {"image":"wall-east.png"},
-"15": {"image":"wall-west.png"},
-"16": {"image":"wall-north.png"},
-"17": {"image":"wall-south.png"}
+"18": {"image":"spinner-clockwise.jpg"},
+"19": {"image":"spinner-counterclockwise.jpg"}
 };
 
 var walls = {
@@ -44,24 +42,23 @@ var walls = {
   "oneLaserSW": "laser-single-SW.png",
   "twoLasersSW": "laser-double-SW.png",
   "threeLasersSW": "laser-triple-SW.png",
+
   map: [
   //row, col, direction, number of lasers
     [0,2,"north", 0], [0,4,"north", 0], [0,7,"north", 0], [0,9,"north", 0],
-    [1,3,"south", 0, 0], [1,5,"south", 0], [1,6,"south", 0], [1,8,"south", 0],
-    [2,0,"west", 0], [2,11,"east", 0],
-    [3,1,"east", 0], [3,10,"west", 0],
+    [2,0,"west", 0], [2,3,"south", 0], [2,11,"east", 0],
+    [3,5,"west", 0], [3,6,"east", 1],
     [4,0,"west", 0], [4,11,"east", 0],
-    [5,1,"east", 0], [5,10,"west", 0],
-    [6,1,"east", 0], [6,10,"west", 0],
+    [5,8,"north", 1],
+    [6,3,"south", 1], 
     [7,0,"west", 0], [7,11,"east", 0],
-    [8,1,"east", 0], [8,10,"west", 0],
-    [9,0,"west", 0], [9,11,"east", 0],
-    [10,3,"north", 0], [10,5,"north", 0], [10,6,"north", 0], [10,8,"north", 0],
+    [8,5,"west", 1], [8,6,"east", 0],
+    [9,0,"west", 0], [9,8,"north", 0], [9,11,"east", 0],
     [11,2,"south", 0], [11,4,"south", 0], [11,7,"south", 0], [11,9,"south", 0]
   ],
   getWallImg: function(coordinate) {
     var direction = coordinate[2];
-    var numLasers = coordinate[3] || 0;
+    var numLasers = coordinate[3];
     var laserImgFile;
     var wallSrc;
 
@@ -76,24 +73,32 @@ var walls = {
   }
 }
 
-var lasers = null;
+var lasers = {
+  map: [ 
+  //start, end, vertical or horizontal
+  [[6,3], [5,3], "h"],
+  [[8,5], [8,8], "v"],
+  [[3,6], [3,2], "v"],
+  [[5,8], [6,8], "h"]
+  ]
+}
 
 var tiles = {
   cols: 12,
   rows: 12,
   map: [
-    2,2,2,2,2,2,2,2,2,2,2,0,
-    2,8,11,11,11,11,11,11,11,11,6,2,
-    2,10,12,2,12,2,13,2,13,2,5,2,
-    2,10,2,3,2,12,2,13,2,13,5,2,
-    2,10,12,2,12,2,3,2,13,2,5,2,
-    2,10,2,12,2,1,2,13,2,13,5,2,
-    2,10,12,2,12,2,1,2,3,2,5,2,
-    2,10,2,12,2,3,2,13,2,13,5,2,
-    2,10,12,2,12,2,13,2,13,2,5,2,
-    2,10,2,12,2,12,2,13,2,13,5,2,
-    2,4,9,9,9,9,9,9,9,9,7,2,
-    0,2,2,2,2,2,2,2,2,2,2,2
+    2,2,2,2,2,2,2,2,2,2,2,2,
+    2,8,11,11,6,2,2,8,11,11,6,2,
+    2,10,18,2,5,19,2,10,18,2,5,2,
+    2,10,0,18,5,2,2,10,1,18,5,2,
+    2,4,9,9,7,2,19,4,9,9,7,2,
+    2,2,2,2,19,2,2,2,2,19,2,2,
+    2,2,19,2,2,2,2,19,2,2,2,2,
+    2,8,11,11,6,19,2,8,11,11,6,2,
+    2,10,18,1,5,2,2,10,18,0,5,2,
+    2,10,2,18,5,2,19,10,2,18,5,2,
+    2,4,9,9,7,2,2,4,9,9,7,2,
+    2,2,2,2,2,2,2,2,2,2,2,2
   ],
   getTileImg: function(col, row){
     var tileId = this.map[row * this.rows + col].toString();
@@ -111,14 +116,14 @@ function buildMap(){
 function buildTiles() {
   for (var col = 0; col < tiles.cols; col ++){
     for (var row = 0; row < tiles.rows; row ++){
-      var tileUrl = tiles.getTileImg(col, row);
+      var tileSrc = tiles.getTileImg(col, row);
                                                           //150x150 is the actual image size
-      var tile = new PIXI.extras.TilingSprite.fromImage(tileUrl, 150, 150)
+      var tile = new PIXI.extras.TilingSprite.fromImage(tileSrc, imgSizeActual, imgSizeActual)
       
-      //rescales the 150px tile image by 4 to fit a 480x640screen
-      tile.position.x = 37.5*col
-      tile.position.y = 37.5*row;
-      tile.scale.set(.25,.25);
+      tile.position.x = imgSize*col
+      tile.position.y = imgSize*row;
+      //rescales the 150px tile image to be 4 times smaller 
+      tile.scale.set(1/imgScale, 1/imgScale);
 
       stage.addChild(tile)
     }
