@@ -17,11 +17,11 @@ var schema = new mongoose.Schema({
 
 mongoose.model('Game', schema);
 
-schema.method.toggleState = function(argument) {
+schema.methods.toggleState = function(argument) {
   // body...
 }
 
-schema.method.dealCards = function(){
+schema.methods.dealCards = function(){
     // splice cards from this.deck
     // send to players where {game: this._id}
 }
@@ -114,7 +114,7 @@ var newDeck = [
   ];
 
 
-schema.method.initializeGame = function(){
+schema.methods.initializeGame = function(){
   // may make more sense to make this in a separate module
   return this.update({deck: newDeck}).save()
 }

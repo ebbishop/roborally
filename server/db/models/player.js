@@ -12,39 +12,65 @@ var playerSchema = new mongoose.Schema({
   game: mongoose.Schema.Type.ObjectId,
   name: String,
   robot: robotSchema,
+  dock: Number, //starting postion
+  position: [Number], //x & y location
   livesRemaining: Number,
   damage: Number,
   hand: [mongoose.Schema.Type.ObjectId], //array of up to 9 cards
-  register: [mongoose.Schema.Type.ObjectId], //
+  register: {
+    type: [mongoose.Schema.Type.ObjectId],
+    default: [null, null, null, null, null]
+  },
   active: {type: Boolean, default: false}, //false if powered down
   ready: {type: Boolean, default: false}
 });
 
 // updates player's own 'ready' status and checks all others in the same game
-playerSchema.method.iAmReady = function(register){
-  var myGame = this.game;
-  var player = this;
-  return player.update({ready: true, register: register}).save()
-  .then(function(player){
-    return mongoose.model('Player').find({game: myGame})
-  })
-  .then(function(players){
-    return Promise.map(players, function(player){
-      return player.ready;
-    });
-  })
-  .then(function(readys){
-    if(readys.indexOf(false)>0) return false
-    return true;
-  });
+playerSchema.methods.iAmReady = function(register){
+  return this.set({ready: true, register: register}).save();
 };
 
-playerSchema.method.damamaged = function(hits){
-  // add to damage points
+playerSchema.methods.getOpponents = function(){
+  return this.model('Player')
+  .find({game: this.game})
+  .where({_id :{$ne: this._id}})
+  .bind(this);
+};
+
+playerSchema.methods.updateHand = function(cards){
+  this.set('hand', cards);
+  return this.save();
+};
+
+playerSchema.methods.emptyRegister = function(){
+  var newRegister = this.register;
+  var damage = this.damage;
+  for (var i = 0; i < 5; i ++){
+    if(9 - damage > i){
+      newRegister[i] = null;
+    }
+  }
+  this.set('register', newRegister);
+  return this.save();
+};
+
+playerSchema.methods.setRegister = function(cards){
+  var newRegister = this.register;
+  for (var i = 0; i < cards.length; i ++){
+    if (newRegister[i] === null){
+      newRegister[i]=cards[i];
+    }
+  }
+  this.set('register', newRegister);
+  return this.save();
 }
 
+playerSchema.methods.applyDamamage = function(hitCount){
+  return this.update({$inc: {damage: hitCount}}, {new: true})
+};
 
-playerSchema.method.dealCards = function(gameId){
+
+playerSchema.methods.dealCards = function(gameId){
   var deck
   mongoose.model('Game').findById(this.game)
   .then(function(game){
