@@ -5,5 +5,4 @@
 
 require('./tile');
 require('./board');
-require('./conveyor');
 require('./user');
