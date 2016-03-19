@@ -5,3 +5,4 @@
 
 require('./tile');
 require('./board');
+require('./conveyor');

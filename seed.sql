@@ -1,88 +1,95 @@
-USE 'robodb';
+\c robodb;
 
-TRUNCATE TABLE 'programCards';
+-- TRUNCATE TABLE programCards;
+CREATE TABLE programCards (
+  type TEXT,
+  turn INTEGER,
+  direction INTEGER,
+  magnitude INTEGER,
+  priority INTEGER PRIMARY KEY
+);
 
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('U-Turn', 180, 0, 0, 10),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('U-Turn', 180, 0, 0, 20),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('U-Turn', 180, 0, 0, 30),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('U-Turn', 180, 0, 0, 40),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('U-Turn', 180, 0, 0, 50),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('U-Turn', 180, 0, 0, 60),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 70),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 90),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 110),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 130),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 150),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 170),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 190),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 210),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 230),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 250),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 270),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 290),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 310),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 330),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 350),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 370),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 390),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Left', -90, 0, 0, 410),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 80),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 100),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 120),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 140),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 160),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 180),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 200),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 220),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 240),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 260),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 280),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 300),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 320),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 340),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 360),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 380),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 400),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Rotate Right', 90, 0, 0, 420),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Back Up', 0, -1, 1, 430),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Back Up', 0, -1, 1, 440),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Back Up', 0, -1, 1, 450),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Back Up', 0, -1, 1, 460),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Back Up', 0, -1, 1, 470),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Back Up', 0, -1, 1, 480),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 490),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 500),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 510),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 520),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 530),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 540),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 550),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 560),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 570),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 580),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 590),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 600),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 610),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 620),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 630),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 640),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 650),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 1', 0, 1, 1, 660),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 2', 0, 1, 2, 670),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 2', 0, 1, 2, 680),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 2', 0, 1, 2, 690),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 2', 0, 1, 2, 700),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 2', 0, 1, 2, 710),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 2', 0, 1, 2, 720),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 2', 0, 1, 2, 730),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 2', 0, 1, 2, 740),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 2', 0, 1, 2, 750),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 2', 0, 1, 2, 760),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 2', 0, 1, 2, 770),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 2', 0, 1, 2, 780),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 2', 0, 1, 2, 790),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 3', 0, 1, 3, 800),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 3', 0, 1, 3, 810),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 3', 0, 1, 3, 820),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 3', 0, 1, 3, 830),
-INSERT INTO 'programCards' ('type', 'turn', 'direction', 'magnitude', 'priority') VALUES ('Move 3', 0, 1, 3, 840);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('U-Turn', 180, 0, 0, 10);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('U-Turn', 180, 0, 0, 20);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('U-Turn', 180, 0, 0, 30);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('U-Turn', 180, 0, 0, 40);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('U-Turn', 180, 0, 0, 50);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('U-Turn', 180, 0, 0, 60);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 70);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 90);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 110);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 130);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 150);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 170);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 190);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 210);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 230);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 250);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 270);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 290);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 310);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 330);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 350);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 370);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 390);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Left', -90, 0, 0, 410);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 80);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 100);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 120);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 140);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 160);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 180);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 200);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 220);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 240);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 260);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 280);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 300);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 320);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 340);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 360);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 380);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 400);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Rotate Right', 90, 0, 0, 420);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Back Up', 0, -1, 1, 430);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Back Up', 0, -1, 1, 440);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Back Up', 0, -1, 1, 450);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Back Up', 0, -1, 1, 460);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Back Up', 0, -1, 1, 470);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Back Up', 0, -1, 1, 480);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 490);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 500);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 510);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 520);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 530);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 540);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 550);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 560);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 570);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 580);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 590);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 600);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 610);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 620);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 630);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 640);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 650);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 1', 0, 1, 1, 660);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 2', 0, 1, 2, 670);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 2', 0, 1, 2, 680);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 2', 0, 1, 2, 690);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 2', 0, 1, 2, 700);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 2', 0, 1, 2, 710);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 2', 0, 1, 2, 720);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 2', 0, 1, 2, 730);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 2', 0, 1, 2, 740);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 2', 0, 1, 2, 750);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 2', 0, 1, 2, 760);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 2', 0, 1, 2, 770);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 2', 0, 1, 2, 780);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 2', 0, 1, 2, 790);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 3', 0, 1, 3, 800);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 3', 0, 1, 3, 810);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 3', 0, 1, 3, 820);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 3', 0, 1, 3, 830);
+INSERT INTO programCards (type, turn, direction, magnitude, priority) VALUES ('Move 3', 0, 1, 3, 840);
