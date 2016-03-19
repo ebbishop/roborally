@@ -10,10 +10,6 @@ var DATABASE_URI = require(path.join(__dirname, '../env')).DATABASE_URI;
 var mongoose = require('mongoose');
 var db = mongoose.connect(DATABASE_URI).connection;
 
-// var roboDB = new Sequelize('postgres://postgres:1234@localhost:5432/robodb');
-
-
-
 
 // Require our models -- these should register the model into mongoose
 // so the rest of the application can simply call mongoose.model('User')
@@ -31,12 +27,4 @@ startDbPromise.then(function () {
     console.log(chalk.green('MongoDB connection opened!'));
 });
 
-module.exports = startDbPromise
-
-// module.exports = roboDB.authenticate()
-// .then(function(){
-//   console.log(chalk.green('we are connecting to postgres!'));
-// })
-// .catch(function(err){
-//   console.error(chalk.magenta('we have a problem connecting to postgres:', err.message));
-// });
+module.exports = startDbPromise;
