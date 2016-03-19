@@ -1,6 +1,6 @@
 ##Using a postgres database in the command line
 
-Switch to user 'postgres': (probably created for you by default)
+Switch to user 'postgres': (probably created for you by default when you install postgres)
 `su posgres`
 
 Start posgres process: (on emma's ubuntu machine - your path may vary):
@@ -27,5 +27,9 @@ Select all rows from a table:
 Exit postgres:
 `\q`
 
-to insert data from a file:
+Insert seed data from a file:
+`cd` into the directory where the `.sql` file is stored. Then run:
+`psql -U <username - probably postgres> -d <dbname> -a -f <filename>`
+
+example:
 `psql -U postgres -d robodb -a -f robo.sql`
