@@ -22,4 +22,4 @@ var schema = new mongoose.Schema({
 });
 
 
-mongoose.model('ConveyorBelt', schema);
+mongoose.model('Conveyor', schema);
