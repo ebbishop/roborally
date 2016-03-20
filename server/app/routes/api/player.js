@@ -46,5 +46,5 @@ router.put('/:playerId/ready', function(req, res, next) {
 	.then(null, next)
 })
 
-
+module.exports = router;
 
