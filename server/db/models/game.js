@@ -3,7 +3,7 @@ var Promise = require('bluebird');
 
 
 var schema = new mongoose.Schema({
-  board: mongoose.Schema.Type.ObejctId,
+  board: {type: mongoose.Schema.Types.ObejctId, ref: 'Board'},
   active: {
     type: Boolean,
     default: true
