@@ -4,6 +4,10 @@ var mongoose = require('mongoose');
 function boardMove (players) {
 
   moveExpressBelts();
+  moveAllBelts();
+  pushPushers();
+  moveGears();
+  fireLasers();
 
 }
 
@@ -20,17 +24,35 @@ function moveExpressBelts (players){  // array of players
     });
   })
   .then(function(players){
-    // send locations of all players?
+    // send new locations
+    // check new locations
+    // perform actions based on new locations
   })
 }
 
 
 
-function moveAllBelts (){
+function moveAllBelts (players){ //array of players
+  return Promise.map(players, function (player){
+    var me = player;
+    return player.findMyTile()
+    .then(function (tile){
+      if (tile.conveyor){
+        var newLocation = getNewLocation(me, direction, 1)
+        player.set('location', newLocation);
+        return player.save()
+      }
+    });
+  })
+  .then(function(players){
+    // send new locations
+    // check new locations
+    // perform actions based on new locations
+  })
 
 }
 
-function pushersPush () {
+function pushPushers () {
 
 }
 
@@ -52,6 +74,10 @@ function getNewLocation (player, direction, magnitude){
   } else if (direction === 'W') {
     return [player.location[0], player.location[1] - magnitude];
   }
+}
+
+function turnConveyorCorner () {
+  // rotates a player landing on a conveyorCorner
 }
 
 function checkNewLocation (){
