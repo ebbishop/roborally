@@ -13,7 +13,7 @@ var playerSchema = new mongoose.Schema({
   name: String,
   robot: robotSchema,
   dock: Number, //starting postion
-  position: [Number], //x & y location
+  position: [Number], //row & col location
   livesRemaining: Number,
   damage: Number,
   hand: [mongoose.Schema.Type.ObjectId], //array of up to 9 cards not sure if this should be in the db or not
@@ -24,6 +24,23 @@ var playerSchema = new mongoose.Schema({
   active: {type: Boolean, default: false}, //false if powered down
   ready: {type: Boolean, default: false}
 });
+
+
+playerSchema.methods.findMyTile = function(){
+  var player = this;
+  return mongoose.model('Game').findById(player.game)
+  .then(function(game){
+    return mongoose.model('Board').findById(game.board);
+  })
+  .then(function(board){
+    return board.getTileAt(player.location[0], player.location[1]);
+  })
+  .then(function(tileId){
+    return mongoose.model('Tile').findById(tileId);
+  });
+
+};
+
 
 // updates player's own 'ready' status and checks all others in the same game
 playerSchema.methods.iAmReady = function(register){
