@@ -79,6 +79,7 @@ function seedConveyors () {
 }
 
 function seedTiles(){
+//tiles:
   var tiles = [
   //barefloor
     {edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: null},
@@ -128,7 +129,7 @@ function seedTiles(){
     {edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: 1},
     {edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: 2},
     {edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: 3},
-  ]
+  ];
 }
 
 function seedBoards(){

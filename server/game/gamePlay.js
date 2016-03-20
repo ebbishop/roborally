@@ -19,7 +19,7 @@ function moveExpressBelts (players){  // array of players
       if (tile.conveyor && tile.conveyor.magnitude === 2){
         var newLocation = getNewLocation(me, direction, 1)
         player.set('location', newLocation);
-        return player.save()
+        return player.save() //update players with new locations
       }
     });
   })
@@ -40,7 +40,7 @@ function moveAllBelts (players){ //array of players
       if (tile.conveyor){
         var newLocation = getNewLocation(me, direction, 1)
         player.set('location', newLocation);
-        return player.save()
+        return player.save() //update all players with new locations
       }
     });
   })

@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 
 var robots = ['Zoom Bot', 'Spin Bot', 'Twonky', 'Squash Bot', 'Trundle Bot', 'Hulk x90', 'Hammer Bot', 'Twitch'];
 
+// does this need to be its own schema?
 var robotSchema = new mongoose.Schema({
   name: {type: String, enum: robots, required: true},
   story: {type: String},

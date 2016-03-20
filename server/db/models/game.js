@@ -1,6 +1,9 @@
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
 
+// could a game have flag locations, instead of having to put these on the tile of the board?
+// could we handle the dock locations the same way?
+// or maybe even the entire little add-on boards?
 
 var schema = new mongoose.Schema({
   board: {type: mongoose.Schema.Types.ObejctId, ref: 'Board'},

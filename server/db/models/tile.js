@@ -24,33 +24,27 @@ var tileSchema = new mongoose.Schema({
     edgeN: {
       type: String,
       enum: edges,
-      required: false
     },
     edgeE:{
       type: String,
       enum: edges,
-      required: false
     },
     edgeS:{
       type: String,
       enum: edges,
-      required: false
     },
     edgeW:{
       type: String,
       enum: edges,
-      required: false
     },
     floor:{
       type: String,
       enum: [null, 'pit', 'barefloor', 'gearCW', 'gearCCW', 'wrench1', 'wrench2'],
-      required: false
     },
     conveyor: conveyorSchema,
     flag: {
       type: Number,
       enum: [null, 1,2,3,4,5,6,7,8],
-      required: false
     }
 });
 
@@ -103,7 +97,9 @@ tileSchema.pre('save', function (next){
   next();
 });
 
-// must be unique  THIS NEEDS WORK DOESN'T CURRENTLY FUNCTION
+
+
+// to prevent insanity, each tile must be unique  THIS NEEDS WORK. IT DOESN'T CURRENTLY FUNCTION
 tileSchema.pre('save', function (next) {
   var self = this;
   console.log('looking for tile like this:', self);
