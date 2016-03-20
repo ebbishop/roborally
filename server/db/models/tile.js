@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-var edges = ['wall0', 'wall1', 'wall2', 'wall3', 'push1', 'push2'];
+var edges = [null, 'wall0', 'wall1', 'wall2', 'wall3', 'push1', 'push2'];
 
 var conveyorSchema = new mongoose.Schema({
   type:{
@@ -43,13 +43,13 @@ var tileSchema = new mongoose.Schema({
     },
     floor:{
       type: String,
-      enum: ['pit', 'barefloor', 'gearCW', 'gearCCW', 'wrench1', 'wrench2'],
+      enum: [null, 'pit', 'barefloor', 'gearCW', 'gearCCW', 'wrench1', 'wrench2'],
       required: false
     },
     conveyor: conveyorSchema,
     flag: {
       type: Number,
-      enum: [1,2,3,4,5,6,7,8],
+      enum: [null, 1,2,3,4,5,6,7,8],
       required: false
     }
 });
@@ -59,20 +59,25 @@ mongoose.model('Tile', tileSchema);
 // may have max 3 edges
 tileSchema.pre('save', function (next) {
   var edges = [this.edgeN, this.edgeE, this.edgeS, this.edgeW];
+  // console.log('edges:', edges);
   if(edges.indexOf(null)===-1){
     this.invalidate('edges', 'may not have more than 3 edges');
     next(new Error('may not have more than 3 edges'));
   } else{
+    // console.log('calling next');
     next();
   }
 });
 
 // may not have a floor AND a conveyor belt
 tileSchema.pre('save', function (next) {
+  // console.log('in hook 2');
   if(this.floor !== null && this.conveyor !==null){
     this.invalidate('floor', 'may not have both a floor and conveyor belt');
     next( new Error('tiles may not have both a floor and a conveyor belt'));
   }
+  // console.log('finishing hook2');
+  next();
 });
 
 function hasEdge (edges){
@@ -84,25 +89,57 @@ function hasEdge (edges){
 
 // pits can have no other information on them
 tileSchema.pre('save', function (next){
+  // console.log('in hook3');
   var edges = [this.edgeN, this.edgeE, this.edgeS, this.edgeW];
   if(this.floor === 'pit'){
     if(this.conveyor || this.flag || hasEdge(edges)){
       this.invalidate('floor', 'pits may contain no other information');
       next( new Error('pits may contain no other information'));
     }
+    // console.log('no error in hook3')
+    next();
   }
+  // console.log('no error in hook3')
+  next();
 });
 
-// must be unique
+// must be unique  THIS NEEDS WORK DOESN'T CURRENTLY FUNCTION
 tileSchema.pre('save', function (next) {
   var self = this;
-  this.findOne(this)
-  .then(function(tile){
-    if(tile){
-      self.invalidate('this', 'each tile must be unique');
-      next( new Error('each tile must be unique'));
-    }else{
-      next();
-    }
-  });
+  console.log('looking for tile like this:', self);
+
+  if(self.conveyor){
+    mongoose.model('Tile').find({'edgeN': self.edgeN, 'edgeE': self.edgeE, 'edgeS': self.edgeS, 'edgeW': self.edgeW, 'floor': self.floor,'flag': self.flag})
+    .where({'conveyor': {type: self.conveyor.type, magnitude: self.conveyor.magnitude, destination: self.conveyor.destination}})
+    .then(function(tiles){
+
+      console.log('tiles found:', tiles);
+      if(tiles.length){
+        self.invalidate('this', 'each tile must be unique');
+        next( new Error('each tile must be unique'));
+      }else{
+        console.log('no error in hook4');
+        next();
+      }
+
+    }, next);
+  }else{
+
+    mongoose.model('Tile').find({
+      edgeN: self.edgeN, edgeE: self.edgeE, edgeS: self.edgeS, edgeW: self.edgeW, floor: self.floor,
+      conveyor: null, flag: self.flag})
+    .then(function(tiles){
+
+      console.log('tiles found:', tiles);
+      if(tiles.length){
+        self.invalidate('this', 'each tile must be unique');
+        next( new Error('each tile must be unique'));
+      }else{
+        console.log('no error in hook4 otherway');
+        next();
+      }
+
+    }, next);
+  }
+
 });
