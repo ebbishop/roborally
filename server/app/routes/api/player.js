@@ -9,15 +9,6 @@ var Player = mongoose.model('Player');
 
 //URL: /api/player
 
-router.param('gameId', function(req, res, next, gameId) {
-	Game.findById(gameId)
-	.then(function(game) {
-		req.game = game;
-		next()
-	})
-	.then(null, next)
-})
-
 router.param('playerId', function(req, res, next, playerId) {
 	Player.findById(playerId)
 	.then(function(player) {
