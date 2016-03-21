@@ -23,19 +23,20 @@ router.param('gameId', function(req, res, next, gameId) {
 //front-end note: state.go to the newly created board
 //side note: will we have different courses for each board selection?
 router.post('/', function(req, res, next) {
-	Game.create(req.body)
-	.then(function(newGame) {
-		//start game will full deck of cards
-		//assuming Game schema has a deck key that initially starts with all cards
-		return newGame.initializeGame()
-		.then(function(updatedGame) {
-			//setting the firebase connection
-			//https://resplendent-torch-4322.firebaseio.com/[game id]
-			firebaseHelper.setConnection(updatedGame._id)
-			res.sendStatus(201)
-		})
-	}
-	.then(null, next)
+	// Game.create(req.body)
+	// .then(function(newGame) {
+	// 	//start game will full deck of cards
+	// 	//assuming Game schema has a deck key that initially starts with all cards
+	// 	return newGame.initializeGame()
+	// 	.then(function(updatedGame) {
+	// 		//setting the firebase connection
+	// 		//https://resplendent-torch-4322.firebaseio.com/[game id]
+			// firebaseHelper.setConnection(updatedGame._id).set(updatedGame)
+			firebaseHelper.setConnection('1234').set({name: 'Priti'})
+			res.status(201).send('1234')
+	// 	})
+	// }
+	// .then(null, next)
 })
 
 //player selects robot and THEN clicks 'join game'
