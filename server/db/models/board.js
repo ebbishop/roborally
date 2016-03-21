@@ -7,18 +7,18 @@ var schema = new mongoose.Schema({
     required: true,
     default: 'Board'
   },
-  row00: [mongoose.Schema.Types.ObjectId],
-  row01: [mongoose.Schema.Types.ObjectId],
-  row02: [mongoose.Schema.Types.ObjectId],
-  row03: [mongoose.Schema.Types.ObjectId],
-  row04: [mongoose.Schema.Types.ObjectId],
-  row05: [mongoose.Schema.Types.ObjectId],
-  row06: [mongoose.Schema.Types.ObjectId],
-  row07: [mongoose.Schema.Types.ObjectId],
-  row08: [mongoose.Schema.Types.ObjectId],
-  row09: [mongoose.Schema.Types.ObjectId],
-  row10: [mongoose.Schema.Types.ObjectId],
-  row11: [mongoose.Schema.Types.ObjectId]
+  row00: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  row01: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  row02: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  row03: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  row04: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  row05: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  row06: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  row07: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  row08: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  row09: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  row10: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  row11: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}]
 });
 
 mongoose.model('Board', schema);
