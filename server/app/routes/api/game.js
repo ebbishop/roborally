@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
-var firebaseHelper = require("../../../firebase");
+var firebaseHelper = require("../../../firebase/firebase.js");
 
 var Game = mongoose.model('Game');
 var Player = mongoose.model('Player');
@@ -34,7 +34,7 @@ router.post('/', function(req, res, next) {
 			firebaseHelper.setConnection(updatedGame._id)
 			res.sendStatus(201)
 		})
-	}
+	})
 	.then(null, next)
 })
 
@@ -53,7 +53,7 @@ router.post('/:gameId/player', function(req, res, next) {
 //get game
 router.get('/:gameId', function(req, res) {
 	//send state of this game to all players --> Firebase
-	firebaseHelper.getConnection().update() --> //?
+	// firebaseHelper.getConnection().update() --> //?
 	res.json(req.game)
 })
 
