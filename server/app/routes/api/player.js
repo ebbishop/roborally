@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
-var firebaseHelper = require("../../../firebase");
+var firebaseHelper = require("../../../firebase/firebase.js");
 
 var Game = mongoose.model('Game');
 var Player = mongoose.model('Player');
