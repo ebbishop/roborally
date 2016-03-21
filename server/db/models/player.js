@@ -10,16 +10,16 @@ var robotSchema = new mongoose.Schema({
 });
 
 var playerSchema = new mongoose.Schema({
-  game: {type: mongoose.Schema.Type.ObjectId, ref: 'Game'},
+  game: {type: mongoose.Schema.Types.ObjectId, ref: 'Game'},
   name: String,
   robot: robotSchema,
   dock: Number, //starting postion
   position: [Number], //row & col location
   livesRemaining: Number,
   damage: Number,
-  hand: [mongoose.Schema.Type.ObjectId], //array of up to 9 cards not sure if this should be in the db or not
+  hand: [mongoose.Schema.Types.ObjectId], //array of up to 9 cards not sure if this should be in the db or not
   register: {
-    type: [mongoose.Schema.Type.ObjectId],
+    type: [mongoose.Schema.Types.ObjectId],
     default: [null, null, null, null, null]
   },
   active: {type: Boolean, default: false}, //false if powered down

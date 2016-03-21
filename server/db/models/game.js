@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
+require('./board');
+
 
 // could a game have flag locations, instead of having to put these on the tile of the board?
 // could we handle the dock locations the same way?
@@ -8,8 +10,12 @@ var Promise = require('bluebird');
 // could boards be static things and games have courses?
 // and courses have boards?
 
-var schema = new mongoose.Schema({
-  board: {type: mongoose.Schema.Types.ObejctId, ref: 'Board'},
+
+var gameSchema = new mongoose.Schema({
+  // board: {
+  //   type: mongoose.Schema.Types.ObejctId,
+  //   ref: 'Board'
+  // },
   active: {
     type: Boolean,
     default: true
@@ -18,23 +24,22 @@ var schema = new mongoose.Schema({
     type: String,
     enum: ['decision', 'run'],
   },
-  deck: {default: newDeck}, //don't think this is valid
+  // deck: {default: newDeck}, //don't think this is valid
 });
 
-mongoose.model('Game', schema);
 
-schema.methods.toggleState = function(argument) {
+gameSchema.methods.toggleState = function(argument) {
   // body...
 }
 
-schema.methods.dealCards = function(){
+gameSchema.methods.dealCards = function(){
     // splice cards from this.deck
     // send to players where {game: this._id}
 
 };
 
 //incomplete
-schema.methods.getPlayerCardCt = function(){
+gameSchema.methods.getPlayerCardCt = function(){
   return mongoose.model('Player').find({game: this._id})
   .then(function(players){
     return Promise.map(players, function(player){
@@ -44,7 +49,7 @@ schema.methods.getPlayerCardCt = function(){
 }
 
 // returns promise for true/false
-schema.methods.checkReady = function(){
+gameSchema.methods.checkReady = function(){
   return this.getPlayers()
   .then(function(players){
     var ready = players.map(function(player){
@@ -143,7 +148,9 @@ var newDeck = [
   ];
 
 
-schema.methods.initializeGame = function(){
+gameSchema.methods.initializeGame = function(){
   // may make more sense to make this in a separate module
   return this.update({deck: newDeck}).save()
 }
+
+mongoose.model('Game', gameSchema);
