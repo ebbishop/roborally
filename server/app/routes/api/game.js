@@ -53,7 +53,7 @@ router.post('/:gameId/player', function(req, res, next) {
 //get game
 router.get('/:gameId', function(req, res) {
 	//send state of this game to all players --> Firebase
-	firebaseHelper.getConnection().update() --> //?
+	firebaseHelper.getConnection().set(req.game) --> //?
 	res.json(req.game)
 })
 
