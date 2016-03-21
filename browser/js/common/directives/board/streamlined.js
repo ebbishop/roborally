@@ -1,7 +1,9 @@
-var stage = new PIXI.Stage(0x66ff99);
-var renderer = new PIXI.CanvasRenderer(480,480);
+window.start = function(){
+  document.getElementById("board").appendChild(renderer.view);
+}
 
-document.body.appendChild(renderer.view);
+var stage = new PIXI.Stage(0x66ff99);
+var renderer = new PIXI.CanvasRenderer(450,450);
 
 //all image files are 150px. Do not change this number!
 var imgSizeActual = 150 
@@ -12,36 +14,36 @@ var imgScale = 4
 var imgSize = imgSizeActual/imgScale
 
 var tileImg = {
-"0": {"image":"repair.jpg"},
-"1": {"image":"option.jpg"},
-"2": {"image":"empty.jpg"},
-"3": {"image":"void.jpg"},
-"4": {"image":"roller-express-wn.jpg"},
-"5": {"image":"roller-express-south.jpg"},
-"6": {"image":"roller-express-es.jpg"},
-"7": {"image":"roller-express-sw.jpg"},
-"8": {"image":"roller-express-se.jpg"},
-"9": {"image":"roller-express-west.jpg"},
-"10": {"image":"roller-express-north.jpg"},
-"11": {"image":"roller-express-east.jpg"},
-"12": {"image":"roller-east.png"},
-"13": {"image":"roller-west.png"},
-"18": {"image":"spinner-clockwise.jpg"},
-"19": {"image":"spinner-counterclockwise.jpg"}
+"0": {"image":"/img/repair.jpg"},
+"1": {"image":"/img/option.jpg"},
+"2": {"image":"/img/empty.jpg"},
+"3": {"image":"/img/void.jpg"},
+"4": {"image":"/img/roller-express-wn.jpg"},
+"5": {"image":"/img/roller-express-south.jpg"},
+"6": {"image":"/img/roller-express-es.jpg"},
+"7": {"image":"/img/roller-express-sw.jpg"},
+"8": {"image":"/img/roller-express-se.jpg"},
+"9": {"image":"/img/roller-express-west.jpg"},
+"10": {"image":"/img/roller-express-north.jpg"},
+"11": {"image":"/img/roller-express-east.jpg"},
+"12": {"image":"/img/roller-east.png"},
+"13": {"image":"/img/roller-west.png"},
+"18": {"image":"/img/spinner-clockwise.jpg"},
+"19": {"image":"/img/spinner-counterclockwise.jpg"}
 };
 
 var walls = {
-  "noLaser": "wall.png",
+  "noLaser": "/img/wall.png",
 
   //images related to lasers that are on the north or east walls
-  "oneLaserNE": "laser-single-NE.png",
-  "twoLasersNE": "laser-double-NE.png",
-  "threeLasersNE": "laser-triple-NE.png",
+  "oneLaserNE": "/img/laser-single-NE.png",
+  "twoLasersNE": "/img/laser-double-NE.png",
+  "threeLasersNE": "/img/laser-triple-NE.png",
 
   //images related to lasers that are on the south or west walls,
-  "oneLaserSW": "laser-single-SW.png",
-  "twoLasersSW": "laser-double-SW.png",
-  "threeLasersSW": "laser-triple-SW.png",
+  "oneLaserSW": "/img/laser-single-SW.png",
+  "twoLasersSW": "/img/laser-double-SW.png",
+  "threeLasersSW": "/img/laser-triple-SW.png",
 
   map: [
   //row, col, direction, number of lasers
@@ -111,6 +113,7 @@ function buildMap(){
   buildTiles();
   buildWalls();
   drawLasers();
+  drawPlayers(players, players1stMove);
 }
 
 function buildTiles() {
@@ -200,4 +203,120 @@ function init(){
 }
 
 
+
+
+// var gameState = play;
+
+var robotImgs = {
+  //robot name: robot image path
+  "green": "/img/robots/robot_0.png",
+  "blue": "/img/robots/robot_1.png",
+  "yellow": "/img/robots/robot_2.png",
+  getRobotImg: function(robotName) {
+    return robotImgs[robotName]
+  }
+}
+
+var player1, player2, player3;
+//seed for original location
+var players = [
+  { player: "player1", location: [0,11], bearing: [-1, 0], robot: "green", priorityVal: null },
+  { player: "player2", location: [2,11], bearing: [-1, 0], robot: "blue", priorityVal: null },
+  { player: "player3", location: [4,11], bearing: [-1, 0], robot: "yellow", priorityVal: null },
+]
+
+//seed for second location
+var players1stMove = [
+  { player: "player1", location: [0,9], bearing: [-1, 0], robot: "green", priorityVal: 500 },
+  { player: "player2", location: [2,7], bearing: [1, 0], robot: "blue", priorityVal: 200 },
+  { player: "player3", location: [4,8], bearing: [0, 1], robot: "yellow", priorityVal: 800 },
+]
+
+function sortIntialDestination(initial, sortedDestination) {
+  var sortedInitial = [];
+
+  for(var i = 0; i < sortedDestination.length; i++) {
+    for(var j = 0; j < initial.length; j++) {
+      if(initial[j].robot === sortedDestination[i].robot) {
+        sortedInitial.push(initial[j])
+      }
+    }
+  }
+  return sortedInitial;
+}
+
+function drawPlayers(initial, destination) {
+  var sortedDestination = sortPlayersByPriority(destination);
+  console.log(sortedDestination)
+
+  var sortedInitial = sortIntialDestination(initial, sortedDestination);
+  console.log('sorted initial in the drawplayers fnc', sortedInitial)
+  sortedInitial.forEach(function(player, idx){
+
+    setTimeout(doSomething.bind(null, player), idx*2000);
+
+
+      function doSomething() {
+        
+        var robotImg = robotImgs.getRobotImg(player.robot);
+        var robot = new PIXI.Sprite(PIXI.Texture.fromImage(robotImg));
+        robot.position.x = imgSize*player.location[0];
+        robot.position.y = imgSize*player.location[1];
+        robot.scale.set(1/imgScale, 1/imgScale);
+
+        stage.addChild(robot);
+
+        movePlayer()
+
+        function movePlayer() {
+          if(robot.position.y >= imgSize*sortedDestination[idx].location[1]) {
+            requestAnimationFrame(movePlayer);
+            robot.position.y -= 1;
+            renderer.render(stage);
+          } 
+        }
+      }
+
+  })
+    // movePlayer();
+}
+// function drawPlayers(intial, destination) {
+//   players.forEach(function(player){
+    
+//   })
+// }
+
+
+function sortPlayersByPriority (arrOfPlayerObjects) {
+  return arrOfPlayerObjects.sort(function(a,b) {
+    return b.priorityVal - a.priorityVal
+  })
+}
+
 buildMap();
+
+
+
+// function drawPlayers(initial, destination) {
+//   initial.forEach(function(player, idx){
+//     var robotImg = robotImgs.getRobotImg(player.robot);
+//     var robot = new PIXI.Sprite(PIXI.Texture.fromImage(robotImg));
+//     robot.position.x = imgSize*player.location[0];
+//     robot.position.y = imgSize*player.location[1];
+//     robot.scale.set(1/imgScale, 1/imgScale);
+
+//     stage.addChild(robot);
+
+//     movePlayer()
+
+//     function movePlayer() {
+//       if(robot.position.y >= imgSize*destination[idx].location[1]) {
+//         requestAnimationFrame(movePlayer);
+//         robot.position.y -= 1;
+//         renderer.render(stage);
+//       }
+//     }
+//   })
+
+//     // movePlayer();
+// }
