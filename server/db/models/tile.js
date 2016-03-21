@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 var edges = [null, 'wall0', 'wall1', 'wall2', 'wall3', 'push1', 'push2'];
 
 var conveyorSchema = new mongoose.Schema({
+  name: { type: String, unique: true},
   type:{
     type: String,
     enum: ['straight', 'clockwise', 'counterclock', 'merge1CCW', 'merge1CW', 'merge2'],
@@ -53,24 +54,20 @@ mongoose.model('Tile', tileSchema);
 // may have max 3 edges
 tileSchema.pre('save', function (next) {
   var edges = [this.edgeN, this.edgeE, this.edgeS, this.edgeW];
-  // console.log('edges:', edges);
   if(edges.indexOf(null)===-1){
     this.invalidate('edges', 'may not have more than 3 edges');
     next(new Error('may not have more than 3 edges'));
   } else{
-    // console.log('calling next');
     next();
   }
 });
 
 // may not have a floor AND a conveyor belt
 tileSchema.pre('save', function (next) {
-  // console.log('in hook 2');
   if(this.floor !== null && this.conveyor !==null){
     this.invalidate('floor', 'may not have both a floor and conveyor belt');
     next( new Error('tiles may not have both a floor and a conveyor belt'));
   }
-  // console.log('finishing hook2');
   next();
 });
 
@@ -83,23 +80,20 @@ function hasEdge (edges){
 
 // pits can have no other information on them
 tileSchema.pre('save', function (next){
-  // console.log('in hook3');
   var edges = [this.edgeN, this.edgeE, this.edgeS, this.edgeW];
   if(this.floor === 'pit'){
     if(this.conveyor || this.flag || hasEdge(edges)){
       this.invalidate('floor', 'pits may contain no other information');
       next( new Error('pits may contain no other information'));
     }
-    // console.log('no error in hook3')
     next();
   }
-  // console.log('no error in hook3')
   next();
 });
 
 
 
-// to prevent insanity, each tile must be unique  THIS NEEDS WORK. IT DOESN'T CURRENTLY FUNCTION
+// to prevent insanity, each tile must be unique  THIS DOESN'T CURRENTLY FUNCTION
 tileSchema.pre('save', function (next) {
   var self = this;
   console.log('looking for tile like this:', self);

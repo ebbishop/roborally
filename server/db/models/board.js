@@ -2,7 +2,9 @@ var mongoose = require('mongoose');
 
 // for now, let's organize  boards by column because all possibilities
 // are only 12 wide, may be a variable height depending on the course
-// ***this ignores the crazy courses at the expert levels. how can we make it endlessly flexible? ***
+
+// ***this ignores the crazy courses at the expert levels.
+// maybe we don't want to make it endlessly flexible? ***
 
 var schema = new mongoose.Schema({
   name: {

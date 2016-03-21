@@ -5,6 +5,9 @@ var Promise = require('bluebird');
 // could we handle the dock locations the same way?
 // or maybe even the entire little add-on boards?
 
+// could boards be static things and games have courses?
+// and courses have boards?
+
 var schema = new mongoose.Schema({
   board: {type: mongoose.Schema.Types.ObejctId, ref: 'Board'},
   active: {

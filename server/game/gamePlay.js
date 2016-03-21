@@ -1,13 +1,38 @@
 var Promise = require('bluebird');
 var mongoose = require('mongoose');
 
+
+
+function moveEvent (startCondition) {
+  this.startCondition = startCondition;
+}
+
+
+moveEvent.prototype.setEndCondition = function(uniqueMoveFunction) {
+
+};
+
+
+
+
+
+
+
+
+
+/***********************************************************************************/
 function boardMove (players) {
+  var startLocations =
 
   moveExpressBelts();
   moveAllBelts();
   pushPushers();
   moveGears();
   fireLasers();
+
+}
+
+function sendMoveEvent (){
 
 }
 
@@ -60,7 +85,7 @@ function moveGears (){
 
 }
 
-function fireLasers(){
+function fireLasers (){
 
 }
 
