@@ -1,42 +1,31 @@
 var Promise = require('bluebird');
 var mongoose = require('mongoose');
 
+var game = {};
+var player = {};
 
-
-function moveEvent (startCondition) {
-  this.startCondition = startCondition;
-}
-
-
-moveEvent.prototype.setEndCondition = function(uniqueMoveFunction) {
+game.playCard = function (i){
 
 };
 
 
 
+game.boardMove = function (players) {
 
-
-
-
-
-
-/***********************************************************************************/
-function boardMove (players) {
-  var startLocations =
-
+  playCards(); //one register in order of priority
   moveExpressBelts();
   moveAllBelts();
   pushPushers();
   moveGears();
   fireLasers();
 
-}
+};
 
-function sendMoveEvent (){
+game.sendMoveEvent = function (){
 
-}
+};
 
-function moveExpressBelts (players){  // array of players
+game.moveExpressBelts = function(players){  // array of players
   return Promise.map(players, function (player){
     var me = player;
     return player.findMyTile()
@@ -53,11 +42,12 @@ function moveExpressBelts (players){  // array of players
     // check new locations
     // perform actions based on new locations
   })
+  // call move all
 }
 
 
 
-function moveAllBelts (players){ //array of players
+game.moveAllBelts = function (players){ //array of players
   return Promise.map(players, function (player){
     var me = player;
     return player.findMyTile()
@@ -75,21 +65,28 @@ function moveAllBelts (players){ //array of players
     // perform actions based on new locations
   })
 
-}
-
-function pushPushers () {
 
 }
 
-function moveGears (){
+game.pushPushers = function () {
+// do require check after moving - pit or other robot in the way?
+}
+
+game.moveGears = function (){
+// require no check after moving
+}
+
+game.fireLasers = function (){
+// find each laser on the board
+// find direction of laser
+// travel in direction of laser and either continue or apply damage
+}
+
+game.applyDamage = function (){
 
 }
 
-function fireLasers (){
-
-}
-
-function getNewLocation (player, direction, magnitude){
+game.getNewLocation = function (player, direction, magnitude){
   if (direction === 'N'){
     return [player.location[0] - magnitude, player.location[1]];
   } else if (direction === 'E') {
@@ -101,10 +98,12 @@ function getNewLocation (player, direction, magnitude){
   }
 }
 
-function turnConveyorCorner () {
+game.turnConveyorCorner = function () {
   // rotates a player landing on a conveyorCorner
 }
 
-function checkNewLocation (){
+player.checkNewLocation = function (){
 
 }
+
+module.exports = game;

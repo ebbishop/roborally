@@ -11,7 +11,7 @@ require('../../../server/db/models');
 
 var Tile = mongoose.model('Tile');
 
-describe('Tile model', function () {
+xdescribe('Tile model', function () {
 
   beforeEach('Establish DB connection', function (done) {
       if (mongoose.connection.db) return done();
