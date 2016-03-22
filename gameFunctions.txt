@@ -1,0 +1,40 @@
+player
+  rotate()
+  cardMove()
+  boardMove()
+  checkMove()
+  playCard()
+
+  setCompass()
+  touchFlag()
+
+  applyDamage()
+  loseLife()
+
+  killPlayer()
+
+  checkForPit()
+  checkForCorner()
+
+card
+  clearRegister()
+  dealCards()
+  shuffleDeck()
+  updateHand()
+  setRegister()
+
+game
+
+  runHand()
+    +runOneRegister()
+    -runBoard()
+    +runBelt()
+    -fireLasers()
+      +fireOneLaser()
+    -checkRegisterReady()
+    -runPushers()
+    -runGears()
+    -activateRepair()
+  +getPlayers()
+
+  checkWon()

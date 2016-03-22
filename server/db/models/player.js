@@ -20,6 +20,7 @@ var playerSchema = new mongoose.Schema({
   dock: Number, //starting postion
 
   position: [Number], //row & col location
+  compassDirection: String, // N E S W
   bearing: {
     type: [Number],
     default: [-1,0]

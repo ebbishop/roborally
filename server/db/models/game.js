@@ -83,6 +83,13 @@ gameSchema.methods.runBelts = function(type){ //type is 1 or 2. 1 = all
   });
 };
 
+gameSchema.methods.findLasers = function (){
+  this.getPlayers().bind(this)
+  .then(function(p){
+
+  })
+}
+
 gameSchema.methods.fireOneLaser = function(laser){
   // laser has qty, bearing, direction (string), start properties
   var currLoc = laser.start;
