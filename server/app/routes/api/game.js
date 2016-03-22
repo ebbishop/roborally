@@ -50,7 +50,9 @@ router.post('/:gameId/player', function(req, res, next) {
 	var gameId = req.params.gameId
 	Player.create(req.body)
 	.then(function(newPlayer) {
-		return newPlayer.set({game: gameId}).save()
+		newPlayer.set({'game': gameId})
+		newPlayer.save()
+		return newPlayer
 	})
 	.then(function(newPlayer) {
 		//sending player info to frontend so we can use it's ID to retrieve data from firebase
