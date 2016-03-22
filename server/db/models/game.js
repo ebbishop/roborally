@@ -1,7 +1,10 @@
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
+var firebaseHelper = require('../../firebase/firebase');
 require('./board');
+require('./player');
 
+var Player = mongoose.model('Player');
 
 // could a game have flag locations, instead of having to put these on the tile of the board?
 // could we handle the dock locations the same way?
@@ -12,6 +15,7 @@ require('./board');
 
 
 var gameSchema = new mongoose.Schema({
+  name: String,
   board: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Board'
@@ -33,210 +37,168 @@ var gameSchema = new mongoose.Schema({
   discard: [Number],
 });
 
+gameSchema.set('versionKey',false );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// does not take into account interactions between players on one turn
-gameSchema.methods.runOneCard = function (){
-  //this is the current register we are interested in
+gameSchema.methods.runOneRegister = function () {
   var currentCard = this.currentCard;
-
-  //get all players for this game
   return this.getPlayers()
   .then(function(players){
-    // sort players by card number
     return players.sort(function(p1, p2){
-      if(p1.register[currentCard] < p2.register[currentCard]) return -1;
+      if (p1.card[currentCard] > p2.card[currentCard]) return -1;
       return 1;
     });
-    return players;
   })
   .then(function(players){
-    return Promise.map(players, function(player){
-
-    })
-  })
+    players.forEach(function(player){
+      player.playCard(currentCard);
+    });
+  });
+  this.currentCard ++;
 };
 
 gameSchema.methods.getPlayers = function (){
-  return mongoose.model('Player').find({game: this._id});
-}
-
-gameSchema.methods.shuffleCards = function (){
-
-}
-
-gameSchema.methods.sendPlayers = function (){
-  this.getPlayers()
+  var self = this;
+  return Player.find({game: self._id})
   .then(function(players){
-    // send to firebase
+    return players;
   })
+  .then(null, function(err){
+    console.error(err);
+  });
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-gameSchema.methods.toggleState = function(argument) {
-  // body...
-};
-
-gameSchema.methods.dealCards = function(){
-    // splice cards from this.deck
-    // send to players where {game: this._id}
-
-};
-
-//incomplete
-gameSchema.methods.getPlayerCardCt = function(){
-  return mongoose.model('Player').find({game: this._id})
+gameSchema.methods.runBelts = function(type){ //type is 1 or 2. 1 = all
+  var playPosition, board, tile;
+  return Board.findById(board)
+  .then(function(b){
+    var board = b;
+    return b;
+  })
+  .then(function(){
+    return this.getPlayers()
+  })
   .then(function(players){
     return Promise.map(players, function(player){
-      return 9 - player.damage;
+      playPosition = player.position;
+      tile = board['col' + playPosition[0].toString()][playPosition[1]];
+      if(tile.conveyor[0].magnitude >= type){
+        player.moveOnBelt(tile.conveyor.bearing);
+      }
+      // check new location and perform necessary actions
     });
   });
 };
-
-// returns promise for true/false
-gameSchema.methods.checkReady = function(){
-  return this.getPlayers()
-  .then(function(players){
-    var ready = players.map(function(player){
-      return player.ready;
-    });
-    if (ready.indexOf(false)>-1) return false
-    return true;
-  });
-};
-
-var cardNums = [10,20,30,40,50,60,70,90,110,130,150,170,190,210,230,250,270,290,310,330,350,370,390,410,80,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380,400,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730,740,750,760,770,780,790,800,810,820,830,840];
-
-var newDeck = [
-    {name: 'U-Turn', rotation: 180, forward: 0, magnitude: 0, priority: 10},
-    {name: 'U-Turn', rotation: 180, forward: 0, magnitude: 0, priority: 20},
-    {name: 'U-Turn', rotation: 180, forward: 0, magnitude: 0, priority: 30},
-    {name: 'U-Turn', rotation: 180, forward: 0, magnitude: 0, priority: 40},
-    {name: 'U-Turn', rotation: 180, forward: 0, magnitude: 0, priority: 50},
-    {name: 'U-Turn', rotation: 180, forward: 0, magnitude: 0, priority: 60},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 70},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 90},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 110},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 130},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 150},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 170},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 190},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 210},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 230},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 250},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 270},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 290},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 310},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 330},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 350},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 370},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 390},
-    {name: 'Rotate Left', rotation: -90, forward: 0, magnitude: 0, priority: 410},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 80},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 100},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 120},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 140},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 160},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 180},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 200},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 220},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 240},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 260},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 280},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 300},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 320},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 340},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 360},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 380},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 400},
-    {name: 'Rotate Right', rotation: 90, forward: 0, magnitude: 0, priority: 420},
-    {name: 'Back Up', rotation: 0, forward: 1, magnitude: 1, priority: 430},
-    {name: 'Back Up', rotation: 0, forward: 1, magnitude: 1,priority: 440},
-    {name: 'Back Up', rotation: 0, forward: 1, magnitude: 1,priority: 450},
-    {name: 'Back Up', rotation: 0, forward: 1, magnitude: 1,priority: 460},
-    {name: 'Back Up', rotation: 0, forward: 1, magnitude: 1,priority: 470},
-    {name: 'Back Up', rotation: 0, forward: 1, magnitude: 1,priority: 480},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 490},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 500},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 510},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 520},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 530},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 540},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 550},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 560},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 570},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 580},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 590},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 600},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 610},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 620},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 630},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 640},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 650},
-    {name: 'Move 1', rotation: 0, forward: 1, magnitude: 1, priority: 660},
-    {name: 'Move 2', rotation: 0, forward: 1, magnitude: 2, priority: 670},
-    {name: 'Move 2', rotation: 0, forward: 1, magnitude: 2, priority: 680},
-    {name: 'Move 2', rotation: 0, forward: 1, magnitude: 2, priority: 690},
-    {name: 'Move 2', rotation: 0, forward: 1, magnitude: 2, priority: 700},
-    {name: 'Move 2', rotation: 0, forward: 1, magnitude: 2, priority: 710},
-    {name: 'Move 2', rotation: 0, forward: 1, magnitude: 2, priority: 720},
-    {name: 'Move 2', rotation: 0, forward: 1, magnitude: 2, priority: 730},
-    {name: 'Move 2', rotation: 0, forward: 1, magnitude: 2, priority: 740},
-    {name: 'Move 2', rotation: 0, forward: 1, magnitude: 2, priority: 750},
-    {name: 'Move 2', rotation: 0, forward: 1, magnitude: 2, priority: 760},
-    {name: 'Move 2', rotation: 0, forward: 1, magnitude: 2, priority: 770},
-    {name: 'Move 2', rotation: 0, forward: 1, magnitude: 2, priority: 780},
-    {name: 'Move 2', rotation: 0, forward: 1, magnitude: 2, priority: 790},
-    {name: 'Move 3', rotation: 0, forward: 1, magnitude: 3, priority: 800},
-    {name: 'Move 3', rotation: 0, forward: 1, magnitude: 3, priority: 810},
-    {name: 'Move 3', rotation: 0, forward: 1, magnitude: 3, priority: 820},
-    {name: 'Move 3', rotation: 0, forward: 1, magnitude: 3, priority: 830},
-    {name: 'Move 3', rotation: 0, forward: 1, magnitude: 3, priority: 840},
-  ];
-
 
 gameSchema.methods.initializeGame = function(){
-  // may make more sense to make this in a separate module
-  return this.update({deck: newDeck}).save()
+
 };
 
 mongoose.model('Game', gameSchema);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // does not take into account interactions between players on one turn
+// gameSchema.methods.runOneCard = function (){
+//   //this is the current register we are interested in
+//   var currentCard = this.currentCard;
+
+//   //get all players for this game
+//   return this.getPlayers()
+//   .then(function(players){
+//     // sort players by card number
+//     return players.sort(function(p1, p2){
+//       if(p1.register[currentCard] < p2.register[currentCard]) return -1;
+//       return 1;
+//     });
+//     return players;
+//   })
+//   .then(function(players){
+//     return Promise.map(players, function(player){
+
+//     })
+//   })
+// };
+
+
+
+// gameSchema.methods.shuffleCards = function (){
+
+// }
+
+// gameSchema.methods.sendPlayers = function (){
+//   this.getPlayers()
+//   .then(function(players){
+//     // send to firebase
+//   })
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// gameSchema.methods.toggleState = function(argument) {
+//   // body...
+// };
+
+// gameSchema.methods.dealCards = function(){
+//     // splice cards from this.deck
+//     // send to players where {game: this._id}
+
+// };
+
+// //incomplete
+// gameSchema.methods.getPlayerCardCt = function(){
+//   return mongoose.model('Player').find({game: this._id})
+//   .then(function(players){
+//     return Promise.map(players, function(player){
+//       return 9 - player.damage;
+//     });
+//   });
+// };
+
+// // returns promise for true/false
+// gameSchema.methods.checkReady = function(){
+//   return this.getPlayers()
+//   .then(function(players){
+//     var ready = players.map(function(player){
+//       return player.ready;
+//     });
+//     if (ready.indexOf(false)>-1) return false
+//     return true;
+//   });
+// };
+
+// var cardNums = [10,20,30,40,50,60,70,90,110,130,150,170,190,210,230,250,270,290,310,330,350,370,390,410,80,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380,400,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730,740,750,760,770,780,790,800,810,820,830,840];
+// gameSchema.methods.initializeGame = function(){
+//   // may make more sense to make this in a separate module
+//   return this.update({deck: newDeck}).save()
+// };
+
+// mongoose.model('Game', gameSchema);

@@ -14,10 +14,8 @@ var conveyorSchema = new mongoose.Schema({
     enum: [1,2],
     required: true
   },
-  destination:{ //describes orientation
-    type: String,
-    enum: ['N', 'E', 'S', 'W'],
-    required: true
+  bearing:{ //describes orientation
+    type: [Number]
   }
 });
 
@@ -42,7 +40,7 @@ var tileSchema = new mongoose.Schema({
       type: String,
       enum: [null, 'pit', 'barefloor', 'gearCW', 'gearCCW', 'wrench1', 'wrench2'],
     },
-    conveyor: conveyorSchema,
+    conveyor: [conveyorSchema],
     flag: {
       type: Number,
       enum: [null, 1,2,3,4,5,6,7,8],

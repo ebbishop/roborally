@@ -13,7 +13,7 @@ var User = mongoose.model('User');
 xdescribe('User model', function () {
 
     beforeEach('Establish DB connection', function (done) {
-        if (mongoose.connection.db) return done();
+        if (mongoose.connection.db) {console.log('db open');return done();}
         mongoose.connect(dbURI, done);
     });
 

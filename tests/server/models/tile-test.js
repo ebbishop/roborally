@@ -26,7 +26,7 @@ xdescribe('Tile model', function () {
       expect(Tile).to.be.a('function');
   });
 
-  describe('Adds tiles', function(){
+  xdescribe('Adds tiles', function(){
     var tile1 = {
       edgeN: 'wall0',
       edgeE: null,
