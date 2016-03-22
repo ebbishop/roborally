@@ -14,7 +14,7 @@ var robotSchema = new mongoose.Schema({
 var playerSchema = new mongoose.Schema({
   game: {type: mongoose.Schema.Types.ObjectId, ref: 'Game'},
   name: String,
-  // robot: robotSchema,
+  robot: [robotSchema],
 
 
   dock: Number, //starting postion
@@ -34,13 +34,14 @@ var playerSchema = new mongoose.Schema({
   active: {type: Boolean, default: false}, //false if powered down
   ready: {type: Boolean, default: false}
 });
+
 playerSchema.set('versionKey', false);
 
 playerSchema.methods.playCard = function(i){
   var cardNum = this.register[i];
   var card = programCards[(cardNum/10)-1];
   this.rotate(card.rotation);
-  this.move(card.magnitude);
+  this.cardMove(card.magnitude);
   // send new loc & bearing
   var gameFB = firebaseHelper.getConnection(this.game);
   gameFB.child('public').child(this._id).child('loc').set(this.position);
@@ -60,41 +61,34 @@ playerSchema.methods.rotate = function (rotation){
   this.set('bearing', [y, x]);
 };
 
-playerSchema.methods.move = function (magnitude) {
-  var newCol = this.position[0];
-  var newRow = this.position[1];
+playerSchema.methods.cardMove = function (magnitude) {
+  // call when player has made decison & self.bearing is relevant
+  var newCol = this.position[1];
+  var newRow = this.position[0];
   while(magnitude > 0){
+    newCol += this.bearing[1];
+    newRow += this.bearing[0];
     // check that move is permitted
-    newCol += this.bearing[0];
-    newRow += this.bearing[1];
+    // if move is permitted, try the next one
+    // else apply
     magnitude --;
   }
   this.set('position', [newCol, newRow]);
 };
 
-playerSchema.methods.moveOnBelt = function (bearing) {
+playerSchema.methods.boardMove = function (bearing) {
+  // call when self.bearing is not relevant
   var newCol = this.position[0];
   var newRow = this.position[1];
-  // check if move is possible
   newCol += bearing[0];
   newRow += bearing[1];
+  // check if move is possible
   this.set('position', [newCol, newRow]);
-}
+};
 
-// playerSchema.methods.findMyTile = function(){
-//   var player = this;
-//   return mongoose.model('Game').findById(player.game)
-//   .then(function(game){
-//     return mongoose.model('Board').findById(game.board);
-//   })
-//   .then(function(board){
-//     return board.getTileAt(player.location[0], player.location[1]);
-//   })
-//   .then(function(tileId){
-//     return mongoose.model('Tile').findById(tileId);
-//   });
-
-// };
+playerSchema.methods.checkMove = function (){
+// return true/false
+};
 
 
 mongoose.model('Player', playerSchema);
@@ -121,6 +115,20 @@ mongoose.model('Player', playerSchema);
 
 
 
+// playerSchema.methods.findMyTile = function(){
+//   var player = this;
+//   return mongoose.model('Game').findById(player.game)
+//   .then(function(game){
+//     return mongoose.model('Board').findById(game.board);
+//   })
+//   .then(function(board){
+//     return board.getTileAt(player.location[0], player.location[1]);
+//   })
+//   .then(function(tileId){
+//     return mongoose.model('Tile').findById(tileId);
+//   });
+
+// };
 // playerSchema.methods.playCard = function (idx){
 //   var cardPriority = this.register[idx];
 //   var cardName =

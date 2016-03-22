@@ -26,7 +26,7 @@ xdescribe('Tile model', function () {
       expect(Tile).to.be.a('function');
   });
 
-  xdescribe('Adds tiles', function(){
+  describe('Adds tiles', function(){
     var tile1 = {
       edgeN: 'wall0',
       edgeE: null,
@@ -51,7 +51,7 @@ xdescribe('Tile model', function () {
       edgeS: null,
       edgeW: 'wall0',
       floor: null,
-      conveyor: {type: 'straight', magnitude: 2, destination: 'E'},
+      conveyor: [{type: 'straight', magnitude: 2, destination: 'E'}],
       flag: null
     };
 

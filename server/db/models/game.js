@@ -58,13 +58,7 @@ gameSchema.methods.runOneRegister = function () {
 
 gameSchema.methods.getPlayers = function (){
   var self = this;
-  return Player.find({game: self._id})
-  .then(function(players){
-    return players;
-  })
-  .then(null, function(err){
-    console.error(err);
-  });
+  return Player.find({game: self._id});
 }
 
 gameSchema.methods.runBelts = function(type){ //type is 1 or 2. 1 = all
@@ -82,12 +76,74 @@ gameSchema.methods.runBelts = function(type){ //type is 1 or 2. 1 = all
       playPosition = player.position;
       tile = board['col' + playPosition[0].toString()][playPosition[1]];
       if(tile.conveyor[0].magnitude >= type){
-        player.moveOnBelt(tile.conveyor.bearing);
+        player.boardMove(tile.conveyor.bearing);
       }
       // check new location and perform necessary actions
     });
   });
 };
+
+gameSchema.methods.fireOneLaser = function(laser){
+  // laser has qty, bearing, direction (string), start properties
+  var currLoc = laser.start;
+  var nextLoc = laser.start;
+    // check current location for obstacles to exiting
+  this.getPlayerAt(currLoc).bind(this)
+  .then(function(p){
+    if (p){
+      p.applyDamage(laser.qty);
+      return;
+    }else{
+      return this.getTileAt(currLoc)
+      .then(function(t){
+        if(t[laserBlockedBy[laser.direction].exit]) return;
+        return t;
+      })
+    }
+  })
+  .then(function(t){
+    if(t) { //check ability to enter next tile
+      nextLoc[0] += laser.bearing[0];
+      nextLoc[1] += laser.bearing[1];
+      return this.getTileAt(nextLoc)
+      .then(function(t){
+        if(t && t[laserBlockedBy[laser.direction].enter]) return;
+        return t;
+      })
+    }
+    return;
+  })
+  .then(function(t){
+    if(t){
+      laser.start[0] += laser.bearing[0];
+      laser.start[1] += laser.bearing[1];
+      gameSchema.methods.fireOneLaser(laser);
+    }
+  })
+
+};
+
+gameSchema.methods.getPlayerAt = function(position){
+  return this.getPlayers()
+  .then(function(players){
+    return players.filter(function(p){
+      if (p.position === position) return true
+      return false;
+    })
+  })
+}
+
+gameSchema.methods.getTileAt = function (position) {
+  // position is array = [row, col]
+  var colStr = 'col' + col.toString();
+  return Board.findById(this.board)
+  .then(function(b){
+    return b[colStr][row];
+  })
+  .then(function(tId){
+    return Tile.findById(tId);
+  });
+}
 
 gameSchema.methods.initializeGame = function(){
 
@@ -98,7 +154,12 @@ mongoose.model('Game', gameSchema);
 
 
 
-
+var laserBlockedBy = {
+'N': {exit: 'edgeN', enter: 'edgeS'},
+'S': {exit: 'edgeS', enter: 'edgeN'},
+'E': {exit: 'edgeE', enter: 'edgeW'},
+'W': {exit: 'edgeW', enter: 'edgeE'}
+};
 
 
 
