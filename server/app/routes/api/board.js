@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose')
 
-require('../../../db/models/board');
 var Board = mongoose.model('Board')
 
 //URL: /api/board

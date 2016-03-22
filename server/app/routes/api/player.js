@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
-var firebaseHelper = require("../../../firebase/firebase.js");
+// var firebaseHelper = require("../../../firebase/firebase.js");
 
 var Game = mongoose.model('Game');
 var Player = mongoose.model('Player');
@@ -19,20 +19,32 @@ router.param('playerId', function(req, res, next, playerId) {
 })
 
 //each player selects cards and sets register
-router.put('/:playerId/cards', function(req, res, next) {
+//sending register to firebase --> might not need it?
+router.put('/:playerId/setcards', function(req, res, next) {
 	req.player.setRegister(req.body)
+	.then(function(register) {
+		firebaseHelper.getConnection(req.player.game).child(req.player._id).child('register').set(register)
+		res.status(201).send(req.player.game)
+	})
+	.then(null, next)
+})
+
+//sets ready status of player to True after cards are registered
+router.put('/:playerId/ready', function(req, res, next) {
+	req.player.iAmReady(req.player.register)
 	.then(function() {
 		res.sendStatus(201)
 	})
 	.then(null, next)
 })
 
-//sets ready status of player to True after cards are registered
-//after each player is ready, send state of game to Firebase?
-router.put('/:playerId/ready', function(req, res, next) {
-	req.player.iAmReady(req.player.register)
+//empty register
+//sending register to firebase --> might not need it?
+router.put('/:playerId/emptycards', function(req, res, next) {
+	req.player.emptyRegister()
 	.then(function() {
-		res.sendStatus(201)
+		firebaseHelper.getConnection(req.player.game).child(req.player._id).child('register').set(null)
+		res.status(201).send(req.player.game)
 	})
 	.then(null, next)
 })
