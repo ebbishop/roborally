@@ -269,6 +269,20 @@ playerSchema.methods.isPlayerReady = function() {
     return this.ready
 }
 
+playerSchema.methods.setRegister = function(cards) { //assumes we are getting an array of cards from the front end in order
+  var self = this;
+  var prevRegister = this.register;
+
+  if(self.damage < 5 && cards.length === 5) self.register = cards;
+  else if(self.damage === 5 && cards.length === 4) self.register = cards.concat(prevRegister.slice(4));
+  else if(self.damage === 6 && cards.length === 3) self.register = cards.concat(prevRegister.slice(3));
+  else if(self.damage === 7 && cards.length === 2) self.register = cards.concat(prevRegister.slice(2));
+  else if(self.damage === 8 && cards.length === 1) self.register = cards.concat(prevRegister.slice(1));
+  else return;
+
+  self.save();
+}
+
 mongoose.model('Player', playerSchema);
 
 

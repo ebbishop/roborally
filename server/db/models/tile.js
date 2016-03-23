@@ -19,7 +19,10 @@ var conveyorSchema = new mongoose.Schema({
 });
 
 var tileSchema = new mongoose.Schema({
-  name: { type: String, unique: true},
+  identifier: {
+      type: Number,
+      required: true
+  },
   edgeN: {
     type: String,
     enum: edges,
@@ -43,7 +46,7 @@ var tileSchema = new mongoose.Schema({
   conveyor: [conveyorSchema],
   flag: {
     type: Number,
-    enum: [null, 1,2,3,4,5,6,7,8],
+    enum: [null, 1,2,3,4],
   }
 });
 
