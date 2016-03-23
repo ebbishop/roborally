@@ -344,14 +344,14 @@ gameSchema.methods.dealCards = function() {
         self.deck = deck.slice(numCardsToDeal);
         return self.save();
     })
-    .then(function() {
-      self.getPlayers()
+    .then(function(game) {
+      game.getPlayers()
     })
     .then(function(players){
       return players.reduce(function(accumulator, player){
         return accumulator.then(function(){
             var newHand = cardsToDeal.slice(0, 9-player.damage)
-            cardsToDeal = cardsToDeal.slice(9-player.damage)
+            cardsToDeal.splice(0, 9-player.damage)
             player.hand = newHand;
             return player.save();
         });
