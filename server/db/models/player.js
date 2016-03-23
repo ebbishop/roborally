@@ -19,10 +19,16 @@ var playerSchema = new mongoose.Schema({
 
   dock: Number, //starting postion
 
-  position: [Number], //row & col location
+  position: [Number], // [row, col]
+  startPosition: [Number],
+  // bearing: {
+  //   type: [Number],
+  //   default: [-1,0] // [row, col]
+  // },
+
   bearing: {
-    type: [Number],
-    default: [-1,0]
+    type: Array,
+    default: [] // [row, col, cardinal] [-1, 0, N]
   },
   livesRemaining: Number,
   damage: Number,
@@ -36,65 +42,134 @@ var playerSchema = new mongoose.Schema({
 });
 playerSchema.set('versionKey', false);
 
+playerSchema.statics.initiate = function() {
+  //find dock number
+  //find location of dock tile
+  //set start position
+}
+
 playerSchema.methods.playCard = function(i){
   var cardNum = this.register[i];
   var card = programCards[(cardNum/10)-1];
+
   this.rotate(card.rotation);
-  this.move(card.magnitude);
+  this.cardMove(card.magnitude);
+
   // send new loc & bearing
   var gameFB = firebaseHelper.getConnection(this.game);
   gameFB.child('public').child(this._id).child('loc').set(this.position);
   gameFB.child('public').child(this._id).child('bearing').set(this.bearing);
 };
 
+//use for spinners
+//call gear 90 or -90 in tile so we can pass in gear rotation to this function?
 playerSchema.methods.rotate = function (rotation){
   var theta = 2*Math.PI*(rotation/360);
+  var cardinal;
 
   var xi = this.bearing[1];
   var yi = this.bearing[0];
 
-  var x = Math.round(xi * Math.cos(theta) - yi * Math.sin(theta));
-  var y = Math.round(yi * Math.cos(theta) + xi * Math.sin(theta));
-
-  // this.bearing = [y,x]
-  this.set('bearing', [y, x]);
-};
-
-playerSchema.methods.move = function (magnitude) {
-  var newCol = this.position[0];
-  var newRow = this.position[1];
-  while(magnitude > 0){
-    // check that move is permitted
-    newCol += this.bearing[0];
-    newRow += this.bearing[1];
-    magnitude --;
+  var col = Math.round(xi * Math.cos(theta) - yi * Math.sin(theta));
+  var row = Math.round(yi * Math.cos(theta) + xi * Math.sin(theta));
+  
+  var cardinal;
+  switch(true) {
+    case (row===-1 && col===0):
+      cardinal = 'N';
+      break;
+    case (row===0 && col===1):
+      cardinal = 'E'
+      break;
+    case (row===0 && col===-1):
+      cardinal = 'W';
+      break;
+    case (row===1 && col===0):
+      cardinal = 'S';
+      break;
   }
-  this.set('position', [newCol, newRow]);
+  this.set('bearing', [row, col, cardinal]);
 };
 
+playerSchema.methods.cardMove = function (magnitude) {
+  var newCol = this.position[1];
+  var newRow = this.position[0];
+    
+  // check that move is permitted
+  return this.checkMove()
+  .then(function(result) {
+    if (result === true) {
+      while(magnitude > 0){
+        newCol += this.bearing[1];
+        newRow += this.bearing[0];
+        magnitude --;
+      }
+      this.set('position', [newRow, newCol]);
+    }
+  })
+};
+
+//?
 playerSchema.methods.moveOnBelt = function (bearing) {
-  var newCol = this.position[0];
-  var newRow = this.position[1];
+  var newCol = this.position[1];
+  var newRow = this.position[0];
   // check if move is possible
-  newCol += bearing[0];
-  newRow += bearing[1];
-  this.set('position', [newCol, newRow]);
+  newCol += bearing[1];
+  newRow += bearing[0];
+  this.set('position', [newRow, newCol]);
+};
+
+playerSchema.methods.checkMove = function(bearing) { // [row, col]
+  var player = this;
+  var key = 'edge' + bearing[2];
+  return player.findMyTile()
+  .then(function(tile) {
+    if (tile[key] === null) return true;
+    else return false
+  })
 }
 
-// playerSchema.methods.findMyTile = function(){
-//   var player = this;
-//   return mongoose.model('Game').findById(player.game)
-//   .then(function(game){
-//     return mongoose.model('Board').findById(game.board);
-//   })
-//   .then(function(board){
-//     return board.getTileAt(player.location[0], player.location[1]);
-//   })
-//   .then(function(tileId){
-//     return mongoose.model('Tile').findById(tileId);
-//   });
+playerSchema.methods.findMyTile = function(){
+  var player = this;
+  return mongoose.model('Game').findById(player.game)
+  .then(function(game){
+    return mongoose.model('Board').findById(game.board);
+  })
+  .then(function(board){
+    return board.getTileAt(player.position[0], player.position[1]);
+  })
+  .then(function(tileId){
+    return mongoose.model('Tile').findById(tileId);
+  });
+};
 
-// };
+playerSchema.methods.applyDamage = function(hitCount){
+  var player = this;
+  return this.update({$inc: {damage: hitCount}}, {new: true})
+  .then(function() {
+    return player.checkHealth()
+  })
+};
+
+playerSchema.methods.checkHealth = function() {
+  if (this.damage === 9) this.loseLife()
+  //check for pits
+}
+
+playerSchema.methods.loseLife = function() {
+  this.livesRemaining--
+  if (this.livesRemaining === 0) this.killPlayer()
+  else this.set('position', startPosition)
+}
+
+playerSchema.methods.killPlayer = function() {
+  this.set('_id', null);
+  this.save();
+}
+
+playerSchema.methods.checkLife = function() {
+  if (this.livesRemaining != 0)
+}
 
 
 mongoose.model('Player', playerSchema);
@@ -167,11 +242,6 @@ mongoose.model('Player', playerSchema);
 //   this.set('register', newRegister);
 //   return this.save();
 // }
-
-// playerSchema.methods.applyDamamage = function(hitCount){
-//   return this.update({$inc: {damage: hitCount}}, {new: true})
-// };
-
 
 // playerSchema.methods.dealCards = function(gameId){
 //   var deck

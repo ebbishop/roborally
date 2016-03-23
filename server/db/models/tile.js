@@ -38,7 +38,7 @@ var tileSchema = new mongoose.Schema({
     },
     floor:{
       type: String,
-      enum: [null, 'pit', 'barefloor', 'gearCW', 'gearCCW', 'wrench1', 'wrench2'],
+      enum: [null, 'pit', 'barefloor', 'gearCW', 'gearCCW', 'wrench1', 'wrench2', 'dock1', 'dock2', 'dock3', 'dock4', 'dock5', 'dock6', 'dock7', 'dock8'],
     },
     conveyor: [conveyorSchema],
     flag: {
