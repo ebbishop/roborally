@@ -1,5 +1,10 @@
 var mongoose = require('mongoose');
 
+// for now, let's organize  boards by column because all possibilities
+// are only 12 wide, may be a variable height depending on the course
+
+// ***this ignores the crazy courses at the expert levels.
+// maybe we don't want to make it endlessly flexible? ***
 
 var schema = new mongoose.Schema({
   name: {
@@ -7,18 +12,24 @@ var schema = new mongoose.Schema({
     required: true,
     default: 'Board'
   },
-  row00: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
-  row01: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
-  row02: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
-  row03: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
-  row04: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
-  row05: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
-  row06: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
-  row07: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
-  row08: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
-  row09: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
-  row10: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
-  row11: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}]
+  col0: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  col1: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  col2: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  col3: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  col4: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  col5: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  col6: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  col7: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  col8: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  col9: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  col10: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}],
+  col11: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tile'}]
 });
 
 mongoose.model('Board', schema);
+schema.set('versionKey',false );
+
+schema.methods.getTileAt = function (row, col) {
+  var key = 'col' + col.toString();
+  return this[key][row];
+};

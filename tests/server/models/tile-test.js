@@ -11,7 +11,7 @@ require('../../../server/db/models');
 
 var Tile = mongoose.model('Tile');
 
-describe('Tile model', function () {
+xdescribe('Tile model', function () {
 
   beforeEach('Establish DB connection', function (done) {
       if (mongoose.connection.db) return done();
@@ -26,7 +26,7 @@ describe('Tile model', function () {
       expect(Tile).to.be.a('function');
   });
 
-  describe('Adds tiles', function(){
+  xdescribe('Adds tiles', function(){
     var tile1 = {
       edgeN: 'wall0',
       edgeE: null,
