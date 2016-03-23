@@ -93,7 +93,7 @@ playerSchema.methods.cardMove = function (magnitude) {
   var player = this;
 
   // check that move is permitted
-  return player.checkMove()
+  return player.checkMove(player.bearing)
   .then(function(result) {
     if (result === true) {
       while(magnitude > 0){
