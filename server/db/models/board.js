@@ -31,5 +31,5 @@ schema.set('versionKey',false );
 
 schema.methods.getTileAt = function (row, col) {
   var key = 'col' + col.toString();
-  return this[key][row];
+  return this[key][row].populate();
 };

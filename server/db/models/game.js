@@ -5,6 +5,7 @@ require('./board');
 require('./player');
 
 var Player = mongoose.model('Player');
+var Board = mongoose.model('Board');
 
 // could a game have flag locations, instead of having to put these on the tile of the board?
 // could we handle the dock locations the same way?
@@ -39,6 +40,13 @@ var gameSchema = new mongoose.Schema({
 
 gameSchema.set('versionKey',false );
 
+var laserBlockedBy = {
+  'N': {exit: 'edgeN', enter: 'edgeS'},
+  'S': {exit: 'edgeS', enter: 'edgeN'},
+  'E': {exit: 'edgeE', enter: 'edgeW'},
+  'W': {exit: 'edgeW', enter: 'edgeE'}
+};
+
 gameSchema.methods.runOneRegister = function () {
   var currentCard = this.currentCard;
   return this.getPlayers()
@@ -52,41 +60,132 @@ gameSchema.methods.runOneRegister = function () {
     players.forEach(function(player){
       player.playCard(currentCard);
     });
-  });
-  this.currentCard ++;
+  })
+  .then(function(){
+    this.currentCard ++;
+  })
 };
 
 gameSchema.methods.getPlayers = function (){
-  var self = this;
-  return Player.find({game: self._id});
+  return Player.find({game: this._id});
 }
 
-gameSchema.methods.runBelts = function(type){ //type is 1 or 2. 1 = all
-  var playPosition, board, tile;
-  return Board.findById(board)
-  .then(function(b){
-    var board = b;
-    return b;
+gameSchema.methods.getPlayerTiles = function () {
+  return this.getPlayers()
+  .then(function(players){
+    return Promise.map(players, function(p){
+      return p.attachMyTile()
+    })
   })
-  .then(function(){
-    return this.getPlayers()
+}
+
+gameSchema.methods.getBoardWithTiles = function () {
+  return Board.findById(this.board)
+  .populate('col0')
+  .populate('col1')
+  .populate('col2')
+  .populate('col3')
+  .populate('col4')
+  .populate('col5')
+  .populate('col6')
+  .populate('col7')
+  .populate('col8')
+  .populate('col9')
+  .populate('col10')
+  .populate('col11')
+  .exec();
+};
+
+gameSchema.methods.runGears = function (){
+  return this.getPlayerTiles().bind(this)
+  .then(function(playersWithTile){
+    return Promise.map(playersWithTile, function(p){
+      if (p.tile.floor === 'gearCW') return p.rotate(90);
+      else if(p.tile.floor ===  'gearCCW') return p.rotate(-90);
+    });
+  });
+};
+// stopping here for tonight
+gameSchema.methods.runPushers = function (){
+  return this.getPlayerTiles().bind(this)
+  .then(function(playersWithTile){
+    return Promise.map(playersWithTile, function(p){
+      if (p.tiles.edgeN === 'push1') return
+    });
+  })
+}
+
+gameSchema.methods.runBelts = function(type) { //type is 1 or 2. 1 = all
+  return this.getPlayerTiles().bind(this)
+  .then(function(playersWithTile){
+    return Promise.map(playersWithTile, function(p){
+      if (p.tile.conveyor && p.tile.conveyor.magnitude >=type){
+        return p.boardMove(p.tile.conveyor.bearing);
+      }
+    });
   })
   .then(function(players){
-    return Promise.map(players, function(player){
-      playPosition = player.position;
-      tile = board['col' + playPosition[0].toString()][playPosition[1]];
-      if(tile.conveyor[0].magnitude >= type){
-        player.boardMove(tile.conveyor.bearing);
+    return this.checkPostBeltLocs(type);
+  });
+};
+
+
+gameSchema.methods.checkPostBeltLocs = function (type, prevloc){
+  return this.getPlayerTiles()
+  .then(function(playersWithTile){
+    return Promise.map(playersWithTile, function(p){
+      if (p.tile.conveyor && p.tile.conveyor.magnitude >=type){
+        if (p.tile.conveyor.type === 'clockwise') return p.rotate(90)
+        else if(p.tile.conveyor.type === 'counterclock') return p.rotate(-90)
+        // 'merge1CCW', 'merge1CW', 'merge2'
+        // else if(p.tile.conveyor.type === ''){} DON'T KNOW WHAT TO DO WITH THIS
       }
-      // check new location and perform necessary actions
+      else if (p.tile.floor === 'pit' || !p.tile){
+        return p.loseLife();
+      }
+    })
+  })
+}
+
+gameSchema.methods.fireRobotLasers = function (){
+  return this.getPlayers().bind(this)
+  .then(function(players){
+    players.forEach(function(p){
+      gameSchema.methods.fireOneLaser({
+        start: p.position,
+        qty: 1,
+        bearing: p.bearing,
+        direction: p.compassDirection
+      });
     });
   });
 };
 
-gameSchema.methods.findLasers = function (){
-  this.getPlayers().bind(this)
-  .then(function(p){
+gameSchema.methods.fireBoardLasers = function (){
+  for (var i = 0; i < 12; i ++){
+    this.fireLasersInCol(i);
+  }
+}
 
+gameSchema.methods.fireLasersInCol = function (col) {
+  var start, bearing, qty, direction;
+  var colStr = 'col' + col.toString();
+  return Board.findById(this.board)
+  .then(function(b){
+    b.colStr.forEach(function(tile, i){
+      if(tile.edgeN.slice(0,4) === 'wall') {
+        gameSchema.methods.fireOneLaser({start: [i, col], qty:Number(tile.edgeN[4]), bearing: [1, 0], direction: 'S'});
+      }
+      if(tile.edgeE.slice(0,4) === 'wall') {
+        gameSchema.methods.fireOneLaser({start: [i, col], qty:Number(tile.edgeE[4]), bearing: [0, -1], direction: 'W'});
+      }
+      if(tile.edgeS.slice(0,4) === 'wall') {
+        gameSchema.methods.fireOneLaser({start: [i, col], qty:Number(tile.edgeS[4]), bearing: [-1, 0], direction: 'N'});
+      }
+      if(tile.edgeW.slice(0,4) === 'wall') {
+        gameSchema.methods.fireOneLaser({start: [i, col], qty:Number(tile.edgeW[4]), bearing: [0, 1], direction: 'E'});
+      }
+    });
   })
 }
 
@@ -95,7 +194,7 @@ gameSchema.methods.fireOneLaser = function(laser){
   var currLoc = laser.start;
   var nextLoc = laser.start;
     // check current location for obstacles to exiting
-  this.getPlayerAt(currLoc).bind(this)
+  return this.getPlayerAt(currLoc).bind(this)
   .then(function(p){
     if (p){
       p.applyDamage(laser.qty);
@@ -157,17 +256,6 @@ gameSchema.methods.initializeGame = function(){
 };
 
 mongoose.model('Game', gameSchema);
-
-
-
-
-var laserBlockedBy = {
-'N': {exit: 'edgeN', enter: 'edgeS'},
-'S': {exit: 'edgeS', enter: 'edgeN'},
-'E': {exit: 'edgeE', enter: 'edgeW'},
-'W': {exit: 'edgeW', enter: 'edgeE'}
-};
-
 
 
 

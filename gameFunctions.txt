@@ -18,22 +18,32 @@ player
 
 card
   clearRegister()
-  dealCards()
+
+
+
+  giveEveryoneCard()
+  getNewHand(n)
+
+
+
+
   shuffleDeck()
   updateHand()
   setRegister()
 
 game
 
+  -checkRegisterReady()
   runHand()
     +runOneRegister()
     -runBoard()
     +runBelt()
-    -fireLasers()
-      +fireOneLaser()
-    -checkRegisterReady()
+    -check players after belt run
+    +fireBoardLasers()
+    +fireRobotLasers
+      +fireOneLaser() --come back to this, it is messy
     -runPushers()
-    -runGears()
+    +runGears()
     -activateRepair()
   +getPlayers()
 

@@ -91,6 +91,20 @@ playerSchema.methods.checkMove = function (){
 // return true/false
 };
 
+playerSchema.methods.attachMyTile = function (){
+  return Game.findById(this.game).bind(this)
+  .then(function(g){
+    return Board.findById(g.board);
+  })
+  .then(function(b){
+    return b.getTileAt(this.position);
+  })
+  .then(function(t){
+    // return player with fully populated tile attached
+    this.tile = t;
+    return this;
+  });
+};
 
 mongoose.model('Player', playerSchema);
 
@@ -130,10 +144,7 @@ mongoose.model('Player', playerSchema);
 //   });
 
 // };
-// playerSchema.methods.playCard = function (idx){
-//   var cardPriority = this.register[idx];
-//   var cardName =
-// };
+
 
 
 
