@@ -169,7 +169,7 @@ playerSchema.methods.killPlayer = function() {
 }
 
 playerSchema.methods.checkLife = function() {
-  if (this.livesRemaining != 0)
+  // if (this.livesRemaining != 0)
 }
 
 playerSchema.methods.attachMyTile = function (){
