@@ -1,5 +1,5 @@
 var Firebase = require("firebase");
-var currentGame;
+var currentGame = {};
 var baseUrl = "https://resplendent-torch-4322.firebaseio.com/";
 
 /*
@@ -12,10 +12,13 @@ module.exports = {
         return new Firebase(baseUrl);
     },
     setConnection: function(key) {
-        var currentGame = new Firebase(baseUrl + key);
-        return currentGame
+        currentGame[key] = new Firebase(baseUrl + key);
+        return currentGame[key]
     },
-    getConnection: function() {
-        return currentGame.key()
+    getConnection: function(key) {
+        if (!currentGame[key]) {
+            return this.setConnection(key)
+        }
+        else return currentGame[key]
     }
 };
