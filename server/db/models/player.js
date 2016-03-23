@@ -32,7 +32,7 @@ var playerSchema = new mongoose.Schema({
   },
   active: {type: Boolean, default: false}, //false if powered down
   ready: {type: Boolean, default: false},
-  flagCount: Number
+  flagCount: {type: Number, default: 0}
 });
 
 playerSchema.set('versionKey', false);
