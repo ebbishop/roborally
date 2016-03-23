@@ -28,7 +28,7 @@ var playerSchema = new mongoose.Schema({
 
   bearing: {
     type: Array,
-    default: [] // [row, col, cardinal] [-1, 0, N]
+    default: [-1,0,'N'] // [row, col, cardinal] [-1, 0, N]
   },
   livesRemaining: Number,
   damage: Number,
@@ -91,6 +91,10 @@ playerSchema.methods.rotate = function (rotation){
   this.set('bearing', [row, col, cardinal]);
 };
 
+playerSchema.methods.setCardinal = function() {
+  
+}
+
 playerSchema.methods.cardMove = function (magnitude) {
   var newCol = this.position[1];
   var newRow = this.position[0];
@@ -101,7 +105,9 @@ playerSchema.methods.cardMove = function (magnitude) {
     if (result === true) {
       while(magnitude > 0){
         newCol += this.bearing[1];
+        if (newCol < 0) return this.loseLife()
         newRow += this.bearing[0];
+        if (newRow < 0) return this.loseLife()
         magnitude --;
       }
       this.set('position', [newRow, newCol]);
