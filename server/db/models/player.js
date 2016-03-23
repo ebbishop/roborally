@@ -67,13 +67,12 @@ playerSchema.methods.rotate = function (rotation){
   var col = Math.round(xi * Math.cos(theta) - yi * Math.sin(theta));
   var row = Math.round(yi * Math.cos(theta) + xi * Math.sin(theta));
 
-  var cardinal;
   switch(true) {
     case (row===-1 && col===0):
       cardinal = 'N';
       break;
     case (row===0 && col===1):
-      cardinal = 'E'
+      cardinal = 'E';
       break;
     case (row===0 && col===-1):
       cardinal = 'W';

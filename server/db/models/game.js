@@ -174,36 +174,32 @@ gameSchema.methods.pushOnePusher = function (pusher){
   });
 };
 
-gameSchema.methods.runBelts = function(type) { //type is 1 or 2. 1 = all
+
+gameSchema.methods.runBelts = function (type){
   return this.getPlayerTiles().bind(this)
   .then(function(playersWithTile){
     return Promise.map(playersWithTile, function(p){
-      if (p.tile.conveyor && p.tile.conveyor.magnitude >=type){
-        return p.boardMove(p.tile.conveyor.bearing);
+      if (p.tile.conveyor && p.tile.conveyor.magnitude >= type){
+        var nextPosition = [];
+        var c = p.tile.conveyor;
+        nextPosition.push(p.position[0] + c.bearing[0]);
+        nextPosition.push(p.position[1] + c.bearing[1]);
+        var deg = getRotation(orig, next);
+        return Player.findById(p._id);
       }
+    })
+    .then(function(p){
+      return Promise.all([p.rotate(deg), p.boardMove(c.bearing)])
     });
-  })
-  .then(function(players){
-    return this.checkPostBeltLocs(type);
   });
 };
 
 
-gameSchema.methods.checkPostBeltLocs = function (type, prevloc){
-  return this.getPlayerTiles()
-  .then(function(playersWithTile){
-    return Promise.map(playersWithTile, function(p){
-      if (p.tile.conveyor && p.tile.conveyor.magnitude >=type){
-        if (p.tile.conveyor.type === 'clockwise') return p.rotate(90);
-        else if(p.tile.conveyor.type === 'counterclock') return p.rotate(-90);
-        // 'merge1CCW', 'merge1CW', 'merge2'
-        // else if(p.tile.conveyor.type === ''){} DON'T KNOW WHAT TO DO WITH THIS
-      }
-      else if (p.tile.floor === 'pit' || !p.tile){
-        return p.loseLife();
-      }
-    })
-  })
+function getRotation (orig, next){
+  var dot = -orig[0]*next[1] + orig[1]*next[0];
+  var rad = Math.asin(dot);
+  var deg = rad * (180/Math.PI);
+  return deg;
 }
 
 gameSchema.methods.fireRobotLasers = function (){
@@ -401,6 +397,43 @@ mongoose.model('Game', gameSchema);
 
 
 
+
+// gameSchema.methods.runBelts = function(type) { //type is 1 or 2. 1 = all
+//   return this.getPlayerTiles().bind(this)
+//   .then(function(playersWithTile){
+//     return Promise.map(playersWithTile, function(p){
+//       if (p.tile.conveyor && p.tile.conveyor.magnitude >=type){
+//         var conveyor = p.tile.conveyor;
+//         return Player.findById(p._id)
+//         .then(function(p){
+//           return p.boardMove(conveyor.bearing);
+//         })
+
+//       }
+//     });
+//   })
+//   .then(function(players){
+//     return this.checkPostBeltLocs(type);
+//   });
+// };
+
+
+// gameSchema.methods.checkPostBeltLocs = function (type, prevloc){
+//   return this.getPlayerTiles()
+//   .then(function(playersWithTile){
+//     return Promise.map(playersWithTile, function(p){
+//       if (p.tile.conveyor && p.tile.conveyor.magnitude >=type){
+//         if (p.tile.conveyor.type === 'clockwise') return p.rotate(90);
+//         else if(p.tile.conveyor.type === 'counterclock') return p.rotate(-90);
+//         // 'merge1CCW', 'merge1CW', 'merge2'
+//         // else if(p.tile.conveyor.type === ''){} DON'T KNOW WHAT TO DO WITH THIS
+//       }
+//       else if (p.tile.floor === 'pit' || !p.tile){
+//         return p.loseLife();
+//       }
+//     })
+//   })
+// }
 
 
 
