@@ -32,7 +32,7 @@ var playerSchema = new mongoose.Schema({
   },
   active: {type: Boolean, default: false}, //false if powered down
   ready: {type: Boolean, default: false},
-  flagCount: Number
+  flagCount: {type: Number, default: 0}
 });
 
 playerSchema.set('versionKey', false);
@@ -93,7 +93,7 @@ playerSchema.methods.cardMove = function (magnitude) {
   var player = this;
 
   // check that move is permitted
-  return player.checkMove()
+  return player.checkMove(player.bearing)
   .then(function(result) {
     if (result === true) {
       while(magnitude > 0){
