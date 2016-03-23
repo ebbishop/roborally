@@ -97,6 +97,17 @@ playerSchema.methods.moveOnBelt = function (bearing) {
 // };
 
 
+playerSchema.methods.clearHand = function() {
+    var handToDiscard = this.hand;
+    return mongoose.model('Game').findByIdAndUpdate(player.game, 
+        {$push:  {discard: {$each: handToDiscard} } } );
+}
+
+playerSchema.methods.isPlayerReady = function() {
+    return this.ready
+}
+
+
 mongoose.model('Player', playerSchema);
 
 

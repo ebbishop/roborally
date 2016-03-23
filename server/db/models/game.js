@@ -1,8 +1,10 @@
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
+var _ = require('lodash');
 var firebaseHelper = require('../../firebase/firebase');
 require('./board');
 require('./player');
+
 
 var Player = mongoose.model('Player');
 
@@ -66,6 +68,89 @@ gameSchema.methods.getPlayers = function (){
     console.error(err);
   });
 }
+
+//call this method before every deal
+gameSchema.methods.shuffleCards = function () {
+    var self = this;
+    return self.getPlayers()
+    .then(function(players){
+        var numPlayers = players.length;
+        //calculate the minimum number of cards needed to complete one full deal assuming that all players are being dealt 9 cards 
+        var minNumCards = numPlayers * 9 
+
+        //if there are not enough cards for one deal, then add the discard pile to the deck before shuffling
+        if(self.deck.length < minNumCards) {
+            var newDeck = self.set('deck', self.deck.concat(self.discard));
+            var saveNewDeck = newDeck.save()
+
+            var newDiscardPile = self.set('discard', []);
+            var saveNewDiscardPile = newDiscardPile.save()
+
+            return Promise.all([saveNewDeck, saveNewDiscardPile])
+            .spread(function(savedNewDeck, savedNewDiscardPile) {
+                var shuffledDeck = _.shuffle(savedNewDeck);
+                self.set('deck', shuffledDeck);
+                self.save();
+            })
+        }
+        else {
+            var shuffledDeck = _.shuffle(self.deck);
+            self.set('deck', shuffledDeck);
+            self.save();
+        } 
+    })
+}
+
+//helper function for dealCards method
+gameSchema.methods.numberOfCardsToDeal = function() {
+    var self = this;
+    var numCards = 0;
+    return self.getPlayers()
+    .then(function(players){
+        players.forEach(function(player){
+            numCards += 9 - player.damage;
+        })
+        return numCards;
+    })
+}
+
+//this method is called after all the players have cleared their hands
+//playerSchema.methods.clearHand() <== this is where we discard cards as well
+gameSchema.methods.dealCards = function() {
+    var self = this;
+    var deck = self.deck    
+    var numCardsToDeal,cardsToDeal;
+
+    return self.numberOfCardsToDeal()
+    .then(function(numCards){
+        numCardsToDeal = numCards;
+        cardsToDeal = deck.slice(0, numCardsToDeal)
+        self.update({deck: deck.slice(numCardsToDeal)});
+        return self.getPlayers()
+    })
+    .then(function(players){
+        players.map(function(player){
+            var newHand = cardsToDeal.slice(0, 9-player.damage)
+            cardsToDeal = cardsToDeal.slice(9-player.damage)
+            return player.update({hand: newHand})     
+        })
+    })
+}
+
+gameSchema.methods.areAllPlayersReady = function() {
+    return this.getPlayers()
+    .then(function(players){
+        for(var i = 0; i < players.length; i++) {
+            if(!player[i].ready) return false;
+        }
+        return true;
+    })
+}
+
+
+
+
+
 
 gameSchema.methods.runBelts = function(type){ //type is 1 or 2. 1 = all
   var playPosition, board, tile;
