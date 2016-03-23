@@ -77,7 +77,11 @@ function seedConveyors () {
 
   return Conveyor.createAsync(conveyors);
 }
-
+// THINGS TO FIX
+// ADD NAME PROPERTY TO TILE
+// CHECK CONVEYOR EMBED
+// REMOVE FLAGS
+// ADD DOCKS
 function seedTiles(){
 //tiles:
   var tiles = [
@@ -125,10 +129,6 @@ function seedTiles(){
     {edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, destination: 'S'}, flag: null},
     {edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, destination: 'W'}, flag: null},
     {edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, destination: 'N'}, flag: null},
-  //flags
-    {edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: 1},
-    {edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: 2},
-    {edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: 3},
   ];
 }
 

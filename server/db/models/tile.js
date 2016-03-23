@@ -3,7 +3,6 @@ var mongoose = require('mongoose');
 var edges = [null, 'wall0', 'wall1', 'wall2', 'wall3', 'push1', 'push2'];
 
 var conveyorSchema = new mongoose.Schema({
-  name: { type: String, unique: true},
   type:{
     type: String,
     enum: ['straight', 'clockwise', 'counterclock', 'merge1CCW', 'merge1CW', 'merge2'],
@@ -20,31 +19,32 @@ var conveyorSchema = new mongoose.Schema({
 });
 
 var tileSchema = new mongoose.Schema({
-    edgeN: {
-      type: String,
-      enum: edges,
-    },
-    edgeE:{
-      type: String,
-      enum: edges,
-    },
-    edgeS:{
-      type: String,
-      enum: edges,
-    },
-    edgeW:{
-      type: String,
-      enum: edges,
-    },
-    floor:{
-      type: String,
-      enum: [null, 'pit', 'barefloor', 'gearCW', 'gearCCW', 'wrench1', 'wrench2'],
-    },
-    conveyor: [conveyorSchema],
-    flag: {
-      type: Number,
-      enum: [null, 1,2,3,4,5,6,7,8],
-    }
+  name: { type: String, unique: true},
+  edgeN: {
+    type: String,
+    enum: edges,
+  },
+  edgeE:{
+    type: String,
+    enum: edges,
+  },
+  edgeS:{
+    type: String,
+    enum: edges,
+  },
+  edgeW:{
+    type: String,
+    enum: edges,
+  },
+  floor:{
+    type: String,
+    enum: [null, 'pit', 'barefloor', 'gearCW', 'gearCCW', 'wrench1', 'wrench2'],
+  },
+  conveyor: [conveyorSchema],
+  flag: {
+    type: Number,
+    enum: [null, 1,2,3,4,5,6,7,8],
+  }
 });
 
 mongoose.model('Tile', tileSchema);

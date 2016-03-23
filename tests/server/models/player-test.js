@@ -15,11 +15,7 @@ var Game = mongoose.model('Game');
 describe ('game logic', function(){
 
   beforeEach('Establish DB connection', function (done) {
-    console.log('db:', mongoose.connection.db);
-    if (mongoose.connection.db) {
-      console.log('connected:', mongoose.connected.db);
-      return done();
-    }
+    if (mongoose.connection.db) return done();
     mongoose.connect(dbURI, done);
   });
 
@@ -30,9 +26,9 @@ describe ('game logic', function(){
   describe('player model', function(){
     var player1 = new Player({
         position: [2,5],
-        bearing: [1,0]
+        bearing: [1,0, 'S']
       });
-
+    console.log(player1);
     it('should have location', function(){
       expect(player1.position.toObject()).to.eql([2,5]);
     });
@@ -92,7 +88,8 @@ describe ('game logic', function(){
       });
       // RL, move1, move1, Uturn, RR
       it('should have cards', function(){
-        expect(player2.register.toObject()).to.eql([370, 600, 590, 10, 220]);
+        console.log('register:', typeof player2.register);
+        expect(player2.register).to.eql([370, 600, 590, 10, 220]);
       });
       it('should play the first card', function(){
         player2.playCard(0);
@@ -112,9 +109,10 @@ describe ('game logic', function(){
     var game1;
     beforeEach(function(done){
       game1 = new Game({});
-      console.log(game1);
+      // console.log(game1);
+
       return Promise.all([
-          Game.create(game1)/*,
+          Game.create(game1),
           Player.create({
             game: game1._id,
             position: [2,5],
@@ -128,12 +126,15 @@ describe ('game logic', function(){
             bearing: [-1,0],
             register: [40, 490, 380, 430, 710]
             // Uturn, move1, RR, back up, move2
-          })*/
+          })
         ])
       .then(function(g){
+        console.log('array of promises was created', g.length);
         done();
       })
-      })
+      .then(null, done);
+    })
+
 
       it('should create a game', function(done){
         console.log('finding a game')

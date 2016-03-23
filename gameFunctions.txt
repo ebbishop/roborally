@@ -1,0 +1,52 @@
+player
+  rotate()
+  cardMove()
+  boardMove()
+  checkMove()
+  playCard()
+
+  setCompass()
+  touchFlag()
+
+  applyDamage()
+  loseLife()
+
+  killPlayer()
+
+  checkForPit()
+  checkForCorner()
+
+card
+  clearRegister()
+
+
+
+  giveEveryoneCard()
+  getNewHand(n)
+
+
+
+
+  shuffleDeck()
+  updateHand()
+  setRegister()
+
+game
+
+  -checkRegisterReady()
+  runHand()
+    +runOneRegister()
+    -runBoard()
+    +runBelt()
+    -check players after belt run
+    +fireBoardLasers()
+    +fireRobotLasers
+      +fireOneLaser() --come back to this, it is messy
+    +runPushers()
+      +runPushersInCol()
+      +runOnePusher()
+    +runGears()
+    -activateRepair()
+  +getPlayers()
+
+  checkWon()

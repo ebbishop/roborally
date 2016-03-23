@@ -14,21 +14,14 @@ var robotSchema = new mongoose.Schema({
 var playerSchema = new mongoose.Schema({
   game: {type: mongoose.Schema.Types.ObjectId, ref: 'Game'},
   name: String,
-  // robot: robotSchema,
+  robot: [robotSchema],
 
-
-  dock: Number, //starting postion
-
-  position: [Number], // [row, col]
-  startPosition: [Number],
-  // bearing: {
-  //   type: [Number],
-  //   default: [-1,0] // [row, col]
-  // },
-
+  dock: [Number], //starting postion
+  position: [Number], //row & col location
+  compassDirection: String, // N E S W
   bearing: {
     type: Array,
-    default: [-1,0,'N'] // [row, col, cardinal] [-1, 0, N]
+    default: [-1, 0, 'N']
   },
   livesRemaining: Number,
   damage: Number,
@@ -40,6 +33,7 @@ var playerSchema = new mongoose.Schema({
   active: {type: Boolean, default: false}, //false if powered down
   ready: {type: Boolean, default: false}
 });
+
 playerSchema.set('versionKey', false);
 
 playerSchema.statics.initiate = function() {
@@ -72,7 +66,7 @@ playerSchema.methods.rotate = function (rotation){
 
   var col = Math.round(xi * Math.cos(theta) - yi * Math.sin(theta));
   var row = Math.round(yi * Math.cos(theta) + xi * Math.sin(theta));
-  
+
   var cardinal;
   switch(true) {
     case (row===-1 && col===0):
@@ -91,14 +85,24 @@ playerSchema.methods.rotate = function (rotation){
   this.set('bearing', [row, col, cardinal]);
 };
 
+playerSchema.methods.boardMove = function (bearing) {
+  // call when self.bearing is not relevant
+  var newCol = this.position[0];
+  var newRow = this.position[1];
+  newCol += bearing[0];
+  newRow += bearing[1];
+  // check if move is possible
+  this.set('position', [newCol, newRow]);
+};
+
 playerSchema.methods.setCardinal = function() {
-  
+
 }
 
 playerSchema.methods.cardMove = function (magnitude) {
   var newCol = this.position[1];
   var newRow = this.position[0];
-    
+
   // check that move is permitted
   return this.checkMove()
   .then(function(result) {
@@ -115,15 +119,6 @@ playerSchema.methods.cardMove = function (magnitude) {
   })
 };
 
-//?
-playerSchema.methods.moveOnBelt = function (bearing) {
-  var newCol = this.position[1];
-  var newRow = this.position[0];
-  // check if move is possible
-  newCol += bearing[1];
-  newRow += bearing[0];
-  this.set('position', [newRow, newCol]);
-};
 
 playerSchema.methods.checkMove = function(bearing) { // [row, col]
   var player = this;
@@ -165,7 +160,7 @@ playerSchema.methods.checkHealth = function() {
 playerSchema.methods.loseLife = function() {
   this.livesRemaining--
   if (this.livesRemaining === 0) this.killPlayer()
-  else this.set('position', startPosition)
+  else this.set('position', this.dock)
 }
 
 playerSchema.methods.killPlayer = function() {
@@ -177,10 +172,24 @@ playerSchema.methods.checkLife = function() {
   if (this.livesRemaining != 0)
 }
 
+playerSchema.methods.attachMyTile = function (){
+  return Game.findById(this.game).bind(this)
+  .then(function(g){
+    return Board.findById(g.board);
+  })
+  .then(function(b){
+    return b.getTileAt(this.position);
+  })
+  .then(function(t){
+    // return player with fully populated tile attached
+    this.tile = t;
+    return this;
+  });
+};
 
 playerSchema.methods.clearHand = function() {
     var handToDiscard = this.hand;
-    return mongoose.model('Game').findByIdAndUpdate(player.game, 
+    return mongoose.model('Game').findByIdAndUpdate(player.game,
         {$push:  {discard: {$each: handToDiscard} } } );
 }
 
@@ -210,13 +219,6 @@ mongoose.model('Player', playerSchema);
 
 
 
-
-
-
-// playerSchema.methods.playCard = function (idx){
-//   var cardPriority = this.register[idx];
-//   var cardName =
-// };
 
 
 
