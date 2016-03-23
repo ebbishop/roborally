@@ -6,6 +6,11 @@ var mongoose = require('mongoose');
 // ***this ignores the crazy courses at the expert levels.
 // maybe we don't want to make it endlessly flexible? ***
 
+var docks = [dock1, dock2];
+var dock1 = []
+
+
+
 var schema = new mongoose.Schema({
   name: {
     type: String,
@@ -31,10 +36,5 @@ schema.set('versionKey',false );
 
 schema.methods.getTileAt = function (row, col) {
   var key = 'col' + col.toString();
-<<<<<<< HEAD
   return this[key][row].populate();
 };
-=======
-  return this[key][row];
-};
->>>>>>> master
