@@ -17,13 +17,13 @@ var playerSchema = new mongoose.Schema({
   robot: [robotSchema],
 
 
-  dock: Number, //starting postion
+  dock: [Number], //starting postion
 
   position: [Number], //row & col location
   compassDirection: String, // N E S W
   bearing: {
-    type: [Number],
-    default: [-1,0]
+    type: Array,
+    default: [-1, 0, 'N']
   },
   livesRemaining: Number,
   damage: Number,

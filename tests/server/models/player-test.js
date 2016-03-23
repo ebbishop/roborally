@@ -26,9 +26,9 @@ describe ('game logic', function(){
   describe('player model', function(){
     var player1 = new Player({
         position: [2,5],
-        bearing: [1,0]
+        bearing: [1,0, 'S']
       });
-
+    console.log(player1);
     it('should have location', function(){
       expect(player1.position.toObject()).to.eql([2,5]);
     });

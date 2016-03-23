@@ -42,7 +42,9 @@ game
     +fireBoardLasers()
     +fireRobotLasers
       +fireOneLaser() --come back to this, it is messy
-    -runPushers()
+    +runPushers()
+      +runPushersInCol()
+      +runOnePusher()
     +runGears()
     -activateRepair()
   +getPlayers()

@@ -105,15 +105,43 @@ gameSchema.methods.runGears = function (){
     });
   });
 };
-// stopping here for tonight
+
 gameSchema.methods.runPushers = function (){
-  return this.getPlayerTiles().bind(this)
-  .then(function(playersWithTile){
-    return Promise.map(playersWithTile, function(p){
-      if (p.tiles.edgeN === 'push1') return
+  for (var i = 0; i < 12; i++){
+    this.runPushersInCol(i)
+  }
+}
+
+gameSchema.methods.runPushersInCol = function (col){
+  var colStr = 'col' + col.toString();
+  var pushType = (this.currentCard % 2) + 1
+  return Board.findById(this.board).bind(this)
+  .then(function(b){
+    b.colStr.forEach(function(tile, i){
+      if(tile.edgeN === 'push' + pushType.toString()) {
+        this.pushOnePusher({bearing: [1, 0], start: [i, col]});
+      }
+      if(tile.edgeE === 'push' + pushType.toString()) {
+        this.pushOnePusher({bearing: [0, -1], start: [i, col]});
+      }
+      if(tile.edgeS === 'push' + pushType.toString()) {
+        this.pushOnePusher({bearing: [-1, 0], start: [i, col]});
+      }
+      if(tile.edgeW === 'push' + pushType.toString()) {
+        this.pushOnePusher({bearing: [0, 1], start: [i, col]});
+      }
     });
   })
 }
+
+gameSchema.methods.pushOnePusher = function (pusher){
+  // pusher has bearing & position
+  return this.getPlayerAt(pusher.start)
+  .then(function(p){
+    if(p) return p.boardMove(pusher.bearing);
+    return;
+  });
+};
 
 gameSchema.methods.runBelts = function(type) { //type is 1 or 2. 1 = all
   return this.getPlayerTiles().bind(this)
@@ -135,8 +163,8 @@ gameSchema.methods.checkPostBeltLocs = function (type, prevloc){
   .then(function(playersWithTile){
     return Promise.map(playersWithTile, function(p){
       if (p.tile.conveyor && p.tile.conveyor.magnitude >=type){
-        if (p.tile.conveyor.type === 'clockwise') return p.rotate(90)
-        else if(p.tile.conveyor.type === 'counterclock') return p.rotate(-90)
+        if (p.tile.conveyor.type === 'clockwise') return p.rotate(90);
+        else if(p.tile.conveyor.type === 'counterclock') return p.rotate(-90);
         // 'merge1CCW', 'merge1CW', 'merge2'
         // else if(p.tile.conveyor.type === ''){} DON'T KNOW WHAT TO DO WITH THIS
       }
@@ -151,7 +179,7 @@ gameSchema.methods.fireRobotLasers = function (){
   return this.getPlayers().bind(this)
   .then(function(players){
     players.forEach(function(p){
-      gameSchema.methods.fireOneLaser({
+      this.fireOneLaser({
         start: p.position,
         qty: 1,
         bearing: p.bearing,
@@ -168,22 +196,21 @@ gameSchema.methods.fireBoardLasers = function (){
 }
 
 gameSchema.methods.fireLasersInCol = function (col) {
-  var start, bearing, qty, direction;
   var colStr = 'col' + col.toString();
-  return Board.findById(this.board)
+  return Board.findById(this.board).bind(this)
   .then(function(b){
     b.colStr.forEach(function(tile, i){
       if(tile.edgeN.slice(0,4) === 'wall') {
-        gameSchema.methods.fireOneLaser({start: [i, col], qty:Number(tile.edgeN[4]), bearing: [1, 0], direction: 'S'});
+        this.fireOneLaser({start: [i, col], qty:Number(tile.edgeN[4]), bearing: [1, 0], direction: 'S'});
       }
       if(tile.edgeE.slice(0,4) === 'wall') {
-        gameSchema.methods.fireOneLaser({start: [i, col], qty:Number(tile.edgeE[4]), bearing: [0, -1], direction: 'W'});
+        this.fireOneLaser({start: [i, col], qty:Number(tile.edgeE[4]), bearing: [0, -1], direction: 'W'});
       }
       if(tile.edgeS.slice(0,4) === 'wall') {
-        gameSchema.methods.fireOneLaser({start: [i, col], qty:Number(tile.edgeS[4]), bearing: [-1, 0], direction: 'N'});
+        this.fireOneLaser({start: [i, col], qty:Number(tile.edgeS[4]), bearing: [-1, 0], direction: 'N'});
       }
       if(tile.edgeW.slice(0,4) === 'wall') {
-        gameSchema.methods.fireOneLaser({start: [i, col], qty:Number(tile.edgeW[4]), bearing: [0, 1], direction: 'E'});
+        this.fireOneLaser({start: [i, col], qty:Number(tile.edgeW[4]), bearing: [0, 1], direction: 'E'});
       }
     });
   })
@@ -223,7 +250,7 @@ gameSchema.methods.fireOneLaser = function(laser){
     if(t){
       laser.start[0] += laser.bearing[0];
       laser.start[1] += laser.bearing[1];
-      gameSchema.methods.fireOneLaser(laser);
+      this.fireOneLaser(laser);
     }
   })
 
