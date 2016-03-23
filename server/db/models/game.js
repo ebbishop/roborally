@@ -49,6 +49,35 @@ var laserBlockedBy = {
   'W': {exit: 'edgeW', enter: 'edgeE'}
 };
 
+// one phase = one register (one card) + one complete board move
+// there are five phases per hand
+gameSchema.methods.runOnePhase = function () {
+  if (this.currentCard < 5){
+    return this.runOneRegister().bind(this)
+    .then(function(){
+      return this.runBelts(2)
+    })
+    .then(function(){
+      return this.runBelts(1)
+    })
+    .then(function(){
+      return this.runPushers();
+    })
+    .then(function(){
+      return this.runGears();
+    })
+    .then(function(){
+      return this.fireRobotLasers();
+    })
+    .then(function(){
+      return this.fireBoardLasers();
+    })
+    .then(function(){
+      return this.update({$inc: {currentCard: 1}})
+    })
+  }
+}
+
 gameSchema.methods.runOneRegister = function () {
   var currentCard = this.currentCard;
   return this.getPlayers()
@@ -63,23 +92,20 @@ gameSchema.methods.runOneRegister = function () {
       player.playCard(currentCard);
     });
   })
-  .then(function(){
-    this.currentCard ++;
-  })
 };
 
 gameSchema.methods.getPlayers = function (){
   return Player.find({game: this._id});
-}
+};
 
 gameSchema.methods.getPlayerTiles = function () {
   return this.getPlayers()
   .then(function(players){
     return Promise.map(players, function(p){
       return p.attachMyTile()
-    })
-  })
-}
+    });
+  });
+};
 
 gameSchema.methods.getBoardWithTiles = function () {
   return Board.findById(this.board)
@@ -109,9 +135,11 @@ gameSchema.methods.runGears = function (){
 };
 
 gameSchema.methods.runPushers = function (){
+  var pushed = []
   for (var i = 0; i < 12; i++){
-    this.runPushersInCol(i)
+    pushed.push(this.runPushersInCol(i))
   }
+  return Promise.all(pushed);
 }
 
 gameSchema.methods.runPushersInCol = function (col){
@@ -121,16 +149,16 @@ gameSchema.methods.runPushersInCol = function (col){
   .then(function(b){
     b.colStr.forEach(function(tile, i){
       if(tile.edgeN === 'push' + pushType.toString()) {
-        this.pushOnePusher({bearing: [1, 0], start: [i, col]});
+        return this.pushOnePusher({bearing: [1, 0], start: [i, col]});
       }
       if(tile.edgeE === 'push' + pushType.toString()) {
-        this.pushOnePusher({bearing: [0, -1], start: [i, col]});
+        return this.pushOnePusher({bearing: [0, -1], start: [i, col]});
       }
       if(tile.edgeS === 'push' + pushType.toString()) {
-        this.pushOnePusher({bearing: [-1, 0], start: [i, col]});
+        return this.pushOnePusher({bearing: [-1, 0], start: [i, col]});
       }
       if(tile.edgeW === 'push' + pushType.toString()) {
-        this.pushOnePusher({bearing: [0, 1], start: [i, col]});
+        return this.pushOnePusher({bearing: [0, 1], start: [i, col]});
       }
     });
   })
@@ -179,23 +207,27 @@ gameSchema.methods.checkPostBeltLocs = function (type, prevloc){
 }
 
 gameSchema.methods.fireRobotLasers = function (){
+  var fired = [];
   return this.getPlayers().bind(this)
   .then(function(players){
     players.forEach(function(p){
-      this.fireOneLaser({
+      fired.push(this.fireOneLaser({
         start: p.position,
         qty: 1,
         bearing: p.bearing,
         direction: p.compassDirection
-      });
+      }))
     });
+    return Promise.all(fired);
   });
 };
 
 gameSchema.methods.fireBoardLasers = function (){
+  var fired = [];
   for (var i = 0; i < 12; i ++){
-    this.fireLasersInCol(i);
+    fired.push(this.fireLasersInCol(i));
   }
+  return Promise.all(fired)
 }
 
 gameSchema.methods.fireLasersInCol = function (col) {
@@ -204,16 +236,16 @@ gameSchema.methods.fireLasersInCol = function (col) {
   .then(function(b){
     b.colStr.forEach(function(tile, i){
       if(tile.edgeN.slice(0,4) === 'wall') {
-        this.fireOneLaser({start: [i, col], qty:Number(tile.edgeN[4]), bearing: [1, 0], direction: 'S'});
+        return this.fireOneLaser({start: [i, col], qty:Number(tile.edgeN[4]), bearing: [1, 0], direction: 'S'});
       }
       if(tile.edgeE.slice(0,4) === 'wall') {
-        this.fireOneLaser({start: [i, col], qty:Number(tile.edgeE[4]), bearing: [0, -1], direction: 'W'});
+        return this.fireOneLaser({start: [i, col], qty:Number(tile.edgeE[4]), bearing: [0, -1], direction: 'W'});
       }
       if(tile.edgeS.slice(0,4) === 'wall') {
-        this.fireOneLaser({start: [i, col], qty:Number(tile.edgeS[4]), bearing: [-1, 0], direction: 'N'});
+        return this.fireOneLaser({start: [i, col], qty:Number(tile.edgeS[4]), bearing: [-1, 0], direction: 'N'});
       }
       if(tile.edgeW.slice(0,4) === 'wall') {
-        this.fireOneLaser({start: [i, col], qty:Number(tile.edgeW[4]), bearing: [0, 1], direction: 'E'});
+        return this.fireOneLaser({start: [i, col], qty:Number(tile.edgeW[4]), bearing: [0, 1], direction: 'E'});
       }
     });
   })
@@ -223,12 +255,11 @@ gameSchema.methods.fireOneLaser = function(laser){
   // laser has qty, bearing, direction (string), start properties
   var currLoc = laser.start;
   var nextLoc = laser.start;
-    // check current location for obstacles to exiting
+  // check current location for obstacles to exiting
   return this.getPlayerAt(currLoc).bind(this)
   .then(function(p){
     if (p){
-      p.applyDamage(laser.qty);
-      return;
+      return p.applyDamage(laser.qty);
     }else{
       return this.getTileAt(currLoc)
       .then(function(t){
@@ -253,7 +284,7 @@ gameSchema.methods.fireOneLaser = function(laser){
     if(t){
       laser.start[0] += laser.bearing[0];
       laser.start[1] += laser.bearing[1];
-      this.fireOneLaser(laser);
+      return this.fireOneLaser(laser);
     }
   })
 
