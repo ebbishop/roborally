@@ -316,13 +316,13 @@ gameSchema.methods.shuffleCards = function () {
             .spread(function(savedNewDeck, savedNewDiscardPile) {
                 var shuffledDeck = _.shuffle(savedNewDeck);
                 self.deck = shuffledDeck;
-                self.save();
+                return self.save();
             })
         }
         else {
             var shuffledDeck = _.shuffle(self.deck);
             self.deck = shuffledDeck;
-            self.save();
+            return self.save();
         }
     })
 }
