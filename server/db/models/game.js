@@ -29,15 +29,21 @@ var gameSchema = new mongoose.Schema({
   },
   state: {
     type: String,
-    enum: ['decision', 'boardmove', 'programmedmove'],
+    enum: ['decision', 'boardmove', 'programmedmove', 'gameover'],
   },
   currentCard: {
     type: Number,
     default: 0
   },
-  deck: { type: [Number],
-    default: [10,20,30,40,50,60,70,90,110,130,150,170,190,210,230,250,270,290,310,330,350,370,390,410,80,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380,400,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730,740,750,760,770,780,790,800,810,820,830,840]},
+  deck: { 
+    type: [Number],
+    default: [10,20,30,40,50,60,70,90,110,130,150,170,190,210,230,250,270,290,310,330,350,370,390,410,80,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380,400,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730,740,750,760,770,780,790,800,810,820,830,840]
+  },
   discard: [Number],
+  numFlags: {
+    type: Number,
+    enum: [1,2,3,4]
+  }
 });
 
 gameSchema.set('versionKey',false );
@@ -337,13 +343,13 @@ gameSchema.methods.shuffleCards = function () {
             return Promise.all([saveNewDeck, saveNewDiscardPile])
             .spread(function(savedNewDeck, savedNewDiscardPile) {
                 var shuffledDeck = _.shuffle(savedNewDeck);
-                self.set('deck', shuffledDeck);
+                self.deck = shuffledDeck;
                 self.save();
             })
         }
         else {
             var shuffledDeck = _.shuffle(self.deck);
-            self.set('deck', shuffledDeck);
+            self.deck = shuffledDeck;
             self.save();
         }
     })
@@ -373,15 +379,21 @@ gameSchema.methods.dealCards = function() {
     .then(function(numCards){
         numCardsToDeal = numCards;
         cardsToDeal = deck.slice(0, numCardsToDeal)
-        self.update({deck: deck.slice(numCardsToDeal)});
-        return self.getPlayers()
+        self.deck = deck.slice(numCardsToDeal);
+        return self.save();
+    })
+    .then(function(game) {
+      game.getPlayers()
     })
     .then(function(players){
-        players.map(function(player){
+      return players.reduce(function(accumulator, player){
+        return accumulator.then(function(){
             var newHand = cardsToDeal.slice(0, 9-player.damage)
-            cardsToDeal = cardsToDeal.slice(9-player.damage)
-            return player.update({hand: newHand})
-        })
+            cardsToDeal.splice(0, 9-player.damage)
+            player.hand = newHand;
+            return player.save();
+        });
+      }, Promise.resolve())
     })
 }
 
@@ -392,6 +404,24 @@ gameSchema.methods.areAllPlayersReady = function() {
             if(!player[i].ready) return false;
         }
         return true;
+    })
+}
+
+gameSchema.methods.assignDocks = function() {
+    return this.getPlayers()
+    .then(function(players){
+      var numPlayers = players.length;
+      var docks = [1,2,3,4,5,6,7,8];
+
+      return players.reduce(function(acc, player){
+        return acc.then(function() {
+          var dockNum = _.sample(docks)
+          player.dock = dockNum;
+          var idx = docks.indexOf(dockNum)
+          docks.splice(idx, 1);
+          return player.save()    
+        })
+      }, Promise.resolve())
     })
 }
 
