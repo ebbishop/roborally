@@ -67,6 +67,7 @@ gameSchema.methods.runOneRound = function (){
 // one phase = one register (one card) + one complete board move
 // there are five phases per round
 gameSchema.methods.runOnePhase = function () {
+  var game = this;
   while (this.currentCard < 5){
     return this.runOneRegister().bind(this)
     .then(function(){
@@ -91,6 +92,13 @@ gameSchema.methods.runOnePhase = function () {
       return this.update({$inc: {currentCard: 1}})
     })
   }
+  game.shuffleCards()
+  .then(function() {
+    return game.dealCards()
+  })
+  .then(function() {
+    return game.initiateRound()
+  })
 }
 
 gameSchema.methods.runOneRegister = function () {
