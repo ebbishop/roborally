@@ -49,32 +49,6 @@ playerSchema.methods.playCard = function(i){
 
   this.rotate(card.rotation);
   this.cardMove(card.magnitude);
-
-  // send new loc & bearing
-  var gameFB = firebaseHelper.getConnection(this.game);
-  gameFB.child('public').child(this._id).child('loc').set(this.position);
-  gameFB.child('public').child(this._id).child('bearing').set(this.bearing);
-};
-
-playerSchema.methods.boardMove = function (bearing) {
-  // call when self.bearing is not relevant
-  var newCol = this.position[0];
-  var newRow = this.position[1];
-  newCol += bearing[0];
-  newRow += bearing[1];
-  // check if move is possible
-  if (newCol < 0 || newRow < 0) return this.loseLife()
-
-  else {
-    this.set('position', [newCol, newRow]);
-    //send to firebase
-    this.save()
-    .then(function(player) {
-      var gameFB = firebaseHelper.getConnection(player.game);
-      gameFB.child('public').child(player._id).child('loc').set(player.position)
-      gameFB.child('public').child(player._id).child('bearing').set(player.bearing)
-    })
-  }
 };
 
 playerSchema.methods.rotate = function (rotation){
@@ -89,16 +63,93 @@ playerSchema.methods.rotate = function (rotation){
   var cardinal = this.setCardinal(row, col)
 
   this.set('bearing', [row, col, cardinal])
-  this.save()
 }
 
+playerSchema.methods.boardMove = function (bearing) {
+  // call when self.bearing is not relevant
+  var newCol = this.position[0];
+  var newRow = this.position[1];
+  newCol += bearing[0];
+  newRow += bearing[1];
+  // check if move is possible
+  if (newCol < 0 || newRow < 0 || newCol > 11 || newRow > 15) return this.loseLife();
+  else {
+    this.set('position', [newCol, newRow]);
+  }
+};
+
+playerSchema.methods.loseLife = function() {
+  this.livesRemaining--;
+  if (this.livesRemaining === 0) return this.killPlayer();
+  else {
+    this.set('position', this.dock);
+  }
+};
+
+playerSchema.methods.killPlayer = function() {
+  this.position = null; //how should we kill players?
+};
+
+
+
+
+
+
+// moveEntireCard(magnitude){
+//   while magnitude > 1{
+//     moveOne()
+//     magnitude --
+//   } 
+// }
+
+// moveOne(){
+//   checkMove()
+//   checkOtherPlayer()
+//       op.boardMove()
+//   moveSelf()
+//   checkNewLoc()
+// }
+
+playerSchema.methods.oneCardMove = function(bearing) {
+  var newRow, newCol, opponent;
+  return this.checkMove(this.bearing).bind(this)
+  .then(function(result) {
+    if(result === true){
+      return Game.findById(this.game)
+    }
+  })
+  .then(function (game) {
+    return game.getPlayerAt([this.position[0]+this.bearing[0], this.position[1]+this.bearing[1]])
+  })
+  .then(function(opponent) {
+    if (opponent){
+      return opponent.boardMove(this.bearing)
+    }else{
+      return
+    }
+  })
+  .then(function())
+}
+
+
+//make this move only one space at a time?
 playerSchema.methods.cardMove = function (magnitude) {
   var newCol = this.position[1];
   var newRow = this.position[0];
   var player = this;
 
   // check that move is permitted
-  return player.checkMove(player.bearing)
+  return player.checkMove(player.bearing).bind(this)
+  .then(function(result){
+    if (result === true){
+      return Game.findById(this.game).getPlayerAt([newRow+this.bearing[0],newCol+this.bearing[1]])
+    }
+  })
+  .then(function(otherPlayer) {
+    if(otherPlayer){
+      return otherPlayer.boardMove(this.bearing)
+    }
+  })
   .then(function(result) {
     if (result === true) {
       while(magnitude > 0){
@@ -161,8 +212,7 @@ playerSchema.methods.boardMove = function (bearing) {
   var newRow = this.position[1];
   newCol += bearing[0];
   newRow += bearing[1];
-  return
-  this.set('position', [newCol, newRow]);
+  return this.set('position', [newCol, newRow]);
 };
 
 playerSchema.methods.pushPlayer = function (){
@@ -264,19 +314,9 @@ playerSchema.methods.checkDamage = function() {
   }
 }
 
-playerSchema.methods.loseLife = function() {
-  this.livesRemaining--;
-  if (this.livesRemaining === 0) return this.killPlayer();
-  else {
-    this.set('position', this.dock);
-    this.save();
-  }
-};
 
-playerSchema.methods.killPlayer = function() {
-  this.set('_id', null); //how should we kill players?
-  this.save();
-};
+
+
 
 playerSchema.methods.gameover = function() {
   return mongoose.model('Game').findById(this.game)

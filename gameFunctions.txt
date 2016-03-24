@@ -50,3 +50,57 @@ game
   +getPlayers()
 
   checkWon()
+
+
+
+
+// post route to /game
+//  creates a game object in mongoose?
+//  and a local variable?
+
+// post route to /joingame (player thing)
+//  creates player object in mongoose?
+//  and pushes to game.players array
+
+
+
+var Game = function(id, player, board, blah){
+  this.id = id
+  this.players: [],
+  this.deck: []
+
+}
+
+var Player = function(){
+  this.name;
+  this.life;
+
+}
+
+var Game = function(){
+  this._id: 'a23u4sjdfslkr54po',
+  this.name: 'bestGameEver',
+  this.active: true,
+  this.state: "decision",
+  this.currentCard: 3,
+  this.deck: [],
+  this.discardDeck: [],
+  this.numFlags: 3,
+  this.board : {},
+  this.players: [{},{}]
+}
+
+var Player = function(){
+  this._id: 'aklsjdf;lkj',
+  this.name: 'me',
+  this.robot: 'zoom',
+  this.dock: [],
+  this.position: [row,col],
+  this.bearing: [row,col,dir],
+  this.livesRemaining: 3,
+  this.damage: 2,
+  this.hand: [],
+  this.register: [],
+  this.ready: false,
+  this.flagCount: 0
+}
