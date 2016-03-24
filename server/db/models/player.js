@@ -268,13 +268,14 @@ playerSchema.methods.setRegister = function(cards) { //assumes we are getting an
 
 
 playerSchema.methods.emptyRegister = function() {
+  var prevRegister = this.register;
+
   if (this.damage < 5) this.register = [0, 0, 0, 0, 0];
-  this.register.slice(4)
-  else if(this.damage === 5) this.register = [0, 0, 0, 0, locked];
-  else if(this.damage === 6) this.register = [0, 0, 0];
-  else if(this.damage === 7) this.register = [0, 0];
-  else if(this.damage === 8) this.register = [0];
-  else return
+  else if(this.damage === 5) this.register = [0, 0, 0, 0].concat(prevRegister.slice(4));
+  else if(this.damage === 6) this.register = [0, 0, 0].concat(prevRegister.slice(3));
+  else if(this.damage === 7) this.register = [0, 0].concat(prevRegister.slice(2));
+  else if(this.damage === 8) this.register = [0].concat(prevRegister.slice(1));
+  else return;
 }
 
 
