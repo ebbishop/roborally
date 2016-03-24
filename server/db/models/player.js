@@ -63,7 +63,7 @@ playerSchema.methods.boardMove = function (bearing) {
   newCol += bearing[0];
   newRow += bearing[1];
   // check if move is possible
-  if (newCol < 0 || newRow < 0) return this.loseLife()
+  if (newCol < 0 || newRow < 0) return this.loseLife()  // AW: loseLife should return something 
 
   else {
     this.set('position', [newCol, newRow]);
@@ -89,7 +89,7 @@ playerSchema.methods.rotate = function (rotation){
   var cardinal = this.setCardinal(row, col)
 
   this.set('bearing', [row, col, cardinal])
-  this.save()
+  this.save()  // AW: return the saved thing?
 }
 
 playerSchema.methods.cardMove = function (magnitude) {
@@ -101,6 +101,8 @@ playerSchema.methods.cardMove = function (magnitude) {
   return player.checkMove(player.bearing)
   .then(function(result) {
     if (result === true) {
+
+      // AW: synchronous loop for managing async operations
       while(magnitude > 0){
 
         newCol += player.bearing[1];
@@ -152,7 +154,7 @@ playerSchema.methods.getOpponents = function(){
   return this.model('Player')
   .find({game: this.game})
   .where({_id :{$ne: this._id}})
-  .bind(this);
+  .bind(this);  // AW: what is `bind` doing here?
 };
 
 playerSchema.methods.boardMove = function (bearing) {
@@ -162,7 +164,7 @@ playerSchema.methods.boardMove = function (bearing) {
   newCol += bearing[0];
   newRow += bearing[1];
   return
-  this.set('position', [newCol, newRow]);
+  this.set('position', [newCol, newRow]);   // AW: do you want to persist this change?
 };
 
 playerSchema.methods.pushPlayer = function (){
@@ -178,6 +180,7 @@ playerSchema.methods.checkMove = function(bearing) {
   var key = 'edge' + bearing[2];
   return this.findMyTile()
   .then(function(tile) {
+    // AW: return tile[key] === null; 
     if (tile[key] === null) return true;
     else return false
   })
@@ -196,6 +199,7 @@ playerSchema.methods.cardMove = function (magnitude) {
   })
   .then(function(result) {
     if (result === true) {
+      // AW: this wont work 
       while(magnitude > 0){
         newCol += this.bearing[1];
         if (newCol < 0) return this.loseLife()
@@ -246,6 +250,9 @@ playerSchema.methods.checkIfWinner = function() {
   })
 }
 
+
+// AW: should applyDamage know about checkDamanage? or maybe there should be a `damageAccounting`
+// fn that invokes both
 playerSchema.methods.applyDamage = function(hitCount){
   var player = this;
   return player.update({$inc: {damage: hitCount}}, {new: true})
@@ -264,25 +271,41 @@ playerSchema.methods.checkDamage = function() {
   }
 }
 
+// // AW: should this be called, "manageDamage" or "AccountForDamage"?
+// playerSchema.methods.checkDamage = function() {
+  
+//   if (this.damage > 9) {
+//     this.set('damage', 0)
+//     return this.loseLife() // AW: this saves the doc so no need to save it and then call loseLife
+//   }
+//   // AW: what happens if damage is not greater than 9 
+//   // aw: else {}
+// }
+
+// AW: maybe this method should not save the player? maybe it should?
 playerSchema.methods.loseLife = function() {
   this.livesRemaining--;
   if (this.livesRemaining === 0) return this.killPlayer();
   else {
+    // AW: should this method change the position or just subtract lives?
     this.set('position', this.dock);
+    // return this.save()?
     this.save();
   }
 };
 
 playerSchema.methods.killPlayer = function() {
   this.set('_id', null); //how should we kill players?
-  this.save();
+  this.save();   // AW: return this.save() ??
 };
 
+
+// AW: should this method be on the game object?
 playerSchema.methods.gameover = function() {
   return mongoose.model('Game').findById(this.game)
   .then(function(game) {
     game.state = 'gameover';
-    game.save();
+    game.save(); 
   });
 };
 

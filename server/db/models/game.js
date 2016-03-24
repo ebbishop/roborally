@@ -35,6 +35,7 @@ var gameSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  // AW: how does this work?
   deck: { 
     type: [Number],
     default: [10,20,30,40,50,60,70,90,110,130,150,170,190,210,230,250,270,290,310,330,350,370,390,410,80,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380,400,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730,740,750,760,770,780,790,800,810,820,830,840]
@@ -63,6 +64,11 @@ gameSchema.methods.initializeGame = function (){
   })
 };
 
+// AW: could initializeGame be written like so? assignDocks and dealCards at the same time?
+// gameSchema.methods.initializeGame = function (){
+//   return Promise.all([this.assignDocks(), this.dealCards()]) 
+// };
+
 gameSchema.methods.initiatePhase = function() {
   var game = this
   var allPlayers;
@@ -77,6 +83,20 @@ gameSchema.methods.initiatePhase = function() {
     if (readyPlayers.length == allPlayers) game.runOnePhase()
   })
 }
+
+// AW: can write initiatePhase like so: 
+// gameSchema.methods.initiatePhase = function() {
+//   return Promise.resolve(this.getPlayers()).bind(this)
+//   .then(function(players) {
+//     var readyPlayers = players.filter(function(player) {
+//       return player.ready === true;
+//     })
+//     if (readyPlayers.length === players.length) this.runOnePhase()
+//   })
+// }
+
+
+
 
 // one phase = one register (one card) + one complete board move
 // there are five phases per round
@@ -146,6 +166,7 @@ gameSchema.methods.getPlayerTiles = function () {
 
 gameSchema.methods.getBoardWithTiles = function () {
   return Board.findById(this.board)
+  // AW: just use one populate
   .populate('col0')
   .populate('col1')
   .populate('col2')
@@ -333,6 +354,8 @@ gameSchema.methods.getPlayerAt = function(position){
   })
 }
 
+// AW: pass the col number, generate the key as stored on the board 
+// 
 gameSchema.methods.getTileAt = function (position) {
   // position is array = [row, col]
   var colStr = 'col' + col.toString();
@@ -379,6 +402,7 @@ gameSchema.methods.shuffleCards = function () {
 
 //helper function for dealCards method
 gameSchema.methods.numberOfCardsToDeal = function() {
+  //AW: no need for `self` here.
     var self = this;
     var numCards = 0;
     return self.getPlayers()
@@ -396,7 +420,17 @@ gameSchema.methods.dealCards = function() {
     var self = this;
     var deck = self.deck
     var numCardsToDeal,cardsToDeal;
+    // AW: no need for `self` here 
+    /*
+      AW: get players and number of cards to deal at the same time??
 
+      Promise.all([
+        this.getPlayers(), 
+        this.numberofCardsToDeal()
+      ])
+    
+
+    */
     return self.numberOfCardsToDeal()
     .then(function(numCards){
         numCardsToDeal = numCards;
@@ -408,6 +442,7 @@ gameSchema.methods.dealCards = function() {
       game.getPlayers()
     })
     .then(function(players){
+      // AW: what's happening here?
       return players.reduce(function(accumulator, player){
         return accumulator.then(function(){
             var newHand = cardsToDeal.slice(0, 9-player.damage)
@@ -435,6 +470,7 @@ gameSchema.methods.assignDocks = function() {
       var numPlayers = players.length;
       var docks = [1,2,3,4,5,6,7,8];
 
+      // AW: whats happening here?
       return players.reduce(function(acc, player){
         return acc.then(function() {
           var dockNum = _.sample(docks)

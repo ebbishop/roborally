@@ -12,6 +12,7 @@ game.playCard = function (i){
 
 game.boardMove = function (players) {
 
+  // AW: guessing you'll want to use bluebird to manage the asynchronicity here 
   playCards(); //one register in order of priority
   moveExpressBelts();
   moveAllBelts();

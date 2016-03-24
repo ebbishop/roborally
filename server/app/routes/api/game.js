@@ -44,6 +44,24 @@ router.post('/', function(req, res, next) {
 	.then(null, next)
 })
 
+// AW: better promise chain
+// router.post('/', function(req, res, next) {
+// 	Game.create(req.body)
+// 	.then(function(newGame) {
+// 		return newGame.initializeGame()
+// 	})
+// 	.then(function(updatedGame) {
+// 		var newGame = firebaseHelper.getConnection(updatedGame._id)
+// 		newGame.child('game').set(updatedGame)
+// 			// sending game info to frontend so we can use it's ID to retrieve data from firebase
+// 		res.status(201).send(updatedGame)
+// 			// var newGame = firebaseHelper.getConnection('1234')
+// 			// newGame.child('game').set('game info')
+// 	})
+// 	.then(null, next)
+// })
+
+
 // player selects robot and THEN clicks 'join game'
 // add player to game and assign game id to the player
 router.post('/:gameId/player', function(req, res, next) {
@@ -53,6 +71,11 @@ router.post('/:gameId/player', function(req, res, next) {
 		newPlayer.set({'game': gameId})
 		newPlayer.save()
 		return newPlayer
+		/*
+			AW: think you want to do: 
+			return newPlayer.save()
+
+		*/
 	})
 	.then(function(newPlayer) {
 		//sending player info to frontend so we can use it's ID to retrieve data from firebase
