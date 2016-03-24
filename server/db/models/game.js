@@ -253,6 +253,21 @@ gameSchema.methods.shuffleDeck = function() {
   this.discardDeck = [];
 };
 
+
+gameSchema.methods.checkIfWinner = function() {
+  this.players.forEach(function(p) {
+    if (this.numFlags === p.flagCount) return this.gameover();
+  })
+}
+
+
+gameSchema.methods.gameover = function() {
+  this.state = 'gameover'
+  //at this point, we should stop everything and push game state into gameFB array
+  //potentially save to database?
+}
+
+
 gameSchema.methods.allPlayersReady = function() {
   var ready = this.players.filter(function(p){
     if(p.ready) return true;
