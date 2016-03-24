@@ -46,6 +46,10 @@ var gameSchema = new mongoose.Schema({
   numFlags: {
     type: Number,
     enum: [1,2,3,4]
+  },
+  inProgress: {
+    type: Boolean, 
+    default: false
   }
 });
 
@@ -259,34 +263,23 @@ gameSchema.methods.allPlayersReady = function() {
   return false;
 }
 
-gameSchema.methods.initiatePhase = function() {
+gameSchema.methods.checkReady = function() {
   if (this.allPlayersReady()) this.runOnePhase()
 }
 
-// not sure what to do with these
 gameSchema.methods.assignDocks = function() {
-  return this.getPlayers()
-  .then(function(players){
-    var numPlayers = players.length;
-    var docks = [1,2,3,4,5,6,7,8];
-
-    return players.reduce(function(acc, player){
-      return acc.then(function() {
-        var dockNum = _.sample(docks)
-        player.dock = dockNum;
-        var idx = docks.indexOf(dockNum)
-        docks.splice(idx, 1);
-        return player.save()    
-      })
-    }, Promise.resolve())
-  })
+  var docks = [1,2,3,4,5,6,7,8];
+  this.players.forEach(function(player){
+    var dock = _.sample(docks);
+    players.dock = dockNum;
+    docks.splice(docks.indexOf(dockNum),1);
+  });
 }
 
 gameSchema.methods.initializeGame = function (){
+  this.assignDocks();
   this.dealCards();
 };
-
-
 
 mongoose.model('Game', gameSchema);
 
