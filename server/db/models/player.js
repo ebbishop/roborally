@@ -37,6 +37,11 @@ var playerSchema = new mongoose.Schema({
 
 playerSchema.set('versionKey', false);
 
+playerSchema.statics.initiate = function() {
+  //find dock number
+  //find location of dock tile
+  //set start position
+};
 
 playerSchema.methods.playCard = function(i){
   var cardNum = this.register[i];
@@ -100,7 +105,7 @@ playerSchema.methods.cardMove = function (magnitude) {
 
         newCol += player.bearing[1];
         if (newCol < 0) return player.loseLife()
-        
+
         newRow += player.bearing[0];
         if (newRow < 0) return player.loseLife()
 
@@ -130,7 +135,7 @@ playerSchema.methods.setCardinal = function(row, col) {
       cardinal = 'N';
       break;
     case (row===0 && col===1):
-      cardinal = 'E'
+      cardinal = 'E';
       break;
     case (row===0 && col===-1):
       cardinal = 'W';
@@ -142,6 +147,33 @@ playerSchema.methods.setCardinal = function(row, col) {
   return cardinal;
 };
 
+
+playerSchema.methods.getOpponents = function(){
+  return this.model('Player')
+  .find({game: this.game})
+  .where({_id :{$ne: this._id}})
+  .bind(this);
+};
+
+playerSchema.methods.boardMove = function (bearing) {
+  // call when self.bearing is not relevant
+  var newCol = this.position[0];
+  var newRow = this.position[1];
+  newCol += bearing[0];
+  newRow += bearing[1];
+  return
+  this.set('position', [newCol, newRow]);
+};
+
+playerSchema.methods.pushPlayer = function (){
+  return this.getOpponents().bind(this)
+  .then(function(opponents){
+    return Promise.map(opponents, function(o){
+      // if
+    })
+  })
+};
+
 playerSchema.methods.checkMove = function(bearing) {
   var key = 'edge' + bearing[2];
   return this.findMyTile()
@@ -150,6 +182,33 @@ playerSchema.methods.checkMove = function(bearing) {
     else return false
   })
 }
+
+playerSchema.methods.cardMove = function (magnitude) {
+  var newCol = this.position[1];
+  var newRow = this.position[0];
+
+  // check that move is permitted
+  return this.checkMove()
+  .then(function(result){
+    if (result === true){
+
+    }
+  })
+  .then(function(result) {
+    if (result === true) {
+      while(magnitude > 0){
+        newCol += this.bearing[1];
+        if (newCol < 0) return this.loseLife()
+        newRow += this.bearing[0];
+        if (newRow < 0) return this.loseLife()
+        magnitude --;
+      }
+      this.set('position', [newRow, newCol]);
+    }
+  })
+}
+
+
 
 playerSchema.methods.checkForPit = function(row, col) {
   return this.findMyTile(row, col)
@@ -183,7 +242,7 @@ playerSchema.methods.checkIfWinner = function() {
   return mongoose.model('Game').findById(player.game)
   .then(function(game) {
     if (game.numFlags === player.flagCount) return true;
-    else return false
+    else return false;
   })
 }
 
@@ -206,31 +265,31 @@ playerSchema.methods.checkDamage = function() {
 }
 
 playerSchema.methods.loseLife = function() {
-  this.livesRemaining--
-  if (this.livesRemaining === 0) return this.killPlayer()
-  else { 
+  this.livesRemaining--;
+  if (this.livesRemaining === 0) return this.killPlayer();
+  else {
     this.set('position', this.dock);
     this.save();
   }
-}
+};
 
 playerSchema.methods.killPlayer = function() {
   this.set('_id', null); //how should we kill players?
   this.save();
-}
+};
 
 playerSchema.methods.gameover = function() {
   return mongoose.model('Game').findById(this.game)
   .then(function(game) {
     game.state = 'gameover';
-    game.save()
-  })
-}
+    game.save();
+  });
+};
 
 playerSchema.methods.findMyTile = function(row, col){
   var player = this;
-  var row = row || player.position[0]
-  var col = col || player.postion[1]
+  var row = row || player.position[0];
+  var col = col || player.postion[1];
 
   return mongoose.model('Game').findById(player.game)
   .then(function(game){
@@ -263,11 +322,11 @@ playerSchema.methods.clearHand = function() {
     var handToDiscard = this.hand;
     return mongoose.model('Game').findByIdAndUpdate(player.game,
         {$push:  {discard: {$each: handToDiscard} } } );
-}
+};
 
 playerSchema.methods.isPlayerReady = function() {
-    return this.ready
-}
+    return this.ready;
+};
 
 playerSchema.methods.setRegister = function(cards) { //assumes we are getting an array of cards from the front end in order
   var self = this;
@@ -281,7 +340,7 @@ playerSchema.methods.setRegister = function(cards) { //assumes we are getting an
   else return;
 
   self.save();
-}
+};
 
 mongoose.model('Player', playerSchema);
 
@@ -310,13 +369,6 @@ mongoose.model('Player', playerSchema);
 // // updates player's own 'ready' status and checks all others in the same game
 // playerSchema.methods.iAmReady = function(register){
 //   return this.set({ready: true, register: register}).save();
-// };
-
-// playerSchema.methods.getOpponents = function(){
-//   return this.model('Player')
-//   .find({game: this.game})
-//   .where({_id :{$ne: this._id}})
-//   .bind(this);
 // };
 
 // playerSchema.methods.updateHand = function(cards){
@@ -454,4 +506,4 @@ var programCards = [
  { name: 'Move 3',   rotation: 0,   magnitude: 3,   priority: 810 },
  { name: 'Move 3',   rotation: 0,   magnitude: 3,   priority: 820 },
  { name: 'Move 3',   rotation: 0,   magnitude: 3,   priority: 830 },
- { name: 'Move 3',   rotation: 0,   magnitude: 3,   priority: 840 } ]
+ { name: 'Move 3',   rotation: 0,   magnitude: 3,   priority: 840 } ];
