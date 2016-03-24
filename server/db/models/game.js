@@ -470,6 +470,20 @@ gameSchema.methods.assignDocks = function() {
 }
 
 
+gameSchema.methods.checkIfWinner = function() {
+  this.players.forEach(function(p) {
+    if (this.numFlags === p.flagCount) return this.gameover();
+  })
+}
+
+
+gameSchema.methods.gameover = function() {
+  this.state = 'gameover'
+  //at this point, we should stop everything and push game state into gameFB array
+  //potentially save to database?
+}
+
+
 mongoose.model('Game', gameSchema);
 
 

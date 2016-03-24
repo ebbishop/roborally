@@ -37,6 +37,13 @@ var playerSchema = new mongoose.Schema({
 
 playerSchema.set('versionKey', false);
 
+var moveBlocked = {
+  'N': {exit: 'edgeN', enter: 'edgeS'},
+  'S': {exit: 'edgeS', enter: 'edgeN'},
+  'E': {exit: 'edgeE', enter: 'edgeW'},
+  'W': {exit: 'edgeW', enter: 'edgeE'}
+};
+
 
 playerSchema.statics.initiate = function() {
   //find dock number
@@ -66,6 +73,7 @@ playerSchema.methods.rotate = function (rotation){
   var cardinal = this.setCardinal(row, col)
 
   this.set('bearing', [row, col, cardinal])
+  return [row, col, cardinal]
 }
 
 
@@ -117,27 +125,16 @@ playerSchema.methods.killPlayer = function() {
 };
 
 
-function findOppositeBearing(bearing) {
-  if (bearing == [-1,0,'N']) return [1,0,'S'];
-  if (bearing == [0,1,'E']) return [0,-1,'W'];
-  if (bearing == [1,0,'S']) return [-1,0,'N'];
-  if (bearing == [0,-1,'W']) return [0,1,'E'];
-}
-
-
 playerSchema.methods.checkMove = function() {
-  var currentKey = 'edge' + this.bearing[2];
-  var oppositeBearing = findOppositeBearing(this.bearing)
-  var nextKey = 'edge' + oppositeBearing[2]
-
   var currentPosition = this.position;
   var nextPosition = [this.position[0] + this.bearing[0], this.position[1] + this.bearing[1]]
 
   var currentTile = this.game.getTileAt(currentPosition)
   var nextTile = this.game.getTileAt(nextPosition)
 
-  if (currentTile[currentKey] === null && nextTile[nextKey] === null) return true;
-  else return false;
+  if(currentTile[moveBlocked[this.bearing[2]]['exit']]) return false;
+  else if(nextTile[moveBlocked[this.bearing[2]]['enter']]) return false;
+  else return true;
 }
 
 
@@ -165,13 +162,10 @@ playerSchema.methods.cardMove = function (magnitude) {
   if (checkMove === true) {
     while (magnitude > 0) {
       newCol += this.bearing[1];
-      if (newCol < 0 || newCol > 11) return this.loseLife();
-
       newRow += this.bearing[0];
-      if (newRow < 0 || newRow > 15) return this.loseLife();
 
-      var checkPit = this.checkForPit(newRow, newCol);
-      if (checkPit === true) return this.loseLife();
+      var edgeOrPit = this.checkForEdgeOrPit(newRow, newCol)
+      if (edgeOrPit === true) return this.loseLife();
 
       magnitude--
     }
@@ -183,9 +177,9 @@ playerSchema.methods.cardMove = function (magnitude) {
 }
 
 
-playerSchema.methods.checkForPit = function(row, col) {
+playerSchema.methods.checkForEdgeOrPit = function(row, col) {
   var tile = this.game.getTileAt(row, col)
-  if (tile.floor === 'pit') return true;
+  if (tile.floor === 'pit' || col < 0 || col > 11 || row < 0 || row > 15) return true;
   else return false;
 }
 
@@ -195,23 +189,10 @@ playerSchema.methods.touchFlag = function(row, col) {
   if(tile.flag != null) {
     if(this.flagCount + 1 === tile.flag) {
       this.flagCount++;
-      this.checkIfWinner()
+      this.game.checkIfWinner()
     }
   }
 }
-
-
-playerSchema.methods.checkIfWinner = function() {
-  if (this.game.numFlags === this.flagCount) this.gameover();
-  else return;
-}
-
-
-playerSchema.methods.gameover = function() {
-  this.game.state = 'gameover'
-  //at this point, we should stop everything and push game state into gameFB array
-  //potentially save to database?
-};
 
 
 playerSchema.iAmReady = function() {
@@ -225,12 +206,12 @@ playerSchema.methods.isPlayerReady = function() {
 
 
 playerSchema.methods.evaluateDamage = function(hitCount) {
-  this.applyDamage(hitCount)
+  this.accrueDamage(hitCount)
   this.checkDamage()
 }
 
 
-playerSchema.methods.applyDamage = function(hitCount) {
+playerSchema.methods.accrueDamage = function(hitCount) {
   this.damage += hitCount
 }
 
@@ -243,15 +224,13 @@ playerSchema.methods.checkDamage = function() {
 }
 
 
+//after first round, assume that we call empty register before setRegister
 playerSchema.methods.setRegister = function(cards) { //assumes we are getting an array of cards from the front end in order
-  var prevRegister = this.register;
+  var cards = cards;
 
-  if(this.damage < 5 && cards.length === 5) this.register = cards;
-  else if(this.damage === 5 && cards.length === 4) this.register = cards.concat(prevRegister.slice(4));
-  else if(this.damage === 6 && cards.length === 3) this.register = cards.concat(prevRegister.slice(3));
-  else if(this.damage === 7 && cards.length === 2) this.register = cards.concat(prevRegister.slice(2));
-  else if(this.damage === 8 && cards.length === 1) this.register = cards.concat(prevRegister.slice(1));
-  else return;
+  for (var i=0; i<5; i++) {
+    if (this.register[i] === 0) this.register[i] = cards.shift();
+  }
 
 };
 
