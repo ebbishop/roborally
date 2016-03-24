@@ -38,7 +38,7 @@ game
     +runBoard()
       +runOneRegister()
       +runBelt()
-      -check players after belt run
+      +check players after belt run
       +fireBoardLasers()
       +fireRobotLasers
         +fireOneLaser() --come back to this, it is messy

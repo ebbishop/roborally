@@ -40,7 +40,7 @@ playerSchema.statics.initiate = function() {
   //find dock number
   //find location of dock tile
   //set start position
-}
+};
 
 playerSchema.methods.playCard = function(i){
   var cardNum = this.register[i];
@@ -84,19 +84,35 @@ playerSchema.methods.rotate = function (rotation){
   this.set('bearing', [row, col, cardinal]);
 };
 
+playerSchema.methods.setCardinal = function() {
+
+};
+
+playerSchema.methods.getOpponents = function(){
+  return this.model('Player')
+  .find({game: this.game})
+  .where({_id :{$ne: this._id}})
+  .bind(this);
+};
+
 playerSchema.methods.boardMove = function (bearing) {
   // call when self.bearing is not relevant
   var newCol = this.position[0];
   var newRow = this.position[1];
   newCol += bearing[0];
   newRow += bearing[1];
-  // check if move is possible
+  return
   this.set('position', [newCol, newRow]);
 };
 
-playerSchema.methods.setCardinal = function() {
-
-}
+playerSchema.methods.pushPlayer = function (){
+  return this.getOpponents().bind(this)
+  .then(function(opponents){
+    return Promise.map(opponents, function(o){
+      if
+    })
+  })
+};
 
 playerSchema.methods.cardMove = function (magnitude) {
   var newCol = this.position[1];
@@ -104,6 +120,11 @@ playerSchema.methods.cardMove = function (magnitude) {
 
   // check that move is permitted
   return this.checkMove()
+  .then(function(result){
+    if (result === true){
+
+    }
+  })
   .then(function(result) {
     if (result === true) {
       while(magnitude > 0){
@@ -147,8 +168,8 @@ playerSchema.methods.applyDamage = function(hitCount){
   var player = this;
   return this.update({$inc: {damage: hitCount}}, {new: true})
   .then(function() {
-    return player.checkHealth()
-  })
+    return player.checkHealth();
+  });
 };
 
 playerSchema.methods.checkHealth = function() {
@@ -224,13 +245,6 @@ mongoose.model('Player', playerSchema);
 // // updates player's own 'ready' status and checks all others in the same game
 // playerSchema.methods.iAmReady = function(register){
 //   return this.set({ready: true, register: register}).save();
-// };
-
-// playerSchema.methods.getOpponents = function(){
-//   return this.model('Player')
-//   .find({game: this.game})
-//   .where({_id :{$ne: this._id}})
-//   .bind(this);
 // };
 
 // playerSchema.methods.updateHand = function(cards){

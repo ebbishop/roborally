@@ -49,10 +49,19 @@ var laserBlockedBy = {
   'W': {exit: 'edgeW', enter: 'edgeE'}
 };
 
+gameSchema.methods.initializeGame = function (){
+// not sure this is necessary
+//
+};
+
+gameSchema.methods.runOneRound = function (){
+
+};
+
 // one phase = one register (one card) + one complete board move
-// there are five phases per hand
+// there are five phases per round
 gameSchema.methods.runOnePhase = function () {
-  if (this.currentCard < 5){
+  while (this.currentCard < 5){
     return this.runOneRegister().bind(this)
     .then(function(){
       return this.runBelts(2)
@@ -307,10 +316,6 @@ gameSchema.methods.getTileAt = function (position) {
     return Tile.findById(tId);
   });
 }
-
-gameSchema.methods.initializeGame = function(){
-
-};
 
 //call this method before every deal
 gameSchema.methods.shuffleCards = function () {
