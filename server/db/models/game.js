@@ -50,6 +50,10 @@ var gameSchema = new mongoose.Schema({
   inProgress: {
     type: Boolean, 
     default: false
+  },
+  isWon: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -79,10 +83,15 @@ gameSchema.methods.runOnePhase = function () {
     this.runGears();
     this.fireRobotLasers();
     this.fireBoardLasers();
+    this.touchFlags();
+    this.touchRepairs();
     this.currentCard ++;
   }
-  this.dealCards();
-  this.initiatePhase();
+
+  if(!this.isWon){
+    this.dealCards();
+    this.initiatePhase();
+  }
 }
 
 gameSchema.methods.runOneRegister = function () {
@@ -230,6 +239,28 @@ gameSchema.methods.fireOneLaser = function(laser){
   return this.fireOneLaser(laser);
 }
 
+gameSchema.methods.touchRepairs = function(){
+  var game = this;
+  var tile;
+  this.players.forEach(function(player){
+    tile = game.getTileAt(player.position);
+    if (tile.floor === 'wrench1' || tile.floor === 'wrench2') {
+      player.applyDamage(-1);
+    }
+  })
+}
+
+gameSchema.methods.touchFlags = function(){
+  var game = this;
+  var tile;
+  this.players.forEach(function(player){
+    tile = game.getTileAt(player.position);
+    if (tile.flag === player.flagCount + 1) {
+      player.touchFlag(tile.flag);
+      player.applyDamage(-1);
+    }
+  })
+}
 
 // one phase = one register (one card) + one complete board move
 // there are five phases per round
@@ -268,18 +299,25 @@ gameSchema.methods.gameover = function() {
 }
 
 
-gameSchema.methods.allPlayersReady = function() {
+gameSchema.methods.areAllPlayersReady = function() {
   var ready = this.players.filter(function(p){
-    if(p.ready) return true;
-    return false;
+    return p.ready === true;
   })
-
-  if (ready.length === this.players.length) return true;
-  return false;
+  return ready.length === this.players.length
 }
 
 gameSchema.methods.checkReady = function() {
-  if (this.allPlayersReady()) this.runOnePhase()
+  if (this.areAllPlayersReady()) this.runOnePhase()
+}
+
+gameSchema.methods.isGameWon = function(){
+  var game = this;
+  this.players.forEach(function(player){
+    if (player.flagCount===game.numFlags) {
+      game.isWon = true;
+      game.inProgress = false;
+    }
+  })
 }
 
 gameSchema.methods.assignDocks = function() {
