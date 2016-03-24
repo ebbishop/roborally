@@ -117,17 +117,6 @@ playerSchema.methods.killPlayer = function() {
 };
 
 
-//might not need
-playerSchema.methods.findMyTile = function(row, col){
-  var position, tile;
-  var row = row || player.position[0];
-  var col = col || player.postion[1];
-
-  position = [row, col]
-  return player.game.getTileAt(position)
-};
-
-
 function findOppositeBearing(bearing) {
   if (bearing == [-1,0,'N']) return [1,0,'S'];
   if (bearing == [0,1,'E']) return [0,-1,'W'];
@@ -280,19 +269,9 @@ playerSchema.methods.emptyRegister = function() {
 
 
 
-// playerSchema.methods.emptyRegister = function(){
-//   var newRegister = this.register;
-//   var damage = this.damage;
-//   for (var i = 0; i < 5; i ++){
-//     if(9 - damage > i){
-//       newRegister[i] = null;
-//     }
-//   }
-//   this.set('register', newRegister);
-//   return this.save();
-// };
 
-//make this move only one space at a time?
+
+
 
 // moveEntireCard(magnitude){
 //   while magnitude > 1{
@@ -310,13 +289,17 @@ playerSchema.methods.emptyRegister = function() {
 // }
 
 
+// playerSchema.methods.findMyTile = function(row, col){
+//   var position, tile;
+//   var row = row || player.position[0];
+//   var col = col || player.postion[1];
+
+//   position = [row, col]
+//   return player.game.getTileAt(position)
+// };
 
 
-
-
-
-
-
+//do we need these?
 playerSchema.methods.getOpponents = function(){
   return this.model('Player')
   .find({game: this.game})
