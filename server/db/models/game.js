@@ -88,9 +88,10 @@ gameSchema.methods.runOnePhase = function () {
     this.currentCard ++;
   }
 
-  if(!this.isWon)
-  this.dealCards();
-  this.initiatePhase();
+  if(!this.isWon){
+    this.dealCards();
+    this.initiatePhase();
+  }
 }
 
 gameSchema.methods.runOneRegister = function () {
