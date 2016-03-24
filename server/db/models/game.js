@@ -55,6 +55,66 @@ var laserBlockedBy = {
   'W': {exit: 'edgeW', enter: 'edgeE'}
 };
 
+gameSchema.methods.initializeGame = function (){
+  var game = this;
+  game.assignDocks()
+  .then(function(){
+    game.dealCards()
+  })
+};
+
+gameSchema.methods.initiatePhase = function() {
+  var game = this
+  var allPlayers;
+  return this.getPlayers()
+  .then(function(players) {
+    allPlayers = players.length
+    return players.filter(function(player) {
+      return player.ready == true
+    })
+  })
+  .then(function(readyPlayers) {
+    if (readyPlayers.length == allPlayers) game.runOnePhase()
+  })
+}
+
+// one phase = one register (one card) + one complete board move
+// there are five phases per round
+gameSchema.methods.runOnePhase = function () {
+  var game = this;
+  while (this.currentCard < 5){
+    return this.runOneRegister().bind(this)
+    .then(function(){
+      return this.runBelts(2)
+    })
+    .then(function(){
+      return this.runBelts(1)
+    })
+    .then(function(){
+      return this.runPushers();
+    })
+    .then(function(){
+      return this.runGears();
+    })
+    .then(function(){
+      return this.fireRobotLasers();
+    })
+    .then(function(){
+      return this.fireBoardLasers();
+    })
+    .then(function(){
+      return this.update({$inc: {currentCard: 1}})
+    })
+  }
+  game.shuffleCards()
+  .then(function() {
+    return game.dealCards()
+  })
+  .then(function() {
+    return game.initiatePhase()
+  })
+}
+
 gameSchema.methods.runOneRegister = function () {
   var currentCard = this.currentCard;
   return this.getPlayers()
@@ -69,23 +129,20 @@ gameSchema.methods.runOneRegister = function () {
       player.playCard(currentCard);
     });
   })
-  .then(function(){
-    this.currentCard ++;
-  })
 };
 
 gameSchema.methods.getPlayers = function (){
   return Player.find({game: this._id});
-}
+};
 
 gameSchema.methods.getPlayerTiles = function () {
   return this.getPlayers()
   .then(function(players){
     return Promise.map(players, function(p){
       return p.attachMyTile()
-    })
-  })
-}
+    });
+  });
+};
 
 gameSchema.methods.getBoardWithTiles = function () {
   return Board.findById(this.board)
@@ -115,9 +172,11 @@ gameSchema.methods.runGears = function (){
 };
 
 gameSchema.methods.runPushers = function (){
+  var pushed = []
   for (var i = 0; i < 12; i++){
-    this.runPushersInCol(i)
+    pushed.push(this.runPushersInCol(i))
   }
+  return Promise.all(pushed);
 }
 
 gameSchema.methods.runPushersInCol = function (col){
@@ -127,16 +186,16 @@ gameSchema.methods.runPushersInCol = function (col){
   .then(function(b){
     b.colStr.forEach(function(tile, i){
       if(tile.edgeN === 'push' + pushType.toString()) {
-        this.pushOnePusher({bearing: [1, 0], start: [i, col]});
+        return this.pushOnePusher({bearing: [1, 0], start: [i, col]});
       }
       if(tile.edgeE === 'push' + pushType.toString()) {
-        this.pushOnePusher({bearing: [0, -1], start: [i, col]});
+        return this.pushOnePusher({bearing: [0, -1], start: [i, col]});
       }
       if(tile.edgeS === 'push' + pushType.toString()) {
-        this.pushOnePusher({bearing: [-1, 0], start: [i, col]});
+        return this.pushOnePusher({bearing: [-1, 0], start: [i, col]});
       }
       if(tile.edgeW === 'push' + pushType.toString()) {
-        this.pushOnePusher({bearing: [0, 1], start: [i, col]});
+        return this.pushOnePusher({bearing: [0, 1], start: [i, col]});
       }
     });
   })
@@ -152,56 +211,56 @@ gameSchema.methods.pushOnePusher = function (pusher){
   });
 };
 
-gameSchema.methods.runBelts = function(type) { //type is 1 or 2. 1 = all
+
+gameSchema.methods.runBelts = function (type){
   return this.getPlayerTiles().bind(this)
   .then(function(playersWithTile){
     return Promise.map(playersWithTile, function(p){
-      if (p.tile.conveyor && p.tile.conveyor.magnitude >=type){
-        return p.boardMove(p.tile.conveyor.bearing);
+      if (p.tile.conveyor && p.tile.conveyor.magnitude >= type){
+        var nextPosition = [];
+        var c = p.tile.conveyor;
+        nextPosition.push(p.position[0] + c.bearing[0]);
+        nextPosition.push(p.position[1] + c.bearing[1]);
+        var deg = getRotation(orig, next);
+        return Player.findById(p._id);
       }
+    })
+    .then(function(p){
+      return Promise.all([p.rotate(deg), p.boardMove(c.bearing)])
     });
-  })
-  .then(function(players){
-    return this.checkPostBeltLocs(type);
   });
 };
 
 
-gameSchema.methods.checkPostBeltLocs = function (type, prevloc){
-  return this.getPlayerTiles()
-  .then(function(playersWithTile){
-    return Promise.map(playersWithTile, function(p){
-      if (p.tile.conveyor && p.tile.conveyor.magnitude >=type){
-        if (p.tile.conveyor.type === 'clockwise') return p.rotate(90);
-        else if(p.tile.conveyor.type === 'counterclock') return p.rotate(-90);
-        // 'merge1CCW', 'merge1CW', 'merge2'
-        // else if(p.tile.conveyor.type === ''){} DON'T KNOW WHAT TO DO WITH THIS
-      }
-      else if (p.tile.floor === 'pit' || !p.tile){
-        return p.loseLife();
-      }
-    })
-  })
+function getRotation (orig, next){
+  var dot = -orig[0]*next[1] + orig[1]*next[0];
+  var rad = Math.asin(dot);
+  var deg = rad * (180/Math.PI);
+  return deg;
 }
 
 gameSchema.methods.fireRobotLasers = function (){
+  var fired = [];
   return this.getPlayers().bind(this)
   .then(function(players){
     players.forEach(function(p){
-      this.fireOneLaser({
+      fired.push(this.fireOneLaser({
         start: p.position,
         qty: 1,
         bearing: p.bearing,
         direction: p.compassDirection
-      });
+      }))
     });
+    return Promise.all(fired);
   });
 };
 
 gameSchema.methods.fireBoardLasers = function (){
+  var fired = [];
   for (var i = 0; i < 12; i ++){
-    this.fireLasersInCol(i);
+    fired.push(this.fireLasersInCol(i));
   }
+  return Promise.all(fired)
 }
 
 gameSchema.methods.fireLasersInCol = function (col) {
@@ -210,16 +269,16 @@ gameSchema.methods.fireLasersInCol = function (col) {
   .then(function(b){
     b.colStr.forEach(function(tile, i){
       if(tile.edgeN.slice(0,4) === 'wall') {
-        this.fireOneLaser({start: [i, col], qty:Number(tile.edgeN[4]), bearing: [1, 0], direction: 'S'});
+        return this.fireOneLaser({start: [i, col], qty:Number(tile.edgeN[4]), bearing: [1, 0], direction: 'S'});
       }
       if(tile.edgeE.slice(0,4) === 'wall') {
-        this.fireOneLaser({start: [i, col], qty:Number(tile.edgeE[4]), bearing: [0, -1], direction: 'W'});
+        return this.fireOneLaser({start: [i, col], qty:Number(tile.edgeE[4]), bearing: [0, -1], direction: 'W'});
       }
       if(tile.edgeS.slice(0,4) === 'wall') {
-        this.fireOneLaser({start: [i, col], qty:Number(tile.edgeS[4]), bearing: [-1, 0], direction: 'N'});
+        return this.fireOneLaser({start: [i, col], qty:Number(tile.edgeS[4]), bearing: [-1, 0], direction: 'N'});
       }
       if(tile.edgeW.slice(0,4) === 'wall') {
-        this.fireOneLaser({start: [i, col], qty:Number(tile.edgeW[4]), bearing: [0, 1], direction: 'E'});
+        return this.fireOneLaser({start: [i, col], qty:Number(tile.edgeW[4]), bearing: [0, 1], direction: 'E'});
       }
     });
   })
@@ -229,12 +288,11 @@ gameSchema.methods.fireOneLaser = function(laser){
   // laser has qty, bearing, direction (string), start properties
   var currLoc = laser.start;
   var nextLoc = laser.start;
-    // check current location for obstacles to exiting
+  // check current location for obstacles to exiting
   return this.getPlayerAt(currLoc).bind(this)
   .then(function(p){
     if (p){
-      p.applyDamage(laser.qty);
-      return;
+      return p.applyDamage(laser.qty);
     }else{
       return this.getTileAt(currLoc)
       .then(function(t){
@@ -259,7 +317,7 @@ gameSchema.methods.fireOneLaser = function(laser){
     if(t){
       laser.start[0] += laser.bearing[0];
       laser.start[1] += laser.bearing[1];
-      this.fireOneLaser(laser);
+      return this.fireOneLaser(laser);
     }
   })
 
@@ -286,14 +344,6 @@ gameSchema.methods.getTileAt = function (position) {
     return Tile.findById(tId);
   });
 }
-
-gameSchema.methods.initializeGame = function(){
-  var game = this;
-  game.assignDocks()
-  .then(function(){
-    game.dealCards()
-  })
-};
 
 //call this method before every deal
 gameSchema.methods.shuffleCards = function () {
@@ -397,21 +447,6 @@ gameSchema.methods.assignDocks = function() {
     })
 }
 
-gameSchema.methods.initiateRound = function() {
-  var game = this
-  var allPlayers;
-  return this.getPlayers()
-  .then(function(players) {
-    allPlayers = players.length
-    return players.filter(function(player) {
-      return player.ready == true
-    })
-  })
-  .then(function(readyPlayers) {
-    if (readyPlayers.length == allPlayers) game.runOnePhase()
-  })
-}
-
 
 mongoose.model('Game', gameSchema);
 
@@ -419,6 +454,43 @@ mongoose.model('Game', gameSchema);
 
 
 
+
+// gameSchema.methods.runBelts = function(type) { //type is 1 or 2. 1 = all
+//   return this.getPlayerTiles().bind(this)
+//   .then(function(playersWithTile){
+//     return Promise.map(playersWithTile, function(p){
+//       if (p.tile.conveyor && p.tile.conveyor.magnitude >=type){
+//         var conveyor = p.tile.conveyor;
+//         return Player.findById(p._id)
+//         .then(function(p){
+//           return p.boardMove(conveyor.bearing);
+//         })
+
+//       }
+//     });
+//   })
+//   .then(function(players){
+//     return this.checkPostBeltLocs(type);
+//   });
+// };
+
+
+// gameSchema.methods.checkPostBeltLocs = function (type, prevloc){
+//   return this.getPlayerTiles()
+//   .then(function(playersWithTile){
+//     return Promise.map(playersWithTile, function(p){
+//       if (p.tile.conveyor && p.tile.conveyor.magnitude >=type){
+//         if (p.tile.conveyor.type === 'clockwise') return p.rotate(90);
+//         else if(p.tile.conveyor.type === 'counterclock') return p.rotate(-90);
+//         // 'merge1CCW', 'merge1CW', 'merge2'
+//         // else if(p.tile.conveyor.type === ''){} DON'T KNOW WHAT TO DO WITH THIS
+//       }
+//       else if (p.tile.floor === 'pit' || !p.tile){
+//         return p.loseLife();
+//       }
+//     })
+//   })
+// }
 
 
 
