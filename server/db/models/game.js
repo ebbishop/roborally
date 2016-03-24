@@ -408,7 +408,7 @@ gameSchema.methods.initiateRound = function() {
     })
   })
   .then(function(readyPlayers) {
-    if (readyPlayers.length == allPlayers) game.runOneRegister()
+    if (readyPlayers.length == allPlayers) game.runOnePhase()
   })
 }
 
