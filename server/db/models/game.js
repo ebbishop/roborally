@@ -288,7 +288,11 @@ gameSchema.methods.getTileAt = function (position) {
 }
 
 gameSchema.methods.initializeGame = function(){
-
+  var game = this;
+  game.assignDocks()
+  .then(function(){
+    game.dealCards()
+  })
 };
 
 //call this method before every deal
@@ -391,6 +395,21 @@ gameSchema.methods.assignDocks = function() {
         })
       }, Promise.resolve())
     })
+}
+
+gameSchema.methods.initiateRound = function() {
+  var game = this
+  var allPlayers;
+  return this.getPlayers()
+  .then(function(players) {
+    allPlayers = players.length
+    return players.filter(function(player) {
+      return player.ready == true
+    })
+  })
+  .then(function(readyPlayers) {
+    if (readyPlayers.length == allPlayers) game.runOneRegister()
+  })
 }
 
 
