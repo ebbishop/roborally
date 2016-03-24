@@ -124,7 +124,7 @@ gameSchema.methods.getTileAt = function (position) {
   return this.board[colStr][position[0]];
 }
 
-gameSchema.methods.runGears = function(type){
+gameSchema.methods.runGears = function(){
   var game = this;
   this.players.forEach(function(p){
     var tile = game.getTileAt(p.position);
@@ -182,7 +182,7 @@ gameSchema.methods.fireBoardLasers = function (){
 
 gameSchema.methods.fireLasersInCol = function (col) {
   var colStr = 'col' + col.toString();
-  this.board[colStr].forEach(function(tile){
+  this.board[colStr].forEach(function(tile, i){
     if(tile.edgeN.slice(0,4) === 'wall') {
       this.fireOneLaser({start: [i, col], qty:Number(tile.edgeN[4]), bearing: [1, 0, 'S']});
     }
@@ -203,19 +203,19 @@ gameSchema.methods.fireOneLaser = function(laser){
   var tile, p;
 
    //find a player at the current location
-  p = this.getPlayerAt(currLoc);
+  p = this.getPlayerAt(laser.start);
 
   if( p.length > 0 ){
     //if there is a player, apply damage and quit
-    p.applyDamage(laser.qty); 
+    p.applyDamage(laser.qty);  //evaluate damage
     return;
   }
   
   //otherwise, get this tile to see if beam can exit
-  tile = this.getTileAt(currLoc); 
+  tile = this.getTileAt(laser.start); 
 
   // if beam cannot exit tile, quit
-  if (tile[laserBlockedBy[laser.direction]['exit']]) return;
+  if (tile[laserBlockedBy[laser.bearing[2]]['exit']]) return;
 
   //otherwise, check next tile for entering
   nextLoc[0]+=laser.bearing[0];
@@ -271,7 +271,7 @@ gameSchema.methods.assignDocks = function() {
   var docks = [1,2,3,4,5,6,7,8];
   this.players.forEach(function(player){
     var dock = _.sample(docks);
-    players.dock = dockNum;
+    player.dock = dockNum;
     docks.splice(docks.indexOf(dockNum),1);
   });
 }
