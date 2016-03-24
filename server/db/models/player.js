@@ -324,6 +324,10 @@ playerSchema.methods.clearHand = function() {
         {$push:  {discard: {$each: handToDiscard} } } );
 };
 
+playerSchema.methods.iAmReady = function(register){
+  return this.set({ready: true, register: register}).save();
+};
+
 playerSchema.methods.isPlayerReady = function() {
     return this.ready;
 };
@@ -341,6 +345,8 @@ playerSchema.methods.setRegister = function(cards) { //assumes we are getting an
 
   self.save();
 };
+
+
 
 mongoose.model('Player', playerSchema);
 
@@ -367,9 +373,6 @@ mongoose.model('Player', playerSchema);
 
 
 // // updates player's own 'ready' status and checks all others in the same game
-// playerSchema.methods.iAmReady = function(register){
-//   return this.set({ready: true, register: register}).save();
-// };
 
 // playerSchema.methods.updateHand = function(cards){
 //   this.set('hand', cards);
