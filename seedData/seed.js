@@ -58,15 +58,14 @@ function seedTiles(){
     {identifier: 21, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 1, destination: 'E'}, flag: null}, 
 
 
-  //barefloor 1 wall, 1 laser
-    {edgeN: null, edgeE: 'wall1', edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: null},
 
   
   //single wrench with nothing else
     {identifier: 30, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: 'wrench1', conveyor: null, flag: null},
   //double wrench
-    {edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: 'wrench2', conveyor: null, flag: null},
-    {edgeN: 'wall0', edgeE: null, edgeS: null, edgeW: 'wall0', floor: 'wrench2', conveyor: null, flag: null},
+    {identifier: 36, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: 'wrench2', conveyor: null, flag: null},
+    //double wrench with north wall and west wall
+    {identifier: 37, edgeN: 'wall0', edgeE: null, edgeS: null, edgeW: 'wall0', floor: 'wrench2', conveyor: null, flag: null},
 
 
   //GEARS
@@ -83,25 +82,36 @@ function seedTiles(){
   //PIT
     {identifier: 60, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: 'pit', conveyor: null, flag: null}, 
 
-  //DOUBLE CONVERY with nothing else
+  //DOUBLE CONVEYOR with nothing else
   //straight
     {identifier: 70, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'N'}, flag: null},
     {identifier: 71, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'E'}, flag: null},
     {identifier: 72, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'S'}, flag: null},
     {identifier: 73, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'W'}, flag: null},
+  //double clockwise
+    {identifier: 74, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, destination: 'N'}, flag: null},
+    {identifier: 75, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, destination: 'E'}, flag: null},
+    {identifier: 76, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, destination: 'S'}, flag: null},
+    {identifier: 77, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, destination: 'W'}, flag: null},
+  //double counterclockwise
+    {identifier: 78, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 2, destination: 'N'}, flag: null},
+    {identifier: 79, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 2, destination: 'E'}, flag: null},
+    {identifier: 80, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 2, destination: 'S'}, flag: null},
+    {identifier: 81, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 2, destination: 'W'}, flag: null},
+
+  //DOUBLE CONVEYOR with one wall 
+  //straight
+    {identifier: 82, edgeN: null, edgeE: 'wall0', edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'N'}, flag: null},
+    {identifier: 83, edgeN: null, edgeE: null, edgeS: 'wall0', edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'E'}, flag: null},
+    {identifier: 84, edgeN: null, edgeE: null, edgeS: null, edgeW: 'wall0', floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'S'}, flag: null},
+    {identifier: 85, edgeN: 'wall0', edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'W'}, flag: null},
 
 
-
-  //express straight 1 wall
-    {edgeN: 'wall0', edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'W'}, flag: null},
-    {edgeN: null, edgeE: 'wall0', edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'N'}, flag: null},
-    {edgeN: null, edgeE: null, edgeS: 'wall0', edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'E'}, flag: null},
-    {edgeN: null, edgeE: null, edgeS: null, edgeW: 'wall0', floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'S'}, flag: null},
-  //express clockwise
-    {edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, destination: 'E'}, flag: null},
-    {edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, destination: 'S'}, flag: null},
-    {edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, destination: 'W'}, flag: null},
-    {edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, destination: 'N'}, flag: null},
+  //barefloor 1 wall, 1 laser
+    {identifier: 90, edgeN: 'wall1', edgeE: null, edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: null},
+    {identifier: 91, edgeN: null, edgeE: 'wall1', edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: null},
+    {identifier: 92, edgeN: null, edgeE: null, edgeS: 'wall1', edgeW: null, floor: 'barefloor', conveyor: null, flag: null},
+    {identifier: 93, edgeN: null, edgeE: null, edgeS: null, edgeW: 'wall1', floor: 'barefloor', conveyor: null, flag: null},
   ];
 }
 
