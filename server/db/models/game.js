@@ -8,6 +8,8 @@ require('./player');
 
 var Player = mongoose.model('Player');
 var Board = mongoose.model('Board');
+                      //x5 hands
+var gameFB = []; //[[game.players after card move], [game.players after board move]];
 
 // could a game have flag locations, instead of having to put these on the tile of the board?
 // could we handle the dock locations the same way?
@@ -19,6 +21,7 @@ var Board = mongoose.model('Board');
 
 var gameSchema = new mongoose.Schema({
   name: String,
+  players: [{type: mongoose.Schema.Types.ObjectId, ref: 'Player'}],
   board: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Board'
@@ -54,6 +57,122 @@ var laserBlockedBy = {
   'E': {exit: 'edgeE', enter: 'edgeW'},
   'W': {exit: 'edgeW', enter: 'edgeE'}
 };
+
+function getRotation (orig, next){
+  var dot = -orig[0]*next[1] + orig[1]*next[0];
+  var rad = Math.asin(dot);
+  var deg = rad * (180/Math.PI);
+  return deg;
+}
+
+gameSchema.methods.getPlayers = function (){
+  return this.players;
+};
+
+gameSchema.methods.initiatePhase = function() {
+  //runOneRegister(),
+  //runBelts(2),
+  //runBelts(1),
+
+}
+
+gameSchema.methods.runOneRegister = function () {
+  var currentCard = this.currentCard;
+  
+  this.players.sort(function(p1, p2){
+    if (p1.card[currentCard] > p2.card[currentCard]) return -1;
+    return 1;
+  })
+
+  players.forEach(function(player){
+    player.playCard(currentCard)
+  })
+}
+
+gameSchema.methods.runBelts = function(type){
+  var game = this;
+  this.players.forEach(function(player){
+    var tile = game.getTileAt(player.position);
+    if(tile.conveyor && tile.conveyor.magnitude >= type) {
+      var c = tile.conveyor;
+      var nextPosition = [player.position[0] + c.bearing[0], [player.position[1] + c.bearing[1]] ];
+      
+      var nextTile = game.getTileAt(nextPosition);
+      if(nextTile.conveyor) {
+        var deg = getRotation(orig, next);
+        player.rotate(deg);
+        player.boardMove(c.bearing);
+        
+      } else {
+        player.boardMove(c.bearing);
+      }
+    }
+  })
+}
+
+
+gameSchema.methods.getTileAt = function (position) {
+  // position is array = [row, col]
+  var colStr = 'col' + position[1].toString();
+
+  return this.board[colStr][position[0]];
+}
+
+gameSchema.methods.runPushers = function (){
+  for (var i = 0; i < 12; i++){
+    this.runPushersInCol(i);
+  }
+}
+
+gameSchema.methods.runPushersInCol = function (col){
+  var colStr = 'col' + col.toString();
+  var pushType = (this.currentCard % 2) + 1;
+
+  this.board[colStr].forEach(function(tile, i){
+    if(tile.edgeN === 'push' + pushType.toString()) {
+        return this.pushOnePusher({bearing: [1, 0], start: [i, col]});
+    }
+    if(tile.edgeE === 'push' + pushType.toString()) {
+      return this.pushOnePusher({bearing: [0, -1], start: [i, col]});
+    }
+    if(tile.edgeS === 'push' + pushType.toString()) {
+      return this.pushOnePusher({bearing: [-1, 0], start: [i, col]});
+    }
+    if(tile.edgeW === 'push' + pushType.toString()) {
+      return this.pushOnePusher({bearing: [0, 1], start: [i, col]});
+    }
+  }) 
+}
+
+gameSchema.methods.pushOnePusher = function (pusher){
+  // pusher has bearing & position
+  this.getPlayerAt(pusher.start)
+  .then(function(p){
+    if(p) return p.boardMove(pusher.bearing);
+    return;
+  });
+};
+
+gameSchema.methods.getPlayerAt = function(position){
+  this.players.filter(function(p){
+    if (p.position[0] === position[0] && p.position[1] === position[1]) return true
+    return false;
+  })
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 gameSchema.methods.initializeGame = function (){
   var game = this;
@@ -115,25 +234,8 @@ gameSchema.methods.runOnePhase = function () {
   })
 }
 
-gameSchema.methods.runOneRegister = function () {
-  var currentCard = this.currentCard;
-  return this.getPlayers()
-  .then(function(players){
-    return players.sort(function(p1, p2){
-      if (p1.card[currentCard] > p2.card[currentCard]) return -1;
-      return 1;
-    });
-  })
-  .then(function(players){
-    players.forEach(function(player){
-      player.playCard(currentCard);
-    });
-  })
-};
 
-gameSchema.methods.getPlayers = function (){
-  return Player.find({game: this._id});
-};
+
 
 gameSchema.methods.getPlayerTiles = function () {
   return this.getPlayers()
@@ -171,73 +273,13 @@ gameSchema.methods.runGears = function (){
   });
 };
 
-gameSchema.methods.runPushers = function (){
-  var pushed = []
-  for (var i = 0; i < 12; i++){
-    pushed.push(this.runPushersInCol(i))
-  }
-  return Promise.all(pushed);
-}
-
-gameSchema.methods.runPushersInCol = function (col){
-  var colStr = 'col' + col.toString();
-  var pushType = (this.currentCard % 2) + 1
-  return Board.findById(this.board).bind(this)
-  .then(function(b){
-    b.colStr.forEach(function(tile, i){
-      if(tile.edgeN === 'push' + pushType.toString()) {
-        return this.pushOnePusher({bearing: [1, 0], start: [i, col]});
-      }
-      if(tile.edgeE === 'push' + pushType.toString()) {
-        return this.pushOnePusher({bearing: [0, -1], start: [i, col]});
-      }
-      if(tile.edgeS === 'push' + pushType.toString()) {
-        return this.pushOnePusher({bearing: [-1, 0], start: [i, col]});
-      }
-      if(tile.edgeW === 'push' + pushType.toString()) {
-        return this.pushOnePusher({bearing: [0, 1], start: [i, col]});
-      }
-    });
-  })
-}
 
 
-gameSchema.methods.pushOnePusher = function (pusher){
-  // pusher has bearing & position
-  return this.getPlayerAt(pusher.start)
-  .then(function(p){
-    if(p) return p.boardMove(pusher.bearing);
-    return;
-  });
-};
 
 
-gameSchema.methods.runBelts = function (type){
-  return this.getPlayerTiles().bind(this)
-  .then(function(playersWithTile){
-    return Promise.map(playersWithTile, function(p){
-      if (p.tile.conveyor && p.tile.conveyor.magnitude >= type){
-        var nextPosition = [];
-        var c = p.tile.conveyor;
-        nextPosition.push(p.position[0] + c.bearing[0]);
-        nextPosition.push(p.position[1] + c.bearing[1]);
-        var deg = getRotation(orig, next);
-        return Player.findById(p._id);
-      }
-    })
-    .then(function(p){
-      return Promise.all([p.rotate(deg), p.boardMove(c.bearing)])
-    });
-  });
-};
 
 
-function getRotation (orig, next){
-  var dot = -orig[0]*next[1] + orig[1]*next[0];
-  var rad = Math.asin(dot);
-  var deg = rad * (180/Math.PI);
-  return deg;
-}
+
 
 gameSchema.methods.fireRobotLasers = function (){
   var fired = [];
@@ -323,27 +365,7 @@ gameSchema.methods.fireOneLaser = function(laser){
 
 };
 
-gameSchema.methods.getPlayerAt = function(position){
-  return this.getPlayers()
-  .then(function(players){
-    return players.filter(function(p){
-      if (p.position === position) return true
-      return false;
-    })
-  })
-}
 
-gameSchema.methods.getTileAt = function (position) {
-  // position is array = [row, col]
-  var colStr = 'col' + col.toString();
-  return Board.findById(this.board)
-  .then(function(b){
-    return b[colStr][row];
-  })
-  .then(function(tId){
-    return Tile.findById(tId);
-  });
-}
 
 //call this method before every deal
 gameSchema.methods.shuffleCards = function () {
