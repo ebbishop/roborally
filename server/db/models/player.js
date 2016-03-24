@@ -37,11 +37,13 @@ var playerSchema = new mongoose.Schema({
 
 playerSchema.set('versionKey', false);
 
+
 playerSchema.statics.initiate = function() {
   //find dock number
   //find location of dock tile
   //set start position
 };
+
 
 playerSchema.methods.playCard = function(i){
   var cardNum = this.register[i];
@@ -49,33 +51,8 @@ playerSchema.methods.playCard = function(i){
 
   this.rotate(card.rotation);
   this.cardMove(card.magnitude);
-
-  // send new loc & bearing
-  var gameFB = firebaseHelper.getConnection(this.game);
-  gameFB.child('public').child(this._id).child('loc').set(this.position);
-  gameFB.child('public').child(this._id).child('bearing').set(this.bearing);
 };
 
-playerSchema.methods.boardMove = function (bearing) {
-  // call when self.bearing is not relevant
-  var newCol = this.position[0];
-  var newRow = this.position[1];
-  newCol += bearing[0];
-  newRow += bearing[1];
-  // check if move is possible
-  if (newCol < 0 || newRow < 0) return this.loseLife()
-
-  else {
-    this.set('position', [newCol, newRow]);
-    //send to firebase
-    this.save()
-    .then(function(player) {
-      var gameFB = firebaseHelper.getConnection(player.game);
-      gameFB.child('public').child(player._id).child('loc').set(player.position)
-      gameFB.child('public').child(player._id).child('bearing').set(player.bearing)
-    })
-  }
-};
 
 playerSchema.methods.rotate = function (rotation){
   var theta = 2*Math.PI*(rotation/360);
@@ -89,44 +66,8 @@ playerSchema.methods.rotate = function (rotation){
   var cardinal = this.setCardinal(row, col)
 
   this.set('bearing', [row, col, cardinal])
-  this.save()
 }
 
-playerSchema.methods.cardMove = function (magnitude) {
-  var newCol = this.position[1];
-  var newRow = this.position[0];
-  var player = this;
-
-  // check that move is permitted
-  return player.checkMove(player.bearing)
-  .then(function(result) {
-    if (result === true) {
-      while(magnitude > 0){
-
-        newCol += player.bearing[1];
-        if (newCol < 0) return player.loseLife()
-
-        newRow += player.bearing[0];
-        if (newRow < 0) return player.loseLife()
-
-        return player.checkForPit(newRow, newCol)
-        .then(function(result) {
-          if (result === true) {
-            return player.loseLife()
-          }
-        })
-        magnitude --;
-      }
-
-      player.set('position', [newRow, newCol]);
-      return player.save()
-    }
-  })
-  .then(function(player) {
-    //check if player is on a flag
-    return player.touchFlag(player.position[0], player.position[1])
-  })
-};
 
 playerSchema.methods.setCardinal = function(row, col) {
   var cardinal;
@@ -148,6 +89,217 @@ playerSchema.methods.setCardinal = function(row, col) {
 };
 
 
+playerSchema.methods.boardMove = function (bearing) {
+  // call when self.bearing is not relevant
+  var newCol = this.position[0];
+  var newRow = this.position[1];
+  newCol += bearing[0];
+  newRow += bearing[1];
+  // check if move is possible
+  if (newCol < 0 || newRow < 0 || newCol > 11 || newRow > 15) return this.loseLife();
+  else {
+    this.set('position', [newCol, newRow]);
+  }
+};
+
+
+playerSchema.methods.loseLife = function() {
+  this.livesRemaining--;
+  if (this.livesRemaining === 0) return this.killPlayer();
+  else {
+    this.set('position', this.dock);
+  }
+};
+
+
+playerSchema.methods.killPlayer = function() {
+  this.position = null;
+};
+
+
+function findOppositeBearing(bearing) {
+  if (bearing == [-1,0,'N']) return [1,0,'S'];
+  if (bearing == [0,1,'E']) return [0,-1,'W'];
+  if (bearing == [1,0,'S']) return [-1,0,'N'];
+  if (bearing == [0,-1,'W']) return [0,1,'E'];
+}
+
+
+playerSchema.methods.checkMove = function() {
+  var currentKey = 'edge' + this.bearing[2];
+  var oppositeBearing = findOppositeBearing(this.bearing)
+  var nextKey = 'edge' + oppositeBearing[2]
+
+  var currentPosition = this.position;
+  var nextPosition = [this.position[0] + this.bearing[0], this.position[1] + this.bearing[1]]
+
+  var currentTile = this.game.getTileAt(currentPosition)
+  var nextTile = this.game.getTileAt(nextPosition)
+
+  if (currentTile[currentKey] === null && nextTile[nextKey] === null) return true;
+  else return false;
+}
+
+
+//do we need to add anything else to this function?
+//potentially use to deal with pushing adjacent players
+playerSchema.methods.oneCardMove = function(bearing) {
+  var newRow, newCol, opponent;
+
+  var checkMove = this.checkMove()
+
+  if (checkMove === true) {
+    var adjacentOpponent = this.game.getPlayerAt([this.position[0]+this.bearing[0], this.position[1]+this.bearing[1]])
+    if (adjacentOpponent) return adjacentOpponent.boardMove(this.bearing)
+    else return 
+  }
+}
+
+
+playerSchema.methods.cardMove = function (magnitude) {
+  var newCol = this.position[1];
+  var newRow = this.position[0];
+
+  var checkMove = this.checkMove()
+
+  if (checkMove === true) {
+    while (magnitude > 0) {
+      newCol += this.bearing[1];
+      if (newCol < 0 || newCol > 11) return this.loseLife();
+
+      newRow += this.bearing[0];
+      if (newRow < 0 || newRow > 15) return this.loseLife();
+
+      var checkPit = this.checkForPit(newRow, newCol);
+      if (checkPit === true) return this.loseLife();
+
+      magnitude--
+    }
+
+    this.position = [newRow, newCol]
+
+    this.touchFlag(newRow, newCol)
+  }
+}
+
+
+playerSchema.methods.checkForPit = function(row, col) {
+  var tile = this.game.getTileAt(row, col)
+  if (tile.floor === 'pit') return true;
+  else return false;
+}
+
+
+playerSchema.methods.touchFlag = function(row, col) {
+  var tile = this.game.getTileAt(row, col)
+  if(tile.flag != null) {
+    if(this.flagCount + 1 === tile.flag) {
+      this.flagCount++;
+      this.checkIfWinner()
+    }
+  }
+}
+
+
+playerSchema.methods.checkIfWinner = function() {
+  if (this.game.numFlags === this.flagCount) this.gameover();
+  else return;
+}
+
+
+playerSchema.methods.gameover = function() {
+  this.game.state = 'gameover'
+  //at this point, we should stop everything and push game state into gameFB array
+  //potentially save to database?
+};
+
+
+playerSchema.iAmReady = function() {
+  this.ready = true
+}
+
+
+playerSchema.methods.isPlayerReady = function() {
+    return this.ready;
+};
+
+
+playerSchema.methods.evaluateDamage = function(hitCount) {
+  this.applyDamage(hitCount)
+  this.checkDamage()
+}
+
+
+playerSchema.methods.applyDamage = function(hitCount) {
+  this.damage += hitCount
+}
+
+
+playerSchema.methods.checkDamage = function() {
+  if (this.damage > 9) {
+    this.loseLife();
+    this.damage = 0
+  }
+}
+
+
+playerSchema.methods.setRegister = function(cards) { //assumes we are getting an array of cards from the front end in order
+  var prevRegister = this.register;
+
+  if(this.damage < 5 && cards.length === 5) this.register = cards;
+  else if(this.damage === 5 && cards.length === 4) this.register = cards.concat(prevRegister.slice(4));
+  else if(this.damage === 6 && cards.length === 3) this.register = cards.concat(prevRegister.slice(3));
+  else if(this.damage === 7 && cards.length === 2) this.register = cards.concat(prevRegister.slice(2));
+  else if(this.damage === 8 && cards.length === 1) this.register = cards.concat(prevRegister.slice(1));
+  else return;
+
+};
+
+
+playerSchema.methods.emptyRegister = function() {
+  var prevRegister = this.register;
+
+  if (this.damage < 5) this.register = [0, 0, 0, 0, 0];
+  else if(this.damage === 5) this.register = [0, 0, 0, 0].concat(prevRegister.slice(4));
+  else if(this.damage === 6) this.register = [0, 0, 0].concat(prevRegister.slice(3));
+  else if(this.damage === 7) this.register = [0, 0].concat(prevRegister.slice(2));
+  else if(this.damage === 8) this.register = [0].concat(prevRegister.slice(1));
+  else return;
+}
+
+
+
+
+
+
+
+// moveEntireCard(magnitude){
+//   while magnitude > 1{
+//     moveOne()
+//     magnitude --
+//   } 
+// }
+
+// moveOne(){
+//   checkMove()
+//   checkOtherPlayer()
+//       op.boardMove()
+//   moveSelf()
+//   checkNewLoc()
+// }
+
+
+// playerSchema.methods.findMyTile = function(row, col){
+//   var position, tile;
+//   var row = row || player.position[0];
+//   var col = col || player.postion[1];
+
+//   position = [row, col]
+//   return player.game.getTileAt(position)
+// };
+
+
+//do we need these?
 playerSchema.methods.getOpponents = function(){
   return this.model('Player')
   .find({game: this.game})
@@ -155,15 +307,6 @@ playerSchema.methods.getOpponents = function(){
   .bind(this);
 };
 
-playerSchema.methods.boardMove = function (bearing) {
-  // call when self.bearing is not relevant
-  var newCol = this.position[0];
-  var newRow = this.position[1];
-  newCol += bearing[0];
-  newRow += bearing[1];
-  return
-  this.set('position', [newCol, newRow]);
-};
 
 playerSchema.methods.pushPlayer = function (){
   return this.getOpponents().bind(this)
@@ -174,134 +317,6 @@ playerSchema.methods.pushPlayer = function (){
   })
 };
 
-playerSchema.methods.checkMove = function(bearing) {
-  var key = 'edge' + bearing[2];
-  return this.findMyTile()
-  .then(function(tile) {
-    if (tile[key] === null) return true;
-    else return false
-  })
-}
-
-playerSchema.methods.cardMove = function (magnitude) {
-  var newCol = this.position[1];
-  var newRow = this.position[0];
-
-  // check that move is permitted
-  return this.checkMove()
-  .then(function(result){
-    if (result === true){
-
-    }
-  })
-  .then(function(result) {
-    if (result === true) {
-      while(magnitude > 0){
-        newCol += this.bearing[1];
-        if (newCol < 0) return this.loseLife()
-        newRow += this.bearing[0];
-        if (newRow < 0) return this.loseLife()
-        magnitude --;
-      }
-      this.set('position', [newRow, newCol]);
-    }
-  })
-}
-
-
-
-playerSchema.methods.checkForPit = function(row, col) {
-  return this.findMyTile(row, col)
-  .then(function(tile) {
-    if (tile.floor === 'pit') return true;
-    else return false;
-  })
-}
-
-playerSchema.methods.touchFlag = function(row, col) {
-  var player = this;
-  return player.findMyTile(row, col)
-  .then(function(tile) {
-    if (tile.flag != null) {
-      if (player.flagCount + 1 === tile.flag) {
-        player.flagCount++;
-        return player.save()
-      }
-    }
-  })
-  .then(function(savedPlayer) {
-    return savedPlayer.checkIfWinner()
-  })
-  .then(function(result) {
-    if (result === true) return player.gameover()
-  })
-}
-
-playerSchema.methods.checkIfWinner = function() {
-  var player = this;
-  return mongoose.model('Game').findById(player.game)
-  .then(function(game) {
-    if (game.numFlags === player.flagCount) return true;
-    else return false;
-  })
-}
-
-playerSchema.methods.applyDamage = function(hitCount){
-  var player = this;
-  return player.update({$inc: {damage: hitCount}}, {new: true})
-  .then(function() {
-    return player.checkDamage()
-  })
-};
-
-playerSchema.methods.checkDamage = function() {
-  if (this.damage > 9) {
-    this.set('damage', 0)
-    this.save()
-    .then(function(player) {
-      player.loseLife()
-    })
-  }
-}
-
-playerSchema.methods.loseLife = function() {
-  this.livesRemaining--;
-  if (this.livesRemaining === 0) return this.killPlayer();
-  else {
-    this.set('position', this.dock);
-    this.save();
-  }
-};
-
-playerSchema.methods.killPlayer = function() {
-  this.set('_id', null); //how should we kill players?
-  this.save();
-};
-
-playerSchema.methods.gameover = function() {
-  return mongoose.model('Game').findById(this.game)
-  .then(function(game) {
-    game.state = 'gameover';
-    game.save();
-  });
-};
-
-playerSchema.methods.findMyTile = function(row, col){
-  var player = this;
-  var row = row || player.position[0];
-  var col = col || player.postion[1];
-
-  return mongoose.model('Game').findById(player.game)
-  .then(function(game){
-    return mongoose.model('Board').findById(game.board);
-  })
-  .then(function(board){
-    return board.getTileAt(row, col);
-  })
-  .then(function(tileId){
-    return mongoose.model('Tile').findById(tileId);
-  });
-};
 
 playerSchema.methods.attachMyTile = function (){
   return Game.findById(this.game).bind(this)
@@ -318,29 +333,13 @@ playerSchema.methods.attachMyTile = function (){
   });
 };
 
+
 playerSchema.methods.clearHand = function() {
     var handToDiscard = this.hand;
     return mongoose.model('Game').findByIdAndUpdate(player.game,
         {$push:  {discard: {$each: handToDiscard} } } );
 };
 
-playerSchema.methods.isPlayerReady = function() {
-    return this.ready;
-};
-
-playerSchema.methods.setRegister = function(cards) { //assumes we are getting an array of cards from the front end in order
-  var self = this;
-  var prevRegister = this.register;
-
-  if(self.damage < 5 && cards.length === 5) self.register = cards;
-  else if(self.damage === 5 && cards.length === 4) self.register = cards.concat(prevRegister.slice(4));
-  else if(self.damage === 6 && cards.length === 3) self.register = cards.concat(prevRegister.slice(3));
-  else if(self.damage === 7 && cards.length === 2) self.register = cards.concat(prevRegister.slice(2));
-  else if(self.damage === 8 && cards.length === 1) self.register = cards.concat(prevRegister.slice(1));
-  else return;
-
-  self.save();
-};
 
 mongoose.model('Player', playerSchema);
 
@@ -351,75 +350,6 @@ mongoose.model('Player', playerSchema);
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // updates player's own 'ready' status and checks all others in the same game
-// playerSchema.methods.iAmReady = function(register){
-//   return this.set({ready: true, register: register}).save();
-// };
-
-// playerSchema.methods.updateHand = function(cards){
-//   this.set('hand', cards);
-//   return this.save();
-// };
-
-// playerSchema.methods.emptyRegister = function(){
-//   var newRegister = this.register;
-//   var damage = this.damage;
-//   for (var i = 0; i < 5; i ++){
-//     if(9 - damage > i){
-//       newRegister[i] = null;
-//     }
-//   }
-//   this.set('register', newRegister);
-//   return this.save();
-// };
-
-// playerSchema.methods.setRegister = function(cards){
-//   var newRegister = this.register;
-//   for (var i = 0; i < cards.length; i ++){
-//     if (newRegister[i] === null){
-//       newRegister[i]=cards[i];
-//     }
-//   }
-//   this.set('register', newRegister);
-//   return this.save();
-// }
-
-// playerSchema.methods.dealCards = function(gameId){
-//   var deck
-//   mongoose.model('Game').findById(this.game)
-//   .then(function(game){
-
-//   })
-
-
-//   mongoose.model('Player').find({game: this._id})
-//   .then(function(players){
-//     // array of players
-//     return Promise.map(players, function(player){
-//       var playerCards = deck.splice(0,9-player.damage);
-
-//       return player.set({currentHand: playerCards}).save();
-//     });
-//   })
-//   .then(function(players){
-
-//   });
-// };
 
 
 var programCards = [
