@@ -10,7 +10,6 @@ var robotSchema = new mongoose.Schema({
 });
 
 
-
 var playerSchema = new mongoose.Schema({
   game: {type: mongoose.Schema.Types.ObjectId, ref: 'Game'},
   name: String,
@@ -44,14 +43,6 @@ var moveBlocked = {
   'W': {exit: 'edgeW', enter: 'edgeE'}
 };
 
-
-playerSchema.statics.initiate = function() {
-  //find dock number
-  //find location of dock tile
-  //set start position
-};
-
-
 playerSchema.methods.playCard = function(i){
   var cardNum = this.register[i];
   var card = programCards[(cardNum/10)-1];
@@ -59,7 +50,6 @@ playerSchema.methods.playCard = function(i){
   this.rotate(card.rotation);
   this.cardMove(card.magnitude);
 };
-
 
 playerSchema.methods.rotate = function (rotation){
   var theta = 2*Math.PI*(rotation/360);
@@ -75,7 +65,6 @@ playerSchema.methods.rotate = function (rotation){
   this.set('bearing', [row, col, cardinal])
   return [row, col, cardinal]
 }
-
 
 playerSchema.methods.setCardinal = function(row, col) {
   var cardinal;
@@ -96,7 +85,6 @@ playerSchema.methods.setCardinal = function(row, col) {
   return cardinal;
 };
 
-
 playerSchema.methods.boardMove = function (bearing) {
   // call when self.bearing is not relevant
   var newCol = this.position[0];
@@ -104,12 +92,11 @@ playerSchema.methods.boardMove = function (bearing) {
   newCol += bearing[0];
   newRow += bearing[1];
   // check if move is possible
-  if (newCol < 0 || newRow < 0 || newCol > 11 || newRow > 15) return this.loseLife();
-  else {
-    this.set('position', [newCol, newRow]);
+  if(this.checkMove()) {
+    if (newCol < 0 || newRow < 0 || newCol > 11 || newRow > 15) return this.loseLife();
+    else this.set('position', [newCol, newRow]);
   }
 };
-
 
 playerSchema.methods.loseLife = function() {
   this.livesRemaining--;
@@ -119,11 +106,9 @@ playerSchema.methods.loseLife = function() {
   }
 };
 
-
 playerSchema.methods.killPlayer = function() {
   this.position = null;
 };
-
 
 playerSchema.methods.checkMove = function() {
   var currentPosition = this.position;
@@ -136,22 +121,6 @@ playerSchema.methods.checkMove = function() {
   else if(nextTile[moveBlocked[this.bearing[2]]['enter']]) return false;
   else return true;
 }
-
-
-//do we need to add anything else to this function?
-//potentially use to deal with pushing adjacent players
-playerSchema.methods.oneCardMove = function(bearing) {
-  var newRow, newCol, opponent;
-
-  var checkMove = this.checkMove()
-
-  if (checkMove === true) {
-    var adjacentOpponent = this.game.getPlayerAt([this.position[0]+this.bearing[0], this.position[1]+this.bearing[1]])
-    if (adjacentOpponent) return adjacentOpponent.boardMove(this.bearing)
-    else return 
-  }
-}
-
 
 playerSchema.methods.cardMove = function (magnitude) {
   var newCol = this.position[1];
@@ -172,10 +141,8 @@ playerSchema.methods.cardMove = function (magnitude) {
 
     this.position = [newRow, newCol]
 
-    this.touchFlag(newRow, newCol)
   }
 }
-
 
 playerSchema.methods.checkForEdgeOrPit = function(row, col) {
   var tile = this.game.getTileAt(row, col)
@@ -183,38 +150,24 @@ playerSchema.methods.checkForEdgeOrPit = function(row, col) {
   else return false;
 }
 
-
-playerSchema.methods.touchFlag = function(row, col) {
-  var tile = this.game.getTileAt(row, col)
-  if(tile.flag != null) {
-    if(this.flagCount + 1 === tile.flag) {
-      this.flagCount++;
-      this.game.checkIfWinner()
-    }
-  }
+playerSchema.methods.touchFlag = function() {
+  this.flagCount++
 }
 
-
-playerSchema.iAmReady = function() {
+// route? <--- player clicks ready and sends cards in order
+playerSchema.iAmReady = function(cards) {
   this.ready = true
+  this.setRegister(cards)
 }
 
-
-playerSchema.methods.isPlayerReady = function() {
-    return this.ready;
-};
-
-
-playerSchema.methods.evaluateDamage = function(hitCount) {
+playerSchema.methods.applyDamage = function(hitCount) {
   this.accrueDamage(hitCount)
   this.checkDamage()
 }
 
-
 playerSchema.methods.accrueDamage = function(hitCount) {
   this.damage += hitCount
 }
-
 
 playerSchema.methods.checkDamage = function() {
   if (this.damage > 9) {
@@ -223,14 +176,13 @@ playerSchema.methods.checkDamage = function() {
   }
 }
 
-
-//after first round, assume that we call empty register before setRegister
-playerSchema.methods.setRegister = function(cards) { //assumes we are getting an array of cards from the front end in order
+// route?
+// after first round, assume that we call empty register before setRegister
+playerSchema.methods.setRegister = function(cards) {
   for (var i=0; i<5; i++) {
     if (this.register[i] === 0) this.register[i] = cards.shift();
   }
 };
-
 
 playerSchema.methods.emptyRegister = function() {
   var prevRegister = this.register;
@@ -246,79 +198,20 @@ playerSchema.methods.emptyRegister = function() {
 
 
 
+//potentially use to deal with pushing adjacent players?
+// playerSchema.methods.oneCardMove = function(bearing) {
+//   var newRow, newCol, opponent;
 
+//   var checkMove = this.checkMove()
 
-
-// moveEntireCard(magnitude){
-//   while magnitude > 1{
-//     moveOne()
-//     magnitude --
-//   } 
+//   if (checkMove === true) {
+//     var adjacentOpponent = this.game.getPlayerAt([this.position[0]+this.bearing[0], this.position[1]+this.bearing[1]])
+//     if (adjacentOpponent) return adjacentOpponent.boardMove(this.bearing)
+//     else return 
+//   }
 // }
-
-// moveOne(){
-//   checkMove()
-//   checkOtherPlayer()
-//       op.boardMove()
-//   moveSelf()
-//   checkNewLoc()
-// }
-
-
-// playerSchema.methods.findMyTile = function(row, col){
-//   var position, tile;
-//   var row = row || player.position[0];
-//   var col = col || player.postion[1];
-
-//   position = [row, col]
-//   return player.game.getTileAt(position)
-// };
-
-
-//do we need these?
-playerSchema.methods.getOpponents = function(){
-  return this.model('Player')
-  .find({game: this.game})
-  .where({_id :{$ne: this._id}})
-  .bind(this);
-};
-
-
-playerSchema.methods.pushPlayer = function (){
-  return this.getOpponents().bind(this)
-  .then(function(opponents){
-    return Promise.map(opponents, function(o){
-      // if
-    })
-  })
-};
-
-
-playerSchema.methods.attachMyTile = function (){
-  return Game.findById(this.game).bind(this)
-  .then(function(g){
-    return Board.findById(g.board);
-  })
-  .then(function(b){
-    return b.getTileAt(this.position);
-  })
-  .then(function(t){
-    // return player with fully populated tile attached
-    this.tile = t;
-    return this;
-  });
-};
-
-
-playerSchema.methods.clearHand = function() {
-    var handToDiscard = this.hand;
-    return mongoose.model('Game').findByIdAndUpdate(player.game,
-        {$push:  {discard: {$each: handToDiscard} } } );
-};
-
 
 mongoose.model('Player', playerSchema);
-
 
 
 
