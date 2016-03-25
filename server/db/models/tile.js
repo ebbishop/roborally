@@ -47,9 +47,6 @@ var tileSchema = new mongoose.Schema({
   flag: {
     type: Number,
     enum: [null, 1,2,3,4],
-  },
-  imgUrl: {
-    type: String
   }
 });
 
