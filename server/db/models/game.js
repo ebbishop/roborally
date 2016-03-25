@@ -65,6 +65,7 @@ function getRotation (orig, next){
 gameSchema.methods.runOneRound = function () {
   while (this.currentCard < 5){
     this.runOneRegister();
+    this.pushGameState();
     this.runBelts(2);
     this.runBelts(1);
     this.runPushers();
@@ -331,17 +332,17 @@ gameSchema.methods.initializeGame = function (){
 gameSchema.methods.pushGameState = function(){
   var publicPlayerArray = this.players.map(function(player){
     var p;
-    p._id = player[i]._id;
-    p.position = player[i].position;
-    p.bearing = player[i].bearing;
-    p.damage = player[i].damage;
-    p.lives = player[i].lives;
-    p.register = player[i].register;
-    p.flagCount = player[i].flagCount;
+    p._id = player._id;
+    p.position = player.position;
+    p.bearing = player.bearing;
+    p.damage = player.damage;
+    p.lives = player.lives;
+    p.register = player.register;
+    p.flagCount = player.flagCount;
     return p;
   });
 
-  var state = {players: playerArray, isWon: this.isWon, };
+  var state = {players: publicPlayerArray, isWon: this.isWon};
   if(!hashOfGames[this._id]){
     hashOfGames[this._id] = [state]
   }else if(this.currentCard===0){
