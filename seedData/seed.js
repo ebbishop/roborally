@@ -1,11 +1,11 @@
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
 var chalk = require('chalk');
-var connectToDb = require('./server/db');
+var connectToDb = require('../server/db');
 
 var User = Promise.promisifyAll(mongoose.model('User'));
-var Conveyor = Promise.promisifyAll(mongoose.model('Conveyor'));
-var Card = Promise.promisifyAll(mongoose.model('Card'));
+var Tile = Promise.promisifyAll(mongoose.model('Tile'));
+var Board = Promise.promisifyAll(mongoose.model('Board'));
 
 var seedUsers = function () {
     var users = [
@@ -20,11 +20,78 @@ var seedUsers = function () {
     ];
 
     return User.createAsync(users);
-
 };
 
-
 function seedTiles(){
+  console.log('seed tiles')
+  return tiles.map(function(tile){
+    return new Tile(tile);
+  })
+}
+
+function connectTileToBoard(){
+  tiles = seedTiles()
+  tiles.forEach(function(tile){
+    boards.forEach(function(b){
+      var keys = Object.keys(b)
+      keys.forEach(function(col){
+        if (col !== 'dockLocations' && col !== 'name'){
+          b[col] = b[col].map(function(tIdentifier, index){
+            if (tile.identifier === tIdentifier){
+              b[col][index] = tile._id;
+            }
+            return b[col][index];
+          })
+        }
+      })
+    })
+  })
+}
+
+function seedBoards(){
+  return boards.map(function(board){
+    return new Board(board);
+  });
+}
+
+function generateAll() {
+  connectTileToBoard();
+  var updatedBoards = seedBoards();
+  return tiles.concat(updatedBoards);
+}
+
+function seedAll() {
+  var docs = generateAll();
+  return Promise.map(docs, function(doc){
+    return doc.save();
+  })
+}
+
+connectToDb
+.then(function() {
+  return Promise.all([
+    Board.remove({}), 
+    Tile.remove({})
+  ])
+})
+.then(function(){
+  return seedAll(); 
+})
+.then(function () {
+  console.log(chalk.green('Seed successful!'));
+  process.kill(0);
+})
+.catch(function (err) {
+  console.error(err);
+  process.kill(1);
+});
+
+
+/******SEED********/
+
+//docks: 
+var dock1 = [[15,5], [15,6], [14,3], [14,8], [13,1], [13,10], [12,0], [12,11]];
+var dock2 = [[14, 5], [14, 6], [14, 3], [14, 8], [14, 1], [14, 10], [14, 0], [14, 11]];
 //tiles:
   var tiles = [
   //BAREFLOOR
@@ -42,26 +109,30 @@ function seedTiles(){
 
     //SINGLE CONVEYOR with nothing else
     //straight
-    {identifier: 10, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 1, destination: 'N'}, flag: null},
-    {identifier: 11, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 1, destination: 'E'}, flag: null},
-    {identifier: 12, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 1, destination: 'S'}, flag: null},
-    {identifier: 13, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 1, destination: 'W'}, flag: null},
+    {identifier: 10, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 1, bearing: [-1, 0, 'N']}, flag: null},
+    {identifier: 11, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 1, bearing: [0, 1, 'E']}, flag: null},
+    {identifier: 12, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 1, bearing: [1, 0, 'S']}, flag: null},
+    {identifier: 13, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 1, bearing: [0, -1, 'W']}, flag: null},
     //clockwise
-    {identifier: 14, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 1, destination: 'S'}, flag: null}, 
-    {identifier: 15, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 1, destination: 'W'}, flag: null}, 
-    {identifier: 16, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 1, destination: 'N'}, flag: null}, 
-    {identifier: 17, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 1, destination: 'E'}, flag: null}, 
+    {identifier: 14, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 1, bearing: [1, 0, 'S']}, flag: null}, 
+    {identifier: 15, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 1, bearing: [0, -1, 'W']}, flag: null}, 
+    {identifier: 16, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 1, bearing: [-1, 0, 'N']}, flag: null}, 
+    {identifier: 17, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 1, bearing: [0, 1, 'E']}, flag: null}, 
      //counter-clockwise
-    {identifier: 18, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 1, destination: 'S'}, flag: null}, 
-    {identifier: 19, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 1, destination: 'W'}, flag: null}, 
-    {identifier: 20, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 1, destination: 'N'}, flag: null}, 
-    {identifier: 21, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 1, destination: 'E'}, flag: null}, 
+    {identifier: 18, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 1, bearing: [1, 0, 'S']}, flag: null}, 
+    {identifier: 19, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 1, bearing: [0, -1, 'W']}, flag: null}, 
+    {identifier: 20, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 1, bearing: [-1, 0, 'N']}, flag: null}, 
+    {identifier: 21, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 1, bearing: [0, 1, 'E']}, flag: null}, 
 
-
+    //counter-clockwise and 1 wall
+    {identifier: 22, edgeN: 'wall0', edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 1, bearing: [0, -1, 'W']}, flag: null},
 
   
   //single wrench with nothing else
     {identifier: 30, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: 'wrench1', conveyor: null, flag: null},
+    //single wrench with east wall
+    {identifier: 31, edgeN: null, edgeE: 'wall0', edgeS: null, edgeW: null, floor: 'wrench1', conveyor: null, flag: null},
+
   //double wrench
     {identifier: 36, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: 'wrench2', conveyor: null, flag: null},
     //double wrench with north wall and west wall
@@ -84,59 +155,98 @@ function seedTiles(){
 
   //DOUBLE CONVEYOR with nothing else
   //straight
-    {identifier: 70, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'N'}, flag: null},
-    {identifier: 71, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'E'}, flag: null},
-    {identifier: 72, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'S'}, flag: null},
-    {identifier: 73, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'W'}, flag: null},
+    {identifier: 70, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [-1, 0, 'N']}, flag: null},
+    {identifier: 71, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [0, 1, 'E']}, flag: null},
+    {identifier: 72, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [1, 0, 'S']}, flag: null},
+    {identifier: 73, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [0, -1, 'W']}, flag: null},
   //double clockwise
-    {identifier: 74, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, destination: 'N'}, flag: null},
-    {identifier: 75, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, destination: 'E'}, flag: null},
-    {identifier: 76, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, destination: 'S'}, flag: null},
-    {identifier: 77, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, destination: 'W'}, flag: null},
+    {identifier: 74, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 2, bearing: [-1, 0, 'N']}, flag: null},
+    {identifier: 75, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 2, bearing: [0, 1, 'E']}, flag: null},
+    {identifier: 76, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 2, bearing: [1, 0, 'S']}, flag: null},
+    {identifier: 77, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 2, bearing: [0, -1, 'W']}, flag: null},
   //double counterclockwise
-    {identifier: 78, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 2, destination: 'N'}, flag: null},
-    {identifier: 79, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 2, destination: 'E'}, flag: null},
-    {identifier: 80, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 2, destination: 'S'}, flag: null},
-    {identifier: 81, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 2, destination: 'W'}, flag: null},
+    {identifier: 78, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 2, bearing: [-1, 0, 'N']}, flag: null},
+    {identifier: 79, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 2, bearing: [0, 1, 'E']}, flag: null},
+    {identifier: 80, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 2, bearing: [1, 0, 'S']}, flag: null},
+    {identifier: 81, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 2, bearing: [0, -1, 'W']}, flag: null},
 
   //DOUBLE CONVEYOR with one wall 
   //straight
-    {identifier: 82, edgeN: null, edgeE: 'wall0', edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'N'}, flag: null},
-    {identifier: 83, edgeN: null, edgeE: null, edgeS: 'wall0', edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'E'}, flag: null},
-    {identifier: 84, edgeN: null, edgeE: null, edgeS: null, edgeW: 'wall0', floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'S'}, flag: null},
-    {identifier: 85, edgeN: 'wall0', edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, destination: 'W'}, flag: null},
+    {identifier: 82, edgeN: null, edgeE: 'wall0', edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [-1, 0, 'N']}, flag: null},
+    {identifier: 83, edgeN: null, edgeE: null, edgeS: 'wall0', edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [0, 1, 'E']}, flag: null},
+    {identifier: 84, edgeN: null, edgeE: null, edgeS: null, edgeW: 'wall0', floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [1, 0, 'S']}, flag: null},
+    {identifier: 85, edgeN: 'wall0', edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [0, -1, 'W']}, flag: null},
+    {identifier: 86, edgeN: null, edgeE: null, edgeS: 'wall0', edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [0, -1, 'W']}, flag: null},
 
+  //DOUBLE CONVEYOR MERGES 
+    {identifier: 87, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'merge2', magnitude: 2, bearing: [0, 1, 'E']}, flag: null},
 
   //barefloor 1 wall, 1 laser
     {identifier: 90, edgeN: 'wall1', edgeE: null, edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: null},
     {identifier: 91, edgeN: null, edgeE: 'wall1', edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: null},
     {identifier: 92, edgeN: null, edgeE: null, edgeS: 'wall1', edgeW: null, floor: 'barefloor', conveyor: null, flag: null},
     {identifier: 93, edgeN: null, edgeE: null, edgeS: null, edgeW: 'wall1', floor: 'barefloor', conveyor: null, flag: null},
+  //barefloor 1 wall 2 lasers
+    {identifier: 94, edgeN: 'wall2', edgeE: null, edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: null},
+    {identifier: 95, edgeN: null, edgeE: 'wall2', edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: null},
+    {identifier: 96, edgeN: null, edgeE: null, edgeS: 'wall2', edgeW: null, floor: 'barefloor', conveyor: null, flag: null},
+    {identifier: 97, edgeN: null, edgeE: null, edgeS: null, edgeW: 'wall2', floor: 'barefloor', conveyor: null, flag: null},
+  //barefloor 1 wall 3 lasers
+    {identifier: 98, edgeN: 'wall3', edgeE: null, edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: null},
+    {identifier: 99, edgeN: null, edgeE: 'wall3', edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: null},
+    {identifier: 100, edgeN: null, edgeE: null, edgeS: 'wall3', edgeW: null, floor: 'barefloor', conveyor: null, flag: null},
+    {identifier: 101, edgeN: null, edgeE: null, edgeS: null, edgeW: 'wall3', floor: 'barefloor', conveyor: null, flag: null},
+
   ];
-}
 
-function seedBoards(){
+var boards = [
+  {
+    name: 'Risky Exchange',
+    col0: [30, 13, 5, 11, 5, 13, 1, 5, 13, 5, 60, 1, 1, 1, 11, 1],
+    col1: [1, 1, 1, 11, 52, 13, 11, 1, 13, 1, 4, 1, 1, 5, 11, 1],
+    col2: [3, 60, 1, 11, 1, 13, 11, 1, 13, 1, 1, 4, 2, 5, 14, 21],
+    col3: [10, 10, 10, 41, 1, 13, 11, 1, 41, 10, 10, 10, 1, 1, 1, 11],
+    col4: [3, 1, 1, 1, 6, 13, 11, 9, 1, 1, 1, 4, 8, 1, 1, 11],
+    col5: [12, 12, 12, 12, 12, 1, 1, 72, 72, 72, 72, 72, 1, 1, 1, 1],
+    col6: [10, 10, 10, 10, 10, 1, 1, 10, 10, 10, 10, 1, 1, 1, 5, 5], 
+    col7: [2, 50, 1, 1, 7, 13, 71, 37, 1, 1, 1, 4, 9, 1, 1, 13],
+    col8: [12, 12, 12, 12, 1, 13, 71, 1, 41, 12, 12, 12, 1, 1, 1, 13],
+    col9: [2, 1, 5, 71, 1, 13, 71, 51, 13, 1, 1, 4, 2, 3, 18, 15],
+    col10: [10, 40, 1, 71, 1, 13, 71, 1, 13, 2, 40, 10, 1, 3, 13, 1],
+    col11: [1, 13, 91, 71, 3, 13, 71, 3, 13, 3, 11, 30, 1, 1, 13, 1],
+    dockLocations: dock1
+  },
+  {
+    name: 'Checkmate',
+    col0: [1, 1, 5, 1, 5, 1, 1, 5, 1, 5, 1, 30, 1, 1, 1, 1],
+    col1: [1, 75, 70, 82, 70, 82, 82, 70, 82, 70, 74, 1, 1, 1, 5, 1],
+    col2: [2, 71, 11, 5, 11, 5, 11, 5, 11, 5, 73, 4, 2, 1, 1, 4],
+    col3: [1, 83, 1, 60, 1, 11, 1, 11, 51, 11, 85, 1, 1, 1, 5, 1],
+    col4: [2, 71, 11, 1, 11, 1, 11, 1, 11, 1, 73, 4, 2, 1, 1, 4],
+    col5: [1, 83, 2, 11, 1, 36, 1, 60, 1, 11, 85, 1, 1, 1, 5, 1],
+    col6: [1, 83, 13, 1, 60, 1, 36, 1, 13, 1, 85, 1, 1, 1, 5, 1],
+    col7: [2, 71, 50, 13, 1, 13, 1, 13, 1, 13, 73, 2, 1, 5, 4],
+    col8: [1, 83, 13, 1, 13, 1, 60, 1, 13, 1, 85, 1, 1, 1, 1, 1],
+    col9: [2, 71, 1, 13, 1, 13, 1, 13, 1, 13, 73, 4, 2, 1, 5, 4],
+    col10: [1, 76, 72, 84, 72, 84, 84, 72, 84, 72, 77, 1, 1, 1, 1, 1],
+    col11: [30, 1, 3, 1, 3, 1, 1, 3, 1, 3, 1, 1, 1, 1, 5, 1],
+    dockLocations: dock2
+  },
+  {
+    name: 'Chop Shop Challenge',
+    col0: [1, 13, 5, 11, 5, 1, 1, 5, 13, 5, 1, 30, 1, 1, 1, 1],
+    col1: [1, 100, 1, 11, 1, 1, 1, 90, 13, 13, 52, 1, 1, 1, 5, 1],
+    col2: [2, 13, 36, 11, 1, 60, 1, 1, 13, 60, 1, 4, 2, 1, 1, 4], 
+    col3: [1, 13, 4, 1, 40, 41, 96, 1, 41, 10, 10, 10, 1, 1, 5, 1], 
+    col4: [2, 13, 93, 71, 1, 1, 13, 1, 1, 50, 1, 4, 2, 1, 1, 4],
+    col5: [12, 15, 41, 71, 1, 1, 13, 60, 93, 1, 5, 1, 1, 1, 5, 1],
+    col6: [10, 10, 40, 71, 1, 36, 22, 10, 40, 10, 10, 10, 1, 1, 5, 1],
+    col7: [2, 1, 1, 71, 1, 12, 41, 1, 3, 36, 1, 4, 2, 1, 5, 4],
+    col8: [1, 1, 1, 71, 1, 8, 11, 1, 1, 60, 1, 1, 1, 1, 1, 1],
+    col9: [2, 1, 3, 87, 70, 74, 11, 1, 13, 13, 1, 51, 2, 1, 5, 4],
+    col10: [1, 60, 4, 71, 1, 86, 11, 1, 13, 19, 10, 10, 1, 1, 1, 1],
+    col11: [30, 1, 3, 71, 3, 73, 11, 53, 73, 3, 1, 1, 1, 1, 5, 1],
+    dockLocations: dock2
+  }  
+];
 
-}
-
-function seedAll(){
-
-}
-
-connectToDb.then(function () {
-  User.findAsync({})
-  .then(function (users) {
-    if (users.length === 0) {
-      return seedAll();
-    } else {
-      console.log(chalk.magenta('Seems to already be user data, exiting!'));
-      process.kill(0);
-    }
-  }).then(function () {
-    console.log(chalk.green('Seed successful!'));
-    process.kill(0);
-  }).catch(function (err) {
-    console.error(err);
-    process.kill(1);
-  });
-});
