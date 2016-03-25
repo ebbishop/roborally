@@ -1,0 +1,22 @@
+{
+  "name": "RoboRally",
+  "description": "Capstone Project",
+  "main": "server/start.js",
+  "authors": [
+    "pdpatel2 <pdpatel2@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/ebbishop/roborally",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "firebase": "^2.4.1",
+    "angularfire": "^1.1.4"
+  }
+}
