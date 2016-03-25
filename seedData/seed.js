@@ -109,23 +109,23 @@ var dock2 = [[14, 5], [14, 6], [14, 3], [14, 8], [14, 1], [14, 10], [14, 0], [14
 
     //SINGLE CONVEYOR with nothing else
     //straight
-    {identifier: 10, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 1, bearing: [-1, 0, 'N']}, flag: null},
-    {identifier: 11, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 1, bearing: [0, 1, 'E']}, flag: null},
-    {identifier: 12, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 1, bearing: [1, 0, 'S']}, flag: null},
-    {identifier: 13, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 1, bearing: [0, -1, 'W']}, flag: null},
+    {identifier: 10, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 1, bearing: [-1, 0, 'N']}, flag: null},
+    {identifier: 11, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 1, bearing: [0, 1, 'E']}, flag: null},
+    {identifier: 12, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 1, bearing: [1, 0, 'S']}, flag: null},
+    {identifier: 13, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 1, bearing: [0, -1, 'W']}, flag: null},
     //clockwise
-    {identifier: 14, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 1, bearing: [1, 0, 'S']}, flag: null}, 
-    {identifier: 15, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 1, bearing: [0, -1, 'W']}, flag: null}, 
-    {identifier: 16, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 1, bearing: [-1, 0, 'N']}, flag: null}, 
-    {identifier: 17, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 1, bearing: [0, 1, 'E']}, flag: null}, 
+    {identifier: 14, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 1, bearing: [1, 0, 'S']}, flag: null}, 
+    {identifier: 15, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 1, bearing: [0, -1, 'W']}, flag: null}, 
+    {identifier: 16, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 1, bearing: [-1, 0, 'N']}, flag: null}, 
+    {identifier: 17, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 1, bearing: [0, 1, 'E']}, flag: null}, 
      //counter-clockwise
-    {identifier: 18, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 1, bearing: [1, 0, 'S']}, flag: null}, 
-    {identifier: 19, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 1, bearing: [0, -1, 'W']}, flag: null}, 
-    {identifier: 20, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 1, bearing: [-1, 0, 'N']}, flag: null}, 
-    {identifier: 21, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 1, bearing: [0, 1, 'E']}, flag: null}, 
+    {identifier: 18, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 1, bearing: [1, 0, 'S']}, flag: null}, 
+    {identifier: 19, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 1, bearing: [0, -1, 'W']}, flag: null}, 
+    {identifier: 20, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 1, bearing: [-1, 0, 'N']}, flag: null}, 
+    {identifier: 21, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 1, bearing: [0, 1, 'E']}, flag: null}, 
 
     //counter-clockwise and 1 wall
-    {identifier: 22, edgeN: 'wall0', edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 1, bearing: [0, -1, 'W']}, flag: null},
+    {identifier: 22, edgeN: 'wall0', edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 1, bearing: [0, -1, 'W']}, flag: null},
 
   
   //single wrench with nothing else
@@ -155,31 +155,31 @@ var dock2 = [[14, 5], [14, 6], [14, 3], [14, 8], [14, 1], [14, 10], [14, 0], [14
 
   //DOUBLE CONVEYOR with nothing else
   //straight
-    {identifier: 70, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [-1, 0, 'N']}, flag: null},
-    {identifier: 71, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [0, 1, 'E']}, flag: null},
-    {identifier: 72, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [1, 0, 'S']}, flag: null},
-    {identifier: 73, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [0, -1, 'W']}, flag: null},
+    {identifier: 70, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, bearing: [-1, 0, 'N']}, flag: null},
+    {identifier: 71, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, bearing: [0, 1, 'E']}, flag: null},
+    {identifier: 72, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, bearing: [1, 0, 'S']}, flag: null},
+    {identifier: 73, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, bearing: [0, -1, 'W']}, flag: null},
   //double clockwise
-    {identifier: 74, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 2, bearing: [-1, 0, 'N']}, flag: null},
-    {identifier: 75, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 2, bearing: [0, 1, 'E']}, flag: null},
-    {identifier: 76, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 2, bearing: [1, 0, 'S']}, flag: null},
-    {identifier: 77, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'clockwise', magnitude: 2, bearing: [0, -1, 'W']}, flag: null},
+    {identifier: 74, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, bearing: [-1, 0, 'N']}, flag: null},
+    {identifier: 75, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, bearing: [0, 1, 'E']}, flag: null},
+    {identifier: 76, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, bearing: [1, 0, 'S']}, flag: null},
+    {identifier: 77, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'clockwise', magnitude: 2, bearing: [0, -1, 'W']}, flag: null},
   //double counterclockwise
-    {identifier: 78, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 2, bearing: [-1, 0, 'N']}, flag: null},
-    {identifier: 79, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 2, bearing: [0, 1, 'E']}, flag: null},
-    {identifier: 80, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 2, bearing: [1, 0, 'S']}, flag: null},
-    {identifier: 81, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'counterclock', magnitude: 2, bearing: [0, -1, 'W']}, flag: null},
+    {identifier: 78, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 2, bearing: [-1, 0, 'N']}, flag: null},
+    {identifier: 79, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 2, bearing: [0, 1, 'E']}, flag: null},
+    {identifier: 80, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 2, bearing: [1, 0, 'S']}, flag: null},
+    {identifier: 81, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'counterclock', magnitude: 2, bearing: [0, -1, 'W']}, flag: null},
 
   //DOUBLE CONVEYOR with one wall 
   //straight
-    {identifier: 82, edgeN: null, edgeE: 'wall0', edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [-1, 0, 'N']}, flag: null},
-    {identifier: 83, edgeN: null, edgeE: null, edgeS: 'wall0', edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [0, 1, 'E']}, flag: null},
-    {identifier: 84, edgeN: null, edgeE: null, edgeS: null, edgeW: 'wall0', floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [1, 0, 'S']}, flag: null},
-    {identifier: 85, edgeN: 'wall0', edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [0, -1, 'W']}, flag: null},
-    {identifier: 86, edgeN: null, edgeE: null, edgeS: 'wall0', edgeW: null, floor: null, conveyor: {category: 'straight', magnitude: 2, bearing: [0, -1, 'W']}, flag: null},
+    {identifier: 82, edgeN: null, edgeE: 'wall0', edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, bearing: [-1, 0, 'N']}, flag: null},
+    {identifier: 83, edgeN: null, edgeE: null, edgeS: 'wall0', edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, bearing: [0, 1, 'E']}, flag: null},
+    {identifier: 84, edgeN: null, edgeE: null, edgeS: null, edgeW: 'wall0', floor: null, conveyor: {type: 'straight', magnitude: 2, bearing: [1, 0, 'S']}, flag: null},
+    {identifier: 85, edgeN: 'wall0', edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, bearing: [0, -1, 'W']}, flag: null},
+    {identifier: 86, edgeN: null, edgeE: null, edgeS: 'wall0', edgeW: null, floor: null, conveyor: {type: 'straight', magnitude: 2, bearing: [0, -1, 'W']}, flag: null},
 
   //DOUBLE CONVEYOR MERGES 
-    {identifier: 87, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {category: 'merge2', magnitude: 2, bearing: [0, 1, 'E']}, flag: null},
+    {identifier: 87, edgeN: null, edgeE: null, edgeS: null, edgeW: null, floor: null, conveyor: {type: 'merge2', magnitude: 2, bearing: [0, 1, 'E']}, flag: null},
 
   //barefloor 1 wall, 1 laser
     {identifier: 90, edgeN: 'wall1', edgeE: null, edgeS: null, edgeW: null, floor: 'barefloor', conveyor: null, flag: null},

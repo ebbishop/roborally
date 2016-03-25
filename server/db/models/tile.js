@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var edges = [null, 'wall0', 'wall1', 'wall2', 'wall3', 'push1', 'push2'];
 
 var conveyorSchema = new mongoose.Schema({
-  category:{
+  type:{
     type: String,
     enum: ['straight', 'clockwise', 'counterclock', 'merge1CCW', 'merge1CW', 'merge2'],
     required: true
