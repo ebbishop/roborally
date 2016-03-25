@@ -176,16 +176,12 @@ playerSchema.methods.checkDamage = function() {
   }
 }
 
-
 // route?
 // after first round, assume that we call empty register before setRegister
 playerSchema.methods.setRegister = function(cards) {
-  var cards = cards;
-
   for (var i=0; i<5; i++) {
     if (this.register[i] === 0) this.register[i] = cards.shift();
   }
-
 };
 
 playerSchema.methods.emptyRegister = function() {
