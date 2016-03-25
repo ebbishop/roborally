@@ -11,14 +11,6 @@ var Board = mongoose.model('Board');
                       //x5 hands
 var gameFB = []; //[[game.players after card move], [game.players after board move]];
 
-// could a game have flag locations, instead of having to put these on the tile of the board?
-// could we handle the dock locations the same way?
-// or maybe even the entire little add-on boards?
-
-// could boards be static things and games have courses?
-// and courses have boards?
-
-
 var gameSchema = new mongoose.Schema({
   name: String,
   players: [{type: mongoose.Schema.Types.ObjectId, ref: 'Player'}],
@@ -74,7 +66,7 @@ function getRotation (orig, next){
   return deg;
 }
 
-gameSchema.methods.runOnePhase = function () {
+gameSchema.methods.runOneRound = function () {
   while (this.currentCard < 5){
     this.runOneRegister();
     this.runBelts(2);
@@ -83,15 +75,26 @@ gameSchema.methods.runOnePhase = function () {
     this.runGears();
     this.fireRobotLasers();
     this.fireBoardLasers();
-    this.touchFlags();
     this.touchRepairs();
-    this.currentCard ++;
+    this.touchFlags();
+    this.setWinStatus();
+    this.pushGameState()
+
+    if(!this.isWon){
+      this.currentCard ++;
+    }else{
+      break; //game over! is this a good idea?
+    }
+
   }
 
   if(!this.isWon){
+    this.emptyRegisters()
     this.dealCards();
-    this.initiatePhase();
+    this.initiateDecisionState();
   }
+
+  this.sendGameStates()
 }
 
 gameSchema.methods.runOneRegister = function () {
@@ -208,7 +211,7 @@ gameSchema.methods.fireLasersInCol = function (col) {
 }
 
 gameSchema.methods.fireOneLaser = function(laser){
-  var nextLoc = laser.start;
+  var nextLoc = [laser.start[0]+laser.bearing[0], laser.start[1]+laser.bearing[1]];
   var tile, p;
 
    //find a player at the current location
@@ -227,14 +230,13 @@ gameSchema.methods.fireOneLaser = function(laser){
   if (tile[laserBlockedBy[laser.bearing[2]]['exit']]) return;
 
   //otherwise, check next tile for entering
-  nextLoc[0]+=laser.bearing[0];
-  nextLoc[1]+=laser.bearing[1];
   nextTile = getTileAt(nextLoc);
 
   //if beam cannot enter next tile, quit
   if(nextTile[laserBlockedBy[laser.bearing[2]]['enter']]) return;
 
-  // otherwise, call again with the next tile's location  
+  // otherwise, call again with the next tile's location
+  // if next loc isn't on board, quit
   laser.start = nextLoc;
   return this.fireOneLaser(laser);
 }
@@ -262,8 +264,6 @@ gameSchema.methods.touchFlags = function(){
   })
 }
 
-// one phase = one register (one card) + one complete board move
-// there are five phases per round
 gameSchema.methods.dealCards = function() {
   var numCardsToDeal,cardsToDeal;
   var self = this;
@@ -284,21 +284,6 @@ gameSchema.methods.shuffleDeck = function() {
   this.discardDeck = [];
 };
 
-
-gameSchema.methods.checkIfWinner = function() {
-  this.players.forEach(function(p) {
-    if (this.numFlags === p.flagCount) return this.gameover();
-  })
-}
-
-
-gameSchema.methods.gameover = function() {
-  this.state = 'gameover'
-  //at this point, we should stop everything and push game state into gameFB array
-  //potentially save to database?
-}
-
-
 gameSchema.methods.areAllPlayersReady = function() {
   var ready = this.players.filter(function(p){
     return p.ready === true;
@@ -307,16 +292,29 @@ gameSchema.methods.areAllPlayersReady = function() {
 }
 
 gameSchema.methods.checkReady = function() {
-  if (this.areAllPlayersReady()) this.runOnePhase()
+  if (this.areAllPlayersReady()) {
+    this.state = 'run';
+    this.runOneRound();
+  }
 }
 
-gameSchema.methods.isGameWon = function(){
+gameSchema.methods.setWinStatus = function(){
   var game = this;
   this.players.forEach(function(player){
     if (player.flagCount===game.numFlags) {
       game.isWon = true;
       game.inProgress = false;
     }
+  })
+}
+
+gameSchema.methods.initiateDecisionState = function(){
+  this.state = 'decision'
+}
+
+gameSchema.methods.emptyRegisters = function(){
+  this.players.forEach(function(p){
+    p.emptyRegister();
   })
 }
 
@@ -329,10 +327,13 @@ gameSchema.methods.assignDocks = function() {
   });
 }
 
+//call from route
 gameSchema.methods.initializeGame = function (){
   this.assignDocks();
   this.dealCards();
 };
+
+
 
 mongoose.model('Game', gameSchema);
 

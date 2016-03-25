@@ -1,106 +1,58 @@
-player
-  rotate()
-  cardMove()
-  boardMove()
-  checkMove()
-  playCard()
+g.checkReady <---add listener????
+  g.areAllPlayersReady
+  g.runOneRound
+    g.runOneRegister
+      p.playCard
+        p.rotate
+          p.setCardinal
+        p.cardMove
+          p.checkMove --come back to this. calls old getTile
+          p.checkForEdgeOrPit --get tile here, too
+            p.loseLife
+              p.killPlayer
+    g.runBelts() x2
+      g.getTileAt
+      getRotation
+      p.boardMove
+    g.runPushers
+    g.runGears
+    g.fireRobotLasers
+      g.fireOneLaser
+        g.getPlayerAt
+          p.applyDamage
+            p.accrueDamage
+            p.checkDamage
+    g.fireBoardLasers
+      g.fireLasersInCol
+    g.touchFlags
+      p.touchFlag
+    g.touchRepair
+    g.emptyRegisters
+      p.emptyRegister
+    g.setWinStatus
+    g.dealCards
+      g.shuffleDeck
+    g.initiateDecisionState
 
-  setCompass()
-  touchFlag()
+to do:
+  cope with players pushing each other
 
-  applyDamage()
-  loseLife()
+not called yet:
+  p.iAmReady - call in route
+    p.setRegister
+  g.initalizeGame - call in route
+    g.assignDocks
+    g.dealCards
 
-  killPlayer()
-
-  checkForPit()
-  checkForCorner()
-
-card
-  clearRegister()
-
-
-
-  giveEveryoneCard()
-  getNewHand(n)
-
-
-
-
-  shuffleDeck()
-  updateHand()
-  setRegister()
-
-game
-
-  -checkRegisterReady()
-  runHand()
-    +runBoard()
-      +runOneRegister()
-      +runBelt()
-      +check players after belt run
-      +fireBoardLasers()
-      +fireRobotLasers
-        +fireOneLaser() --come back to this, it is messy
-      +runPushers()
-        +runPushersInCol()
-        +runOnePusher()
-      +runGears()
-      -activateRepair()
-  +getPlayers()
-
-  checkWon()
+to write:
+  g.pushGameState at end of each phase
+  g.sendGameStates at end of round or on win
 
 
 
 
-// post route to /game
-//  creates a game object in mongoose?
-//  and a local variable?
-
-// post route to /joingame (player thing)
-//  creates player object in mongoose?
-//  and pushes to game.players array
 
 
 
-var Game = function(id, player, board, blah){
-  this.id = id
-  this.players: [],
-  this.deck: []
 
-}
-
-var Player = function(){
-  this.name;
-  this.life;
-
-}
-
-var Game = function(){
-  this._id: 'a23u4sjdfslkr54po',
-  this.name: 'bestGameEver',
-  this.active: true,
-  this.state: "decision",
-  this.currentCard: 3,
-  this.deck: [],
-  this.discardDeck: [],
-  this.numFlags: 3,
-  this.board : {},
-  this.players: [{},{}]
-}
-
-var Player = function(){
-  this._id: 'aklsjdf;lkj',
-  this.name: 'me',
-  this.robot: 'zoom',
-  this.dock: [],
-  this.position: [row,col],
-  this.bearing: [row,col,dir],
-  this.livesRemaining: 3,
-  this.damage: 2,
-  this.hand: [],
-  this.register: [],
-  this.ready: false,
-  this.flagCount: 0
-}
+  
