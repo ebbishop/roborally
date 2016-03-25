@@ -32,7 +32,7 @@ var gameSchema = new mongoose.Schema({
   },
   state: {
     type: String,
-    enum: ['decision', 'boardmove', 'programmedmove', 'gameover'],
+    enum: ['decision', 'run'],
   },
   currentCard: {
     type: Number,
