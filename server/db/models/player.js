@@ -226,12 +226,9 @@ playerSchema.methods.checkDamage = function() {
 
 //after first round, assume that we call empty register before setRegister
 playerSchema.methods.setRegister = function(cards) { //assumes we are getting an array of cards from the front end in order
-  var cards = cards;
-
   for (var i=0; i<5; i++) {
     if (this.register[i] === 0) this.register[i] = cards.shift();
   }
-
 };
 
 
