@@ -14,7 +14,6 @@ var imgScale = 3.75
 var imgSize = imgSizeActual/imgScale
 var cols = 12;
 var rows = 16;
-
 var board = {
           col0: [1, 13, 5, 11, 5, 1, 1, 5, 13, 5, 1, 30, 1, 1, 1, 1],
           col1: [4, 100, 1, 11, 1, 1, 1, 90, 13, 1, 52, 2, 1, 1, 5, 1],
@@ -28,7 +27,10 @@ var board = {
           col9: [2, 1, 3, 87, 70, 74, 11, 1, 13, 13, 1, 51, 2, 1, 5, 4],
           col10: [1, 60, 4, 71, 1, 88, 11, 1, 13, 19, 10, 10, 1, 1, 1, 1],
           col11: [30, 1, 3, 71, 3, 73, 11, 53, 73, 3, 1, 1, 1, 1, 5, 1]
-      }    
+        }
+
+
+             
 var boardArr = [];
 
 function createBoardArr (boardObj) {
