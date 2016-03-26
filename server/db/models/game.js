@@ -11,7 +11,7 @@ require('./player');
 var Player = mongoose.model('Player');
 var Board = mongoose.model('Board');
                       //x5 hands
-var gameFB = []; //[[game.players after card move], [game.players after board move]];
+var hashOfGames = {}; //[[game.players after card move], [game.players after board move]];
 
 var gameSchema = new mongoose.Schema({
   name: String,
@@ -41,10 +41,6 @@ var gameSchema = new mongoose.Schema({
     type: Number,
     enum: [1,2,3,4]
   },
-  inProgress: {
-    type: Boolean, 
-    default: false
-  },
   isWon: {
     type: Boolean,
     default: false
@@ -71,6 +67,7 @@ function getRotation (orig, next){
 gameSchema.methods.runOneRound = function () {
   while (this.currentCard < 5){
     this.runOneRegister();
+    this.pushGameState();
     this.runBelts(2);
     this.runBelts(1);
     this.runPushers();
@@ -87,10 +84,10 @@ gameSchema.methods.runOneRound = function () {
     }else{
       break; //game over! is this a good idea?
     }
-
   }
 
   if(!this.isWon){
+    this.currentCard = 0;
     this.emptyRegisters()
     this.dealCards();
     this.initiateDecisionState();
@@ -107,7 +104,7 @@ gameSchema.methods.runOneRegister = function () {
     return 1;
   })
 
-  players.forEach(function(player){
+  this.players.forEach(function(player){
     player.playCard(currentCard)
   })
 }
@@ -305,7 +302,6 @@ gameSchema.methods.setWinStatus = function(){
   this.players.forEach(function(player){
     if (player.flagCount===game.numFlags) {
       game.isWon = true;
-      game.inProgress = false;
     }
   })
 }
@@ -335,6 +331,45 @@ gameSchema.methods.initializeGame = function (){
   this.dealCards();
 };
 
+gameSchema.methods.pushGameState = function(){
+  var publicPlayerArray = this.players.map(function(player){
+    var p;
+    p._id = player._id;
+    p.position = player.position;
+    p.bearing = player.bearing;
+    p.damage = player.damage;
+    p.lives = player.lives;
+    p.register = player.register;
+    p.flagCount = player.flagCount;
+    return p;
+  });
+
+  var state = {players: publicPlayerArray, isWon: this.isWon};
+  if(!hashOfGames[this._id]){
+    hashOfGames[this._id] = [state]
+  }else if(this.currentCard===0){
+    hashOfGames[this._id] = [state];
+  }else{
+    hashOfGames[this._id].push(state);
+  }
+}
+
+gameSchema.methods.sendGameStates = function(){
+  myFireBaseGame = firebaseHelper.getConnection(this._id);
+  myFireBaseGame.child('phases').set(hashOfGames[this._id])
+
+  var privatePlayerArray = this.players.map(function(player){
+    var p;
+    p._id = player[i]._id;
+    p.hand = player[i].hand;
+    return p;
+  });
+
+  privatePlayerArray.forEach(function(player){
+    myFireBaseGame.child('private').child(player._id).set(player.hand);
+  });
+
+}
 
 
 mongoose.model('Game', gameSchema);

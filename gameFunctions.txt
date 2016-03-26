@@ -34,12 +34,16 @@ g.checkReady <---add listener????
       g.shuffleDeck
     g.initiateDecisionState
 
+
+
 to do:
   cope with players pushing each other
+  pause game and return to it?
 
 not called yet:
   p.iAmReady - call in route
     p.setRegister
+
   g.initalizeGame - call in route
     g.assignDocks
     g.dealCards
@@ -47,6 +51,43 @@ not called yet:
 to write:
   g.pushGameState at end of each phase
   g.sendGameStates at end of round or on win
+
+
+
+
+
+array of players:
+  one player:
+    id
+    +position
+    +bearing
+    -register (array of 5 null/cards)
+    -hand
+    +damage
+    +lives
+    +flag count
+
+hash of games: {
+  'lfjwk3v9gjkgdi': [{ players:[], isWon}], //x10
+  'gjrv9ir4j9f0bek': [{ players:[], isWon}] //x10
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
