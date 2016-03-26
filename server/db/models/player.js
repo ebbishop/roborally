@@ -22,9 +22,9 @@ var playerSchema = new mongoose.Schema({
     type: Array,
     default: [-1, 0, 'N']
   },
-  livesRemaining: Number,
-  damage: Number,
-  hand: [Number],
+  livesRemaining: {type: Number, default: 3},
+  damage: {type: Number, default:0},
+  hand: {type: [Number]},
   register: {
     type: [Number],
     default: [0, 0, 0, 0, 0]
@@ -46,7 +46,6 @@ var moveBlocked = {
 playerSchema.methods.playCard = function(i){
   var cardNum = this.register[i];
   var card = programCards[(cardNum/10)-1];
-
   this.rotate(card.rotation);
   this.cardMove(card.magnitude);
 };
@@ -60,13 +59,16 @@ playerSchema.methods.rotate = function (rotation){
   var col = Math.round(xi * Math.cos(theta) - yi * Math.sin(theta));
   var row = Math.round(yi * Math.cos(theta) + xi * Math.sin(theta));
 
-  var cardinal = this.setCardinal(row, col)
+  if(col === -0) col = 0;
+  if(row === -0) row = 0;
+
+  var cardinal = setCardinal(row, col)
 
   this.set('bearing', [row, col, cardinal])
   return [row, col, cardinal]
 }
 
-playerSchema.methods.setCardinal = function(row, col) {
+function setCardinal(row, col) {
   var cardinal;
   switch(true) {
     case (row===-1 && col===0):
@@ -151,18 +153,18 @@ playerSchema.methods.cardMove = function (magnitude) {
 // }
 
 playerSchema.methods.touchFlag = function() {
-  this.flagCount++
+  this.flagCount++;
 }
 
 // route? <--- player clicks ready and sends cards in order
 playerSchema.iAmReady = function(cards) {
-  this.ready = true
-  this.setRegister(cards)
+  this.ready = true;
+  this.setRegister(cards);
 }
 
 playerSchema.methods.applyDamage = function(hitCount) {
-  this.accrueDamage(hitCount)
-  this.checkDamage()
+  this.accrueDamage(hitCount);
+  this.checkDamage();
 }
 
 playerSchema.methods.accrueDamage = function(hitCount) {
@@ -172,7 +174,7 @@ playerSchema.methods.accrueDamage = function(hitCount) {
 playerSchema.methods.checkDamage = function() {
   if (this.damage > 9) {
     this.loseLife();
-    this.damage = 0
+    this.damage = 0;
   }
 }
 
@@ -180,19 +182,18 @@ playerSchema.methods.checkDamage = function() {
 // after first round, assume that we call empty register before setRegister
 playerSchema.methods.setRegister = function(cards) {
   for (var i=0; i<5; i++) {
-    if (this.register[i] === 0) this.register[i] = cards.shift();
+    if (this.register[i] === 0) {
+      this.register[i] = cards.shift()
+    };
   }
 };
 
 playerSchema.methods.emptyRegister = function() {
-  var prevRegister = this.register;
-
-  if (this.damage < 5) this.register = [0, 0, 0, 0, 0];
-  else if(this.damage === 5) this.register = [0, 0, 0, 0].concat(prevRegister.slice(4));
-  else if(this.damage === 6) this.register = [0, 0, 0].concat(prevRegister.slice(3));
-  else if(this.damage === 7) this.register = [0, 0].concat(prevRegister.slice(2));
-  else if(this.damage === 8) this.register = [0].concat(prevRegister.slice(1));
-  else return;
+  var discard = this.register.slice(0, 9-this.damage);
+  var keep = this.register.slice(9-this.damage);
+  var zeros = Array((9-this.damage)).fill(0).slice(0,5);
+  this.register = zeros.concat(keep);
+  return discard;
 }
 
 
