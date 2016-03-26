@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
 var _ = require('lodash');
+var deepPopulate = require('mongoose-deep-populate')(mongoose);
+
 var firebaseHelper = require('../../firebase/firebase');
 require('./board');
 require('./player');
@@ -45,8 +47,8 @@ var gameSchema = new mongoose.Schema({
   }
 });
 
+gameSchema.plugin(deepPopulate);
 gameSchema.set('versionKey',false );
-
 
 var laserBlockedBy = {
   'N': {exit: 'edgeN', enter: 'edgeS'},

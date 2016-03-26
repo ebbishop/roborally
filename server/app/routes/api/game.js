@@ -3,6 +3,7 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
 var firebaseHelper = require("../../../firebase/firebase.js");
+var deepPopulate = require('mongoose-deep-populate')(mongoose);
 
 var Game = mongoose.model('Game');
 var Player = mongoose.model('Player');
@@ -10,8 +11,12 @@ var Player = mongoose.model('Player');
 //URL: /api/game
 
 router.param('gameId', function(req, res, next, gameId) {
-	Game.findById(gameId)
+	Game.findById(gameId).deepPopulate(['board.col0', 'board.col1', 'board.col2', 'board.col3', 'board.col4',
+        'board.col5', 'board.col6', 'board.col7', 'board.col8', 'board.col9', 'board.col10',
+        'board.col11']).exec()
+ 	// Game.findById(gameId).populate('board')
 	.then(function(game) {
+		// console.log(game)
 		req.game = game;
 		next()
 	})

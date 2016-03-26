@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var deepPopulate = require('mongoose-deep-populate')(mongoose);
 
 // for now, let's organize  boards by column because all possibilities
 // are only 12 wide, may be a variable height depending on the course
@@ -34,5 +35,6 @@ var schema = new mongoose.Schema({
   }
 });
 
+schema.plugin(deepPopulate);
 mongoose.model('Board', schema);
 schema.set('versionKey',false );
