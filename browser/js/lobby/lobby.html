@@ -2,22 +2,50 @@
 
 	<div class="container">
 
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="page-header" style="text-align: center">RoboRally Game Lobby</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+            	<div class="wrapper" style="text-align: center">
+            		<button class="btn btn-success" style="width: 300px;">Create New Game</button>
+            	</div><br>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+            	<div class="wrapper" style="text-align: center">
+            		<h3>{{localConnection}}</h3>
+            	</div><br>
+            </div>
+        </div>
+
 		<div class="row">
+
 			<div class="col-md-12">
-				<h1>Placeholder for starting game button</h1>
-			</div>
-		</div>
 
-		<div class="row">
-			<div class="col-md-6">
-				<p>Placeholder for player info1</p>
-			</div>
+				<div class="row clearfix">
 
-			<div class="col-md-6">
-				<p>Placeholder for player info2</p>
-			</div>
-		</div>
+					<div class="clearfix col-md-6" ng-repeat="game in games">
+
+		                <a href="#">
+		                    <h2>{{game}}</h2>
+		                </a>
+<!-- 		                <div ng-repeat="i in info">
+                			<p>{{i}}</p>
+                		</div> -->
+            		</div>
+
+        		</div>
 		
+			</div>
+
+		</div>
+
 	</div>
 
 </section>
