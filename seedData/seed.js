@@ -247,7 +247,8 @@ var boards = [
     col9: [2, 1, 5, 71, 1, 13, 71, 51, 13, 1, 1, 4, 2, 3, 18, 15],
     col10: [10, 40, 1, 71, 1, 13, 71, 1, 13, 2, 40, 10, 1, 3, 13, 1],
     col11: [1, 13, 91, 71, 3, 13, 71, 3, 13, 3, 11, 30, 1, 1, 13, 1],
-    dockLocations: dock1
+    dockLocations: dock1,
+    thumbnail: '/img/thumbnails/riskyexchange.png'
   },
   {
     name: 'Checkmate',
@@ -279,7 +280,8 @@ var boards = [
     col9: [2, 1, 3, 87, 70, 74, 11, 1, 13, 13, 1, 51, 2, 1, 5, 4],
     col10: [1, 60, 4, 71, 1, 88, 11, 1, 13, 19, 10, 10, 1, 1, 1, 1],
     col11: [30, 1, 3, 71, 3, 73, 11, 53, 73, 3, 1, 1, 1, 1, 5, 1],
-    dockLocations: dock2
+    dockLocations: dock2,
+    thumbnail: '/img/thumbnails/chopshop.png'
   }  
 ];
 
