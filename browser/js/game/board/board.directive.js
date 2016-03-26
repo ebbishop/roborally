@@ -7,7 +7,6 @@ app.directive('board', function () {
         	game: '='
         },
         link: function(scope, element) {
-
         	window.start()
         // 	var board = {
 	       //    col0: [1, 13, 5, 11, 5, 1, 1, 5, 13, 5, 1, 30, 1, 1, 1, 1],
