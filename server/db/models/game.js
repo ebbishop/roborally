@@ -4,6 +4,7 @@ var _ = require('lodash');
 var deepPopulate = require('mongoose-deep-populate')(mongoose);
 
 var firebaseHelper = require('../../firebase/firebase');
+var deepPopulate = require('mongoose-deep-populate')(mongoose);
 require('./board');
 require('./player');
 
@@ -32,7 +33,7 @@ var gameSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  deck: { 
+  deck: {
     type: [Number],
     default: [10,20,30,40,50,60,70,90,110,130,150,170,190,210,230,250,270,290,310,330,350,370,390,410,80,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380,400,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730,740,750,760,770,780,790,800,810,820,830,840]
   },
@@ -49,6 +50,7 @@ var gameSchema = new mongoose.Schema({
 
 gameSchema.plugin(deepPopulate);
 gameSchema.set('versionKey',false );
+
 
 var laserBlockedBy = {
   'N': {exit: 'edgeN', enter: 'edgeS'},
@@ -98,7 +100,7 @@ gameSchema.methods.runOneRound = function () {
 
 gameSchema.methods.runOneRegister = function () {
   var currentCard = this.currentCard;
-  
+
   this.players.sort(function(p1, p2){
     if (p1.card[currentCard] > p2.card[currentCard]) return -1;
     return 1;
@@ -122,7 +124,7 @@ gameSchema.methods.runBelts = function(type){
       if(nextTile.conveyor) {
         var deg = getRotation(orig, next);
         player.rotate(deg);
-      } 
+      }
 
       player.boardMove(c.bearing);
     }
@@ -221,9 +223,9 @@ gameSchema.methods.fireOneLaser = function(laser){
     p.applyDamage(laser.qty);  //evaluate damage
     return;
   }
-  
+
   //otherwise, get this tile to see if beam can exit
-  tile = this.getTileAt(laser.start); 
+  tile = this.getTileAt(laser.start);
 
   // if beam cannot exit tile, quit
   if (tile[laserBlockedBy[laser.bearing[2]]['exit']]) return;
@@ -312,7 +314,7 @@ gameSchema.methods.initiateDecisionState = function(){
 
 gameSchema.methods.emptyRegisters = function(){
   this.players.forEach(function(p){
-    p.emptyRegister();
+    this.discard.concat(p.emptyRegister());
   })
 }
 
