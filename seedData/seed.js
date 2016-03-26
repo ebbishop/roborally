@@ -37,7 +37,7 @@ function connectTileToBoard(){
     boards.forEach(function(b){
       var keys = Object.keys(b)
       keys.forEach(function(col){
-        if (col !== 'dockLocations' && col !== 'name'){
+        if (col !== 'dockLocations' && col !== 'name' && col !== 'thumbnail'){
           b[col] = b[col].map(function(tIdentifier, index){
             if (tile.identifier === tIdentifier){
               b[col][index] = tile._id;
