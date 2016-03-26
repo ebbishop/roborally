@@ -32,6 +32,9 @@ var schema = new mongoose.Schema({
     //this is the location of every docking number in order (8 docks)
     //      dock#1  dock#2  dock#3  dock#4  dock#5  dock#6   dock#7  dock#8
     //ex: [ [15,5], [15,6], [14,3], [14,8], [13,1], [13,10], [12,0], [12,11] ]     
+  },
+  thumbnail: {
+    type: String
   }
 });
 
