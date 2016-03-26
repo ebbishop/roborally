@@ -57,6 +57,9 @@ navbar {
       color: #f30046;
       cursor: pointer; }
 
+#board {
+  margin-top: 30px; }
+
 #home fullstack-logo {
   padding-top: 30px;
   width: 150px;
