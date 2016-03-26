@@ -210,12 +210,8 @@ describe ('Game Logic', function() {
           expect(game.players[2].flagCount).to.equal(0);
         })
       });
-
-
-
 // not yet tested:
 // iAmReady
-// emptyRegister
 // boardMove
 
     })

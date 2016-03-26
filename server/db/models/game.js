@@ -311,7 +311,7 @@ gameSchema.methods.initiateDecisionState = function(){
 
 gameSchema.methods.emptyRegisters = function(){
   this.players.forEach(function(p){
-    p.emptyRegister();
+    this.discard.concat(p.emptyRegister());
   })
 }
 
