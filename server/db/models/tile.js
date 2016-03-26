@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var deepPopulate = require('mongoose-deep-populate')(mongoose);
 
 var edges = [null, 'wall0', 'wall1', 'wall2', 'wall3', 'push1', 'push2'];
 
@@ -50,6 +51,7 @@ var tileSchema = new mongoose.Schema({
   }
 });
 
+tileSchema.plugin(deepPopulate);
 mongoose.model('Tile', tileSchema);
 
 // // may have max 3 edges
