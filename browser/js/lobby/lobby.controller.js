@@ -1,4 +1,4 @@
-app.controller("LobbyController", function($scope, FirebaseFactory, ) {
+app.controller("LobbyController", function($scope, FirebaseFactory) {
 
 	
 	
