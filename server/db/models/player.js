@@ -11,9 +11,9 @@ var robotSchema = new mongoose.Schema({
 
 
 var playerSchema = new mongoose.Schema({
-  game: {type: mongoose.Schema.Types.ObjectId, ref: 'Game'},
+  // game: {type: mongoose.Schema.Types.ObjectId, ref: 'Game'},
   name: String,
-  robot: [robotSchema],
+  robot: {type: String, enum:robots},
 
   dock: [Number], //starting postion
   position: [Number], //row & col location
@@ -92,10 +92,10 @@ playerSchema.methods.boardMove = function (bearing) {
   newCol += bearing[0];
   newRow += bearing[1];
   // check if move is possible
-  if(this.checkMove()) {
+  // if(this.checkMove()) {
     if (newCol < 0 || newRow < 0 || newCol > 11 || newRow > 15) return this.loseLife();
     else this.set('position', [newCol, newRow]);
-  }
+  // }
 };
 
 playerSchema.methods.loseLife = function() {
@@ -110,45 +110,45 @@ playerSchema.methods.killPlayer = function() {
   this.position = null;
 };
 
-playerSchema.methods.checkMove = function() {
-  var currentPosition = this.position;
-  var nextPosition = [this.position[0] + this.bearing[0], this.position[1] + this.bearing[1]]
+// playerSchema.methods.checkMove = function() {
+//   var currentPosition = this.position;
+//   var nextPosition = [this.position[0] + this.bearing[0], this.position[1] + this.bearing[1]]
 
-  var currentTile = this.game.getTileAt(currentPosition)
-  var nextTile = this.game.getTileAt(nextPosition)
+//   var currentTile = this.game.getTileAt(currentPosition)
+//   var nextTile = this.game.getTileAt(nextPosition)
 
-  if(currentTile[moveBlocked[this.bearing[2]]['exit']]) return false;
-  else if(nextTile[moveBlocked[this.bearing[2]]['enter']]) return false;
-  else return true;
-}
+//   if(currentTile[moveBlocked[this.bearing[2]]['exit']]) return false;
+//   else if(nextTile[moveBlocked[this.bearing[2]]['enter']]) return false;
+//   else return true;
+// }
 
 playerSchema.methods.cardMove = function (magnitude) {
   var newCol = this.position[1];
   var newRow = this.position[0];
 
-  var checkMove = this.checkMove()
+  // var checkMove = this.checkMove()
 
-  if (checkMove === true) {
+  // if (checkMove === true) {
     while (magnitude > 0) {
       newCol += this.bearing[1];
       newRow += this.bearing[0];
 
-      var edgeOrPit = this.checkForEdgeOrPit(newRow, newCol)
-      if (edgeOrPit === true) return this.loseLife();
+      // var edgeOrPit = this.checkForEdgeOrPit(newRow, newCol)
+      // if (edgeOrPit === true) return this.loseLife();
 
       magnitude--
     }
 
     this.position = [newRow, newCol]
 
-  }
+  // }
 }
 
-playerSchema.methods.checkForEdgeOrPit = function(row, col) {
-  var tile = this.game.getTileAt(row, col)
-  if (tile.floor === 'pit' || col < 0 || col > 11 || row < 0 || row > 15) return true;
-  else return false;
-}
+// playerSchema.methods.checkForEdgeOrPit = function(row, col) {
+//   var tile = this.game.getTileAt(row, col)
+//   if (tile.floor === 'pit' || col < 0 || col > 11 || row < 0 || row > 15) return true;
+//   else return false;
+// }
 
 playerSchema.methods.touchFlag = function() {
   this.flagCount++
@@ -207,7 +207,7 @@ playerSchema.methods.emptyRegister = function() {
 //   if (checkMove === true) {
 //     var adjacentOpponent = this.game.getPlayerAt([this.position[0]+this.bearing[0], this.position[1]+this.bearing[1]])
 //     if (adjacentOpponent) return adjacentOpponent.boardMove(this.bearing)
-//     else return 
+//     else return
 //   }
 // }
 
