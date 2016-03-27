@@ -61,6 +61,7 @@
     "passport-local": "^1.0.0",
     "passport-twitter": "^1.0.2",
     "pg": "^4.5.1",
+    "phaser": "^2.4.6",
     "pixi": "^0.3.1",
     "run-sequence": "^1.0.2",
     "sequelize": "^3.19.3",
