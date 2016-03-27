@@ -17,6 +17,10 @@ var hashOfGames = {}; //[[game.players after card move], [game.players after boa
 var gameSchema = new mongoose.Schema({
   name: String,
   players: [{type: mongoose.Schema.Types.ObjectId, ref: 'Player'}],
+  host: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Player'  
+  },
   board: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Board'

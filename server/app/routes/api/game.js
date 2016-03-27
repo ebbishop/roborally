@@ -34,17 +34,20 @@ router.param('gameId', function(req, res, next, gameId) {
 //req.body will include board selection
 //front-end note: state.go to the newly created board
 router.post('/', function(req, res, next) {
-	Game.create(req.body)
-	.then(function(newGame) {
-		return newGame.initializeGame()
-		.then(function(updatedGame) {
-			var newGame = firebaseHelper.getConnection(updatedGame._id)
-			newGame.child('game').set(updatedGame)
-			// sending game info to frontend so we can use it's ID to retrieve data from firebase
-			res.status(201).send(updatedGame)
-			// var newGame = firebaseHelper.getConnection('1234')
-			// newGame.child('game').set('game info')
-		})
+	Player.create({name: req.body.playerName, robot: req.body.robot.name})
+	.then(function(player) {
+		console.log("this is player:", player);
+		return Game.create({name: req.body.gameName, players: player._id, host: player._id, board: req.body.board._id})
+	})
+	.then(function(game){
+		return Game.findById(game._id)
+		.populate('players host')
+	})
+	.then(function(updatedGame) {
+		console.log(updatedGame)
+		var newGame = firebaseHelper.getConnection(updatedGame._id)
+		newGame.child('game').set(updatedGame)
+		res.status(201).send(updatedGame._id)
 	})
 	.then(null, next)
 })

@@ -1,63 +1,45 @@
-<!-- <div class="container">
 
-	<h1 style="text-align: center">Create New Game</h1>
+<div class="container"> 
 
-	<form>
+<form name="CreateGameForm" novalidate ng-submit="CreateGame(game)">
+
+    <div class="form-group">
+  		<label for="name">Game Name</label>
+  		<input type="text" class="form-control" id="gameName" placeholder="Game Name" ng-model="game.gameName" ng-required="true">
+    </div>
+
+  <!--   <div class="form-group">
+            <label for="board">Select Board</label>
+            <select ng-model="game.board">
+            	<option ng-repeat="board in boards" value="{{board._id}}">{{board.name}}<option>
+            </select>
+    </div> -->
+    <div class="form-group">
+        <label>Select Board</label>
+        <div ng-repeat="board in boards">
+            <label>
+                <input type="radio" ng-model="game.board" ng-value="{{board}}" ng-required="true"><img src="{{board.thumbnail}}"></input>
+            </label>
+        </div>
+    </div>
 
 
+    <div class="form-group">
+  		<label for="name">Player Name</label>
+  		<input type="text" class="form-control" id="playerName" placeholder="Player Name" ng-model="game.playerName" ng-required="true">
+    </div>
 
-		<div ng-repeat="board in boards">
-			
-				<a href="#"><img ng-src ="{{board.thumbnail}}" class="img-thumbnail" /></a>
 
-		</div>
+    <div class="form-group">
+        <label>Select Robot</label>
+        <div ng-repeat="robot in robots">
+            <label>
+                <input type="radio" ng-model="game.robot" ng-value="{{robot}}" ng-required="true"><img src="{{robot.imgUrl}}"></input>
+            </label>
+        </div>
+    </div>
 
-	</form>
+	<button type="submit" class="btn btn-default">Create Game</button>
+</form>
 
-</div>
- -->
-
-<div class="container">
-        
-	<div id="page-wrapper">
-	    <div class="row">
-	        <div class="col-lg-12">
-	            <h1 class="page-header" style="text-align: center">Create New Game</h1>
-	        </div>
-	    </div>
-	    <!-- /.row -->
-	    <div class="row">
-	        <div class="col-lg-12">
-	            <div class="panel panel-default">
-	                <div class="panel-heading" style="text-align: center">
-	                    Welcome to RoboRally!
-	                </div>
-	                <div class="panel-body">
-
-	                    <div class="row">
-	                        <div class="col-lg-6">
-	                            <div class="form-group">
-	                                <label>Game Name</label>
-	                                <input class="form-control">
-	                            </div>
-	                        </div>
-	                    </div>
-
-	                    <div class="row">
-	                        <div class="col-lg-12">
-                                <div class="form-group">
-                                    <label>Select Board</label>
-                                    <div ng-repeat="board in boards">
-	                                    <label class="radio-inline">
-	                                        <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline1" value="option1"><a href="#"><img ng-src ="{{board.thumbnail}}"  /></a>
-	                                    </label>
-                                    </div>
-                                </div>
-	                        </div>
-	                    </div>
-	        		</div>
-	        	</div>
-	    	</div>
-	    </div>
-	</div>
 </div>
