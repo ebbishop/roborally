@@ -1,19 +1,19 @@
-window.start = function(){
-  document.getElementById("board").appendChild(renderer.view);
-}
+// window.start = function(){
+//   document.getElementById("board").appendChild(renderer.view);
+// }
 
-var stage = new PIXI.Stage(0x66ff99);
-var renderer = new PIXI.CanvasRenderer(640,480);
+// var stage = new PIXI.Stage(0x66ff99);
+// var renderer = new PIXI.CanvasRenderer(640,480);
 
-//all image files are 150px. Do not change this number!
-var imgSizeActual = 150 
+// //all image files are 150px. Do not change this number!
+// var imgSizeActual = 150 
 
-//factor to rescale images by. This number can be changed
-var imgScale = 3.75 
+// //factor to rescale images by. This number can be changed
+// var imgScale = 3.75 
 
-var imgSize = imgSizeActual/imgScale
-var cols = 12;
-var rows = 16;
+// var imgSize = imgSizeActual/imgScale
+// var cols = 12;
+// var rows = 16;
 // var board = {
 //           col0: [1, 13, 5, 11, 5, 1, 1, 5, 13, 5, 1, 30, 1, 1, 1, 1],
 //           col1: [4, 100, 1, 11, 1, 1, 1, 90, 13, 1, 52, 2, 1, 1, 5, 1],
@@ -31,50 +31,50 @@ var rows = 16;
 
 
              
-var boardArr = [];
+// var boardArr = [];
 
-function createBoardArr (boardObj) {
-  for(var key in board) {
-    if(key.slice(0,3) === 'col') boardArr.push(board[key])
-  }
-  return boardArr;
-}
+// function createBoardArr (boardObj) {
+//   for(var key in board) {
+//     if(key.slice(0,3) === 'col') boardArr.push(board[key])
+//   }
+//   return boardArr;
+// }
 
-function drawDockLine() {
-  var line = new PIXI.Graphics;
-  line.lineStyle(4, 0x000000, 1);
-  line.moveTo(12*imgSizeActual/imgScale, 0)
-  line.lineTo(12*imgSizeActual/imgScale, 12*imgSizeActual/imgScale)
+// function drawDockLine() {
+//   var line = new PIXI.Graphics;
+//   line.lineStyle(4, 0x000000, 1);
+//   line.moveTo(12*imgSizeActual/imgScale, 0)
+//   line.lineTo(12*imgSizeActual/imgScale, 12*imgSizeActual/imgScale)
 
-  stage.addChild(line)
-}
+//   stage.addChild(line)
+// }
 
-function buildTiles() {
-  for (var col = 0; col < cols; col ++){
-    for (var row = 0; row < rows; row ++){
-      var tileSrc = '/img/tiles/' + boardArr[col][row] + '.jpg';
-                                                          //150x150 is the actual image size
-      var tile = new PIXI.extras.TilingSprite.fromImage(tileSrc, imgSizeActual, imgSizeActual)
+// function buildTiles() {
+//   for (var col = 0; col < cols; col ++){
+//     for (var row = 0; row < rows; row ++){
+//       var tileSrc = '/img/tiles/' + boardArr[col][row] + '.jpg';
+//                                                           //150x150 is the actual image size
+//       var tile = new PIXI.extras.TilingSprite.fromImage(tileSrc, imgSizeActual, imgSizeActual)
       
-      tile.position.x = imgSize*row
-      tile.position.y = imgSize*cols - imgSize - imgSize * col;
-      //rescales the 150px tile image to be 4 times smaller 
-      tile.scale.set(1/imgScale, 1/imgScale);
+//       tile.position.x = imgSize*row
+//       tile.position.y = imgSize*cols - imgSize - imgSize * col;
+//       //rescales the 150px tile image to be 4 times smaller 
+//       tile.scale.set(1/imgScale, 1/imgScale);
 
-      stage.addChild(tile)
-    }
-  }
-}
+//       stage.addChild(tile)
+//     }
+//   }
+// }
 
-function buildMap(){
-  createBoardArr();
-  buildTiles();
-  drawDockLine();
-}
+// function buildMap(){
+//   createBoardArr();
+//   buildTiles();
+//   drawDockLine();
+// }
 
 
-function init(){
-  renderer.render(stage);
-}
+// function init(){
+//   renderer.render(stage);
+// }
 
-buildMap();
+// buildMap();
