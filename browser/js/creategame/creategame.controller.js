@@ -8,7 +8,7 @@ app.controller("CreateGameController", function($scope, boards, GameFactory, $st
 		return GameFactory.createPlayerAndGame(game)
 		.then(function(gameInfo) {
 			console.log('this is the response', gameInfo)
-			$state.go('waitingroom', {id: gameInfo._id})
+			$state.go('host', {id: gameInfo._id, hostId: gameInfo.host._id})
 		})
 	}
 })

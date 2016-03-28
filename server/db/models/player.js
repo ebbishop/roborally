@@ -15,7 +15,7 @@ var playerSchema = new mongoose.Schema({
   name: String,
   robot: {type: String, enum:robots},
 
-  dock: [Number], //starting postion
+  dock: {type: Number, default:0}, //dock number will be assigned a position on the front-end
   position: [Number], //row & col location
   compassDirection: String, // N E S W
   bearing: {
@@ -24,7 +24,10 @@ var playerSchema = new mongoose.Schema({
   },
   livesRemaining: {type: Number, default: 3},
   damage: {type: Number, default:0},
-  hand: {type: [Number]},
+  hand: {
+    type: [Number],
+    default: [0, 0, 0, 0, 0, 0, 0, 0, 0]
+  },
   register: {
     type: [Number],
     default: [0, 0, 0, 0, 0]

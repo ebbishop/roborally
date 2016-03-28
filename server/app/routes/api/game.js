@@ -13,7 +13,7 @@ var Player = mongoose.model('Player');
 router.param('gameId', function(req, res, next, gameId) {
 	Game.findById(gameId).deepPopulate(['board.col0', 'board.col1', 'board.col2', 'board.col3', 'board.col4',
         'board.col5', 'board.col6', 'board.col7', 'board.col8', 'board.col9', 'board.col10',
-        'board.col11']).exec()
+        'board.col11', 'players.player', 'host']).exec()
 	.then(function(game) {
 		req.game = game;
 		next()
@@ -42,8 +42,20 @@ router.post('/', function(req, res, next) {
 
 //get game
 router.get('/:gameId', function(req, res) {
-	console.log('we hit this route')
 	res.json(req.game)
+})
+
+router.get('/:gameId/start', function(req, res, next) {
+	var state = req.game.state;
+	var id = req.params.gameId
+	var game = firebaseHelper.getConnection(id)
+	req.game.set({state: 'decision'})
+	req.game.save()
+	.then (function(updatedGame) {
+		updatedGame.initializeGame()
+		game.child('game').set(updatedGame.toObject())
+		res.send(id)
+	})
 })
 
 //deal cards to all players in game when game is active and state is in 'decision' mode

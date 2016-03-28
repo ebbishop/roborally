@@ -1,7 +1,7 @@
 app.config(function ($stateProvider) {
 
     $stateProvider.state('game', {
-      url: '/game/:gameId',
+      url: '/game/:gameId/:playerId',
       templateUrl: '/js/game/game.html',
       controller: 'GameCtrl',
       resolve: {

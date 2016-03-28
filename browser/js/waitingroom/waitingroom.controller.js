@@ -1,9 +1,13 @@
-app.controller("WaitingRoomController", function($scope, game, $stateParams, PlayerFactory, FirebaseFactory) {
+app.controller("WaitingRoomController", function($scope, game, $stateParams, PlayerFactory, FirebaseFactory, $state) {
 
 	$scope.gameID = $stateParams.id
 
-	var localGamePlayers = FirebaseFactory.getConnection($scope.gameID + '/game' + '/players')
-	$scope.players = localGamePlayers
+	console.log($scope.gameID)
+
+	$scope.players = FirebaseFactory.getConnection($scope.gameID + '/game' + '/players')
+
+	$scope.localGame = FirebaseFactory.getConnection($scope.gameID + '/game' + '/state')
+	console.log('this is the state', $scope.localGame)
 
 	$scope.game = game
 	$scope.robots = [{name: "Spin Bot", imgUrl: "/img/robots/spinbot.jpg"}, {name: "Twonky", imgUrl: "/img/robots/twonky.jpg"}, {name: "Zoom Bot", imgUrl: "/img/robots/zoombot.jpg"}]
@@ -11,8 +15,17 @@ app.controller("WaitingRoomController", function($scope, game, $stateParams, Pla
 	$scope.CreatePlayer = function(player, gameID) {
 		return PlayerFactory.createPlayer(player, $scope.gameID)
 		.then(function(playerInfo) {
-			console.log('this is the response', playerInfo)
-			// $state.go('waitingroom', {id: gameInfo._id})
+			var id = playerInfo.playerId
+			$scope.$watch('localGame.$value', function(state) {
+				console.log('this is the local game', $scope.localGame.$value)
+				console.log('this is state', state)
+				if (state === 'decision') {
+					$state.go('game', {gameId: $scope.gameID, playerId: id})
+				}
+			})
 		})
 	}
+
+
+
 })
