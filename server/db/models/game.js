@@ -100,12 +100,10 @@ gameSchema.methods.runOneRound = function () {
 
 gameSchema.methods.runOneRegister = function () {
   var currentCard = this.currentCard;
-
   this.players.sort(function(p1, p2){
-    if (p1.card[currentCard] > p2.card[currentCard]) return -1;
+    if (p1.register[currentCard] > p2.register[currentCard]) return -1;
     return 1;
   })
-
   this.players.forEach(function(player){
     player.playCard(currentCard)
   })
@@ -116,13 +114,13 @@ gameSchema.methods.runBelts = function(type){
   var tile;
   this.players.forEach(function(player){
     tile = game.getTileAt(player.position);
-    if(tile.conveyor && tile.conveyor.magnitude >= type) {
-      var c = tile.conveyor;
+    if(tile.conveyor && tile.conveyor[0].magnitude >= type) {
+      var c = tile.conveyor[0];
       var nextPosition = [player.position[0] + c.bearing[0], player.position[1] + c.bearing[1]];
       var nextTile = game.getTileAt(nextPosition);
 
       if(nextTile.conveyor) {
-        var deg = getRotation(orig, next);
+        var deg = getRotation(c.bearing, nextTile.conveyor[0].bearing);
         player.rotate(deg);
       }
 
