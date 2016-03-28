@@ -3,7 +3,10 @@
 		<div class="col-md-6">
 			<h2>{{game.name}}</h2><br>
 			<h5>Active Players</h5>
-			{{localGame}}
+			<div ng-repeat="player in players">
+			{{player.name}}
+			</div>
+
 		</div>
 
 		<div class="col-md-6">

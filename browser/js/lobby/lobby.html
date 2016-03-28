@@ -18,30 +18,12 @@
 
         <div class="row">
             <div class="col-md-12">
-            	<div class="wrapper" style="text-align: center">
-            		<h3>{{localConnection}}</h3>
+            	<div class="wrapper" ng-repeat="game in games" style="text-align: center">
+            		<h3>Game Name: {{game.game.name}}</h3>
+                    <h4>Game Status: {{game.game.state}}</h4>
             	</div><br>
             </div>
         </div>
-
-<!-- 		<div class="row">
-
-			<div class="col-md-12">
-
-				<div class="row clearfix">
-
-					<div class="clearfix col-md-6" ng-repeat="game in games">
-
-		                <a href="#">
-		                    <h2>{{game}}</h2>
-		                </a>
-            		</div>
-
-        		</div>
-		
-			</div>
-
-		</div> -->
 
 	</div>
 

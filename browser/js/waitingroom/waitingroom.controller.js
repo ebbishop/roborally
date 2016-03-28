@@ -2,7 +2,8 @@ app.controller("WaitingRoomController", function($scope, game, $stateParams, Pla
 
 	$scope.gameID = $stateParams.id
 
-	$scope.localGame = FirebaseFactory.getConnection($scope.gameID + '/game' + '/players')
+	var localGamePlayers = FirebaseFactory.getConnection($scope.gameID + '/game' + '/players')
+	$scope.players = localGamePlayers
 
 	$scope.game = game
 	$scope.robots = [{name: "Spin Bot", imgUrl: "/img/robots/spinbot.jpg"}, {name: "Twonky", imgUrl: "/img/robots/twonky.jpg"}, {name: "Zoom Bot", imgUrl: "/img/robots/zoombot.jpg"}]
