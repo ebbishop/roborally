@@ -235,26 +235,26 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 						var degreesToRotate = getRotation(robot.bearing, player.bearing);
 						robot.bearing = player.bearing;
 						var direction; //clockwise or counterclockwise
-
-						var container = new Container();
-						container.position.x = robot.position.x + imgSize/2
-						container.position.y = robot.position.y + imgSize/2
-						container.pivot.set(robot.position.x + imgSize/2, robot.position.y + imgSize/2)
-						container.addChild(robot);
-						stage.addChild(container);
+						robot.pivot.set(0.5, 0.5)
+						// var container = new Container();
+						// container.position.x = robot.position.x + imgSize/2
+						// container.position.y = robot.position.y + imgSize/2
+						// container.pivot.set(robot.position.x + imgSize/2, robot.position.y + imgSize/2)
+						// container.addChild(robot);
+						// stage.addChild(container);
 						turn = true;
 						return promiseForRotate();
 
 						function rotate(resolve) {
 							if(robot.rotation <= degreesToRotate && direction == "clockwise" || direction == undefined) {
 								direction = "clockwise";
-								requestAnimationFrame(rotate.bind(null, resolve));
 								robot.rotation += 0.1	
+								requestAnimationFrame(rotate.bind(null, resolve));
 							}
 							else if(robot.rotation >= degreesToRotate) {
 								direction = "counterclockwise";
-								requestAnimationFrame(rotate.bind(null, resolve));
 								robot.rotation -= 0.1;
+								requestAnimationFrame(rotate.bind(null, resolve));
 							}
 							else {
 								resolve();
