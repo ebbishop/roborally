@@ -8,28 +8,22 @@
 					<span class="glyphicon glyphicon-cog"></span>
 					<span class="glyphicon glyphicon-cog"></span>
 				</div>
-			</div>	
+			</div>
 
-			<div>		
+			<div>
 				<img src="/img/robots/hammerbot.png"/>
 			</div><br>
 
 			<div>
-				<button type="button" class="btn btn-success" style="width: 100%; display: block; margin: 0 auto;">Ready</button>
+				<button type="button" class="btn btn-success" ng-click="sendRegister()" style="width: 100%; display: block; margin: 0 auto;">Ready</button>
 			</div>
 
 		</div>
 
 		<div class="col-md-7" id="right">
-			<img src="/img/cards/f1.png"/>
-			<img src="/img/cards/f1.png"/>
-			<img src="/img/cards/f1.png"/>
-			<img src="/img/cards/f1.png"/>
-			<img src="/img/cards/f1.png"/>
-			<img src="/img/cards/f1.png"/>
-			<img src="/img/cards/f1.png"/>
-			<img src="/img/cards/f1.png"/>
-			<img src="/img/cards/f1.png"/>
+			<div ng-repeat="row in cards track by $index">
+				<span ng-repeat="card in row track by $index" ng-click="clickedCard(card)" carddata="{{card.priority}}" class="with-card" draggable><img src="/img/cards/{{card.name}}.png" height="100" width="70"></span>
+			</div>
 		</div>
 	</div>
 	<br>
@@ -50,10 +44,10 @@
 	</div>
 
 	<div class="row" id="register">
-		<img src="/img/cards/f1.png"/>
-		<img src="/img/cards/f1.png"/>
-		<img src="/img/cards/f1.png"/>
-		<img src="/img/cards/f1.png"/>
-		<img src="/img/cards/f1.png"/>
+		<span class="register empty-card" droppable></span>
+		<span class="register empty-card" droppable></span>
+		<span class="register empty-card" droppable></span>
+		<span class="register empty-card" droppable></span>
+		<span class="register empty-card" droppable></span>
 	</div>
 </div>

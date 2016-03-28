@@ -14,60 +14,35 @@ router.param('gameId', function(req, res, next, gameId) {
 	Game.findById(gameId).deepPopulate(['board.col0', 'board.col1', 'board.col2', 'board.col3', 'board.col4',
         'board.col5', 'board.col6', 'board.col7', 'board.col8', 'board.col9', 'board.col10',
         'board.col11']).exec()
- 	// Game.findById(gameId).populate('board')
 	.then(function(game) {
-		// console.log(game)
 		req.game = game;
 		next()
 	})
 	.then(null, next)
 })
 
-// router.post('/', function(req, res, next) {
-// 		var newGame = firebaseHelper.getConnection('1234')
-// 		newGame.child('game').child(1).set('game info1')
-// 		newGame.child('game').child(2).set('game info2')
-// 		res.send('done')
-// })
-
-//click 'create new game'
-//req.body will include board selection
-//front-end note: state.go to the newly created board
 router.post('/', function(req, res, next) {
-	Game.create(req.body)
-	.then(function(newGame) {
-		return newGame.initializeGame()
-		.then(function(updatedGame) {
-			var newGame = firebaseHelper.getConnection(updatedGame._id)
-			newGame.child('game').set(updatedGame)
-			// sending game info to frontend so we can use it's ID to retrieve data from firebase
-			res.status(201).send(updatedGame)
-			// var newGame = firebaseHelper.getConnection('1234')
-			// newGame.child('game').set('game info')
-		})
+	Player.create({name: req.body.playerName, robot: req.body.robot.name})
+	.then(function(player) {
+		return Game.create({name: req.body.gameName, players: player._id, host: player._id, board: req.body.board._id})
 	})
-	.then(null, next)
-})
-
-// player selects robot and THEN clicks 'join game'
-// add player to game and assign game id to the player
-router.post('/:gameId/player', function(req, res, next) {
-	var gameId = req.params.gameId
-	Player.create(req.body)
-	.then(function(newPlayer) {
-		newPlayer.set({'game': gameId})
-		newPlayer.save()
-		return newPlayer
+	.then(function(game){
+		return Game.findById(game._id)
+		.populate('players host')
 	})
-	.then(function(newPlayer) {
-		//sending player info to frontend so we can use it's ID to retrieve data from firebase
-		res.status(201).send(newPlayer)
+	.then(function(updatedGame) {
+		var playerKey = updatedGame.host._id.toString()
+		var newGame = firebaseHelper.getConnection(updatedGame._id)
+		newGame.child('game').set(updatedGame.toObject())
+		newGame.child(playerKey).set(updatedGame.host.toObject())
+		res.status(201).json(updatedGame)
 	})
 	.then(null, next)
 })
 
 //get game
 router.get('/:gameId', function(req, res) {
+	console.log('we hit this route')
 	res.json(req.game)
 })
 
