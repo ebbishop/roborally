@@ -1,0 +1,36 @@
+<div class="container">
+	<div class="row">
+		<div class="col-md-6">
+			<h2>{{game.name}}</h2><br>
+			<h5>Active Players</h5>
+			<div ng-repeat="player in players">
+			{{player.name}}
+			</div>
+
+		</div>
+
+		<div class="col-md-6">
+			<h2>{{game.board.name}}</h2><br>
+			<img src="{{game.board.thumbnail}}">
+		</div>
+	</div>
+
+	<div class="row">
+		<form name="CreatePlayerForm" novalidate ng-submit="CreatePlayer(player)">
+		    <div class="form-group">
+		  		<label for="name">Player Name</label>
+		  		<input type="text" class="form-control" id="playerName" placeholder="Player Name" ng-model="player.playerName" ng-required="true">
+		    </div>
+		    <div class="form-group">
+		        <label>Select Robot</label>
+		        <div ng-repeat="robot in robots">
+		            <label>
+		                <input type="radio" ng-model="player.robot" ng-value="{{robot}}" ng-required="true"><img src="{{robot.imgUrl}}"></input>
+		            </label>
+		        </div>
+		    </div>
+			<button type="submit" class="btn btn-default">Join Game</button>
+		</form>
+	</div>
+
+</div>
