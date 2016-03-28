@@ -2,10 +2,12 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
-// var firebaseHelper = require("../../../firebase/firebase.js");
+var firebaseHelper = require("../../../firebase/firebase.js");
 
 var Game = mongoose.model('Game');
 var Player = mongoose.model('Player');
+
+var firebaseHelper = require("../../../firebase/firebase.js");
 
 //URL: /api/player
 
@@ -14,6 +16,29 @@ router.param('playerId', function(req, res, next, playerId) {
 	.then(function(player) {
 		req.player = player;
 		next()
+	})
+	.then(null, next)
+})
+
+router.post('/', function(req, res, next) {
+	var name = req.body.params.data.playerName
+	var robot = req.body.params.data.robot.name
+	var gameID = req.body.params.id
+	var currentGame = firebaseHelper.getConnection(gameID)
+
+	Player.create({name: name, robot: robot})
+	.then(function(player) {
+		var playerKey = player._id.toString()
+		currentGame.child(playerKey).set(player.toObject())
+		return Game.findByIdAndUpdate(gameID, {$addToSet: {players: player}})
+	})
+	.then(function(game){
+		return Game.findById(game._id)
+		.populate('players')
+	})
+	.then(function(updatedGame) {
+		currentGame.child('game').set(updatedGame.toObject())
+		res.status(201).json(updatedGame)
 	})
 	.then(null, next)
 })
