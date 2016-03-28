@@ -242,23 +242,43 @@ describe ('Game Logic', function() {
         })
 
       });
-      describe('run express belts', function(){
+      describe('run belts', function(){
         beforeEach(function(){
           game.players[0].set('position', [9,5]); //mag 2, bearing s
           game.players[1].set('position',[1,11]); //magnitude 1, bearing w
           game.players[2].set('position', [7,7]);
-          game.runBelts(2);
         })
-        it('should move players on express belts',function(){
-          expect(game.players[0].position.toObject()).to.eql([10,5]);
+        describe('run express belts', function(){
+          beforeEach(function(){
+            game.runBelts(2);
+          })
+          it('should move players on express belts',function(){
+            expect(game.players[0].position.toObject()).to.eql([10,5]);
+          });
+          it('should not move players on regular belts', function(){
+            expect(game.players[1].position.toObject()).to.eql([1,11]);
+          })
+          it('should not move players not on belts', function(){
+            expect(game.players[2].position.toObject()).to.eql([7,7]);
+          })
         });
-        it('should not move players on regular belts', function(){
-          expect(game.players[1].position.toObject()).to.eql([1,11]);
-        })
-        it('should not move players not on belts', function(){
-          expect(game.players[2].position.toObject()).to.eql([7,7]);
-        })
-      })
+        describe('run all belts', function(){
+          beforeEach(function(){
+            game.runBelts(1);
+          })
+          it('should move players on express belts',function(){
+            expect(game.players[0].position.toObject()).to.eql([10,5]);
+          });
+          it('should ALSO move players on regular belts', function(){
+            expect(game.players[1].position.toObject()).to.eql([1,10]);
+          })
+          it('should not move players not on belts', function(){
+            expect(game.players[2].position.toObject()).to.eql([7,7]);
+          })
+        });
+      });
+
+
     })
   });
 
