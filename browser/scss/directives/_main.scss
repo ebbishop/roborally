@@ -1,9 +1,34 @@
 @import "fullstack-logo";
 @import "navbar";
 
-#board {
+#gameContainer {
 	// position: fixed;
 	// background-color: white;
-	// margin-left: -80px;
 	margin-top: 30px;
+}
+
+canvas {
+	position:absolute;
+	// margin-left: 14px;
+	right:0;
+}
+
+#right {
+	padding: 0;
+}
+
+#damage {
+	width: 100%;
+	display: block;
+	margin: 0 auto;
+	font-size: 20px;
+	margin-left:25px
+}
+
+.glyphicon {
+  margin-right: 8px;
+}
+
+#register {
+	margin-left: 10px;
 }
