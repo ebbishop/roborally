@@ -19,6 +19,15 @@ body {
   margin: 0 auto;
 }
 
+.empty-card{
+  height: 100px;
+  width: 70px;
+  border: solid 1px black;
+  display: inline-block;
+  padding: 0;
+}
+
+
 @import 'directives/main';
 @import 'home/main';
 @import 'about/main';

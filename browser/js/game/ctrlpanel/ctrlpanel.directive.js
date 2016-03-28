@@ -172,10 +172,11 @@ app.directive('droppable', function(){
         item.src = "/img/cards/" + programCards[cardId/10-1].name + ".png"
         item.height = 100;
         item.width = 70;
+        // this.removeChild(this.childNodes[0]);
         this.appendChild(item);
 
         var handCard = document.querySelectorAll('[carddata="' + cardId + '"]')[0];
-        handCard.classList.add('empty-card');
+        // handCard.classList.add('empty-card');
         handCard.removeAttribute('carddata');
         handCard.removeChild(handCard.childNodes[0]);
 
