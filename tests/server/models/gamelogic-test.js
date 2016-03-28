@@ -34,42 +34,38 @@ describe ('Game Logic', function() {
         done()
       })
       .then(null, done)
-    })
-    var game = new Game({});
-    var player1 = new Player({
-      name: 'emma',
-      robot: 'Squash Bot',
-      dock: [15,5],
-      position: [15,5]
     });
-    var player2 = new Player({
-      name: 'jisoo',
-      robot: 'Twitch',
-      dock: [15,6],
-      position: [15,6]
-    });
-    var player3 = new Player({
-      name: 'priti',
-      robot: 'Hulk x90',
-      dock: [14,3],
-      position: [14,3]
-    })
-    beforeEach(function(){
-      game.players.push(player1, player2, player3);
-      game.set('board', board);
-    })
-    beforeEach(function(done){
-      Promise.all([game.save(), player1.save(), player2.save(), player3.save()])
-      .then(function(){
-        done();
+      var game = new Game({});
+      var player1 = new Player({
+        name: 'emma',
+        robot: 'Squash Bot',
+        dock: [15,5],
+        position: [15,5]
+      });
+      var player2 = new Player({
+        name: 'jisoo',
+        robot: 'Twitch',
+        dock: [15,6],
+        position: [15,6]
+      });
+      var player3 = new Player({
+        name: 'priti',
+        robot: 'Hulk x90',
+        dock: [14,3],
+        position: [14,3]
       })
-      .then(null, done)
-    })
-    beforeEach(function(done){
-      Game.findById(game._id)
-      .deepPopulate(['board.col0', 'board.col1', 'board.col2', 'board.col3', 'board.col4',
-        'board.col5', 'board.col6', 'board.col7', 'board.col8', 'board.col9', 'board.col10',
-        'board.col11', 'players.player'])
+      game.players.push(player1, player2, player3);
+    beforeEach('set things on board', function(done){
+      game.set('board', board);
+      return Promise.all([game.save(), player1.save(), player2.save(), player3.save()])
+      .then(function(){
+        return Game.findById(game._id)
+      })
+      .then(function(g){
+        return g.deepPopulate(['board.col0', 'board.col1', 'board.col2', 'board.col3', 'board.col4',
+          'board.col5', 'board.col6', 'board.col7', 'board.col8', 'board.col9', 'board.col10',
+          'board.col11', 'players.player'])
+      })
       .then(function(g){
         game = g;
         done()
@@ -99,10 +95,7 @@ describe ('Game Logic', function() {
     });
 
 
-
-
-
-    describe('Player functionality', function(){
+    xdescribe('Player functionality', function(){
 
       describe('lose life', function(){
         beforeEach(function(){
@@ -216,6 +209,57 @@ describe ('Game Logic', function() {
 
     })
 
+    describe('Game model', function(){
+      describe('run one register', function(){
+        beforeEach(function(){
+          game.players[0].setRegister([800,570,380,60,450]);
+          // [15,5], 3, 1, R, U, -1
+          game.players[1].setRegister([740, 180, 700, 390, 530]);
+          // [15,6] 2, R, 2, L, 1
+          game.players[2].setRegister([270, 200, 640, 750, 510]);
+          // [14,3] L, R, 1, 2, 1
+          game.runOneRegister();
+        });
+        it('should have 3 players', function(){
+          expect(game.players.length).to.equal(3);
+        })
+        it('game should have players with registers', function(){
+          expect(game.players[0].register).to.have.length(5);
+        });
+        it('should play first card of one player', function(){
+          expect(game.players[0].position.toObject()).to.eql([12,5]);
+        });
+        it('should play first card of all players', function(){
+          expect(game.players[1].bearing.toObject()).to.eql([-1,0,'N'])
+          expect(game.players[1].position.toObject()).to.eql([13,6]);
+          expect(game.players[2].bearing.toObject()).to.eql([0,-1,'W']);
+        });
+      });
+      describe('get tile at', function(){
+        it('should return the tile object of a location', function(){
+          var tile = game.getTileAt([9,5]);
+          expect(tile).to.exist;
+        })
+
+      });
+      describe('run express belts', function(){
+        beforeEach(function(){
+          game.players[0].set('position', [9,5]); //mag 2, bearing s
+          game.players[1].set('position',[1,11]); //magnitude 1, bearing w
+          game.players[2].set('position', [7,7]);
+          game.runBelts(2);
+        })
+        it('should move players on express belts',function(){
+          expect(game.players[0].position.toObject()).to.eql([10,5]);
+        });
+        it('should not move players on regular belts', function(){
+          expect(game.players[1].position.toObject()).to.eql([1,11]);
+        })
+        it('should not move players not on belts', function(){
+          expect(game.players[2].position.toObject()).to.eql([7,7]);
+        })
+      })
+    })
   });
 
 });
