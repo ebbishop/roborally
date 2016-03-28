@@ -1,12 +1,12 @@
-app.factory('FirebaseFactory', function($firebaseArray) {
+app.factory('FirebaseFactory', function($firebaseObject) {
 
 	var FirebaseFactory = {};
 
 	var baseUrl = "https://resplendent-torch-4322.firebaseio.com/";
-	var baseConnection = $firebaseArray(new Firebase(baseUrl))
+	var baseConnection = $firebaseObject(new Firebase(baseUrl))
 
 	FirebaseFactory.getConnection = function(key) {
-		var localConnection = $firebaseArray(new Firebase(baseUrl + key))
+		var localConnection = $firebaseObject(new Firebase(baseUrl + key))
 		return localConnection
 	}
 

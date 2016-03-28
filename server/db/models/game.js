@@ -269,16 +269,19 @@ gameSchema.methods.touchFlags = function(){
 }
 
 gameSchema.methods.dealCards = function() {
-  var numCardsToDeal,cardsToDeal;
   var self = this;
   this.players.forEach(function(player){
-    numCardsToDeal = 9-player.damage;
+    var playerKey = player._id.toString()
+    var deck = _.shuffle(self.deck)
+    var numCardsToDeal = 9-player.damage;
 
     if(numCardsToDeal > self.deck.length) {
       self.shuffleDeck()
     }
-    cardsToDeal = self.deck.splice(0,numCardsToDeal);
+
+    var cardsToDeal = deck.splice(0,numCardsToDeal);
     player.hand = cardsToDeal;
+    firebaseHelper.getConnection(self._id).child(playerKey).child('hand').set(cardsToDeal)
   });
 }
 
@@ -322,11 +325,16 @@ gameSchema.methods.emptyRegisters = function(){
 }
 
 gameSchema.methods.assignDocks = function() {
+  console.log('got to assignDocks')
+  var game = this;
   var docks = [1,2,3,4,5,6,7,8];
   this.players.forEach(function(player){
+    var playerKey = player._id.toString()
     var dock = _.sample(docks);
-    player.dock = dockNum;
-    docks.splice(docks.indexOf(dockNum),1);
+    player.dock = dock;
+    docks.splice(docks.indexOf(dock),1);
+    console.log('this is dock', dock)
+    firebaseHelper.getConnection(game._id).child(playerKey).child('dock').set(dock)
   });
 }
 

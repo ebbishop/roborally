@@ -26,9 +26,13 @@ router.post('/', function(req, res, next) {
 	var gameID = req.body.params.id
 	var currentGame = firebaseHelper.getConnection(gameID)
 
+
+	console.log('this is body', req.body)
+
+	var playerKey;
 	Player.create({name: name, robot: robot})
 	.then(function(player) {
-		var playerKey = player._id.toString()
+		playerKey = player._id.toString()
 		currentGame.child(playerKey).set(player.toObject())
 		return Game.findByIdAndUpdate(gameID, {$addToSet: {players: player}})
 	})
@@ -38,7 +42,7 @@ router.post('/', function(req, res, next) {
 	})
 	.then(function(updatedGame) {
 		currentGame.child('game').set(updatedGame.toObject())
-		res.status(201).json(updatedGame)
+		res.status(201).json({game: updatedGame, playerId: playerKey})
 	})
 	.then(null, next)
 })
