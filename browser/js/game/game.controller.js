@@ -127,17 +127,51 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 		  { name: "player2", location: [14,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: null },
 		]
 
-		//seed for second location
-		var playerCardMove = [
-		  { name: "player3", location: [15,3], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
-		  { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-		  { name: "player2", location: [11,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 },
-		]
+		var oneRegister = [
+			[ //cardmove1,
+			  { name: "player3", location: [15,3], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
+			  { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+			  { name: "player2", location: [11,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 },
+			],
 
-		var playerBoardMove = [
-			// { name: "player3", location: [15,4], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 }
-			// { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			{ name: "player2", location: [10,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
+			[// boardmove1,
+				{ name: "player3", location: [15,4], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
+				{ name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+				{ name: "player2", location: [10,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
+			],
+
+			[ //cardmove2,
+			  { name: "player3", location: [15,4], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
+			  { name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
+			  { name: "player2", location: [8,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 },
+			],
+
+			[ //boardmove2
+				{ name: "player3", location: [15,5], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
+				{ name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
+				{ name: "player2", location: [8,8], bearing: [0, -1], robot: "Spin Bot", priorityVal: 200 }
+			],
+			[ //cardmove3,
+			  { name: "player3", location: [15,3], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
+			  { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+			  { name: "player2", location: [8,8], bearing: [0, 1], robot: "Spin Bot", priorityVal: 200 },
+			],
+
+			[ //boardmove3
+				{ name: "player3", location: [15,4], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
+				{ name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
+				{ name: "player2", location: [8,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
+			],
+			[ //cardmove4
+				{ name: "player3", location: [15,5], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
+				{ name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+				{ name: "player2", location: [8,9], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
+			],
+			[ //boardmove4,
+			  { name: "player3", location: [15,3], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
+			  { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+			  { name: "player2", location: [8,10], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 },
+			]
 		]
 
 				/* bearings
@@ -151,13 +185,15 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 
 		var robotHash = {};
 
+		// var flattenedRegister = _.flatten(oneRegister)
+
 		function drawRobots(initial) {
 			initial.forEach(function(player, idx){
 				if(robotHash[player.name] === undefined) createSprite();
 
 				function createSprite() {
 					var robotImg = robotImage(player.robot);
-					var robot = new Sprite(resources["img/spritesheet.json"].textures[robotImg])
+					var robot = new Sprite(PIXI.Texture.fromImage(robotImg))
 					robot.position.x = imgSize*player.location[0];
 			        robot.position.y = imgSize*player.location[1];
 			        robot.scale.set(1/imgScale, 1/imgScale);
@@ -168,40 +204,72 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 			      	renderer.render(stage)
 				}	
 			})
-				console.log('robohash', robotHash)
+		}
+
+		function runOneRegister (register) {
+			move(_.flatten(register))
+			.then(function() {
+				console.log(robotHash)
+			})
 		}
 
 		function move(playerObjs) {
-			playerObjs.reduce(function(acc, player, idx){
+			return playerObjs.reduce(function(acc, player, idx){
 				var robot = robotHash[player.name];
 				var turn = false;
 				var direction;
-				// setTimeout(turnAndMove.bind(null, player), idx*.5 + 6000)
 
 				return acc.then(function() {
 					return turnAndMove()	
 				});
 
 				function turnAndMove() {
-					turnRobot();
-					return promiseForMoveRobot();
+					return turnRobot().then(function() {
+
+						return promiseForMoveRobot();
+					})
 				}
 
 				function turnRobot() {
-					if(player.bearing[0] !== robot.bearing[0] || player.bearing[1] !== robot.bearing[1]) {
-					var degreesToRotate = getRotation(robot.bearing, player.bearing);
-					// console.log('player name and rad to rotate', player.name, degreesToRotate)
+					if(player.bearing[0] !== robot.bearing[0] && player.bearing[1] !== robot.bearing[1]) {
+						var degreesToRotate = getRotation(robot.bearing, player.bearing);
+						robot.bearing = player.bearing;
+						var direction; //clockwise or counterclockwise
+
 						var container = new Container();
 						container.position.x = robot.position.x + imgSize/2
 						container.position.y = robot.position.y + imgSize/2
 						container.pivot.set(robot.position.x + imgSize/2, robot.position.y + imgSize/2)
 						container.addChild(robot);
-						container.rotation = degreesToRotate
-						stage.addChild(container)
+						stage.addChild(container);
 						turn = true;
-					}
+						return promiseForRotate();
 
-					renderer.render(stage);
+						function rotate(resolve) {
+							if(robot.rotation <= degreesToRotate && direction == "clockwise" || direction == undefined) {
+								direction = "clockwise";
+								requestAnimationFrame(rotate.bind(null, resolve));
+								robot.rotation += 0.1	
+							}
+							else if(robot.rotation >= degreesToRotate) {
+								direction = "counterclockwise";
+								requestAnimationFrame(rotate.bind(null, resolve));
+								robot.rotation -= 0.1;
+							}
+							else {
+								resolve();
+							}
+						}
+
+						function promiseForRotate () {
+							return $q(function(resolve, reject){
+								rotate(resolve);
+							})
+						}
+					}
+					else {
+						return $q.resolve();
+					}
 				}
 
 				function moveRobot(resolve) {
@@ -209,32 +277,21 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 						direction = 'north';
 				        requestAnimationFrame(moveRobot.bind(null, resolve));
 				        robot.position.x -= 1;
-				        renderer.render(stage);
 				  	} 
 				  	else if(!turn && robot.position.x <= imgSize * player.location[0]) {
 				  		direction = "south";
-				  		// console.log('twonky')
-				  		// console.log(robot.position.x, imgSize*player.location[0])
-				  		requestAnimationFrame(function() {
-				  			moveRobot(resolve);
-				  		});
+				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.x += 1;
-				  		renderer.render(stage);
 				  	}
-				  	else if(!turn && robot.position.y <= imgSize * player.location[1] && direction == 'west' || direction == undefined) {
+				  	else if(!turn && robot.position.y <= imgSize * player.location[1]) {
 				  		direction = "west";
-				  		requestAnimationFrame(function() {
-				  			moveRobot(resolve);
-				  		});
+				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.y += 1;
 				  	} 		
-				  	else if(!turn && robot.position.y <= imgSize & player.location[1] && direction == 'east' || direction == undefined) {
+				  	else if(!turn && robot.position.y >= imgSize & player.location[1] && direction == 'east') {
 				  		direction = 'east';
-				  		requestAnimationFrame(function() {
-				  			moveRobot(resolve);
-				  		});
+				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.y -= 1;
-				  		renderer.render(stage);
 				  	} else {
 				  		resolve();
 				  	} 	
@@ -249,11 +306,13 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 			}, $q.resolve())
 		}
 
-		// function boardMove(playerObjs){
-		// 	playerObjs.forEach(function(player,idx){
-
-		// 	}
+		// function promiseForMoving (oneMove) {
+		// 	return $q(function(resolve, reject) {
+		// 		move(oneMove);
+		// 	});
 		// }
+
+
 
 
 		buildTiles();
@@ -261,11 +320,8 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 		drawDockLine();
 		drawLasers();
 		drawRobots(players);
-		move(playerCardMove);
-		console.log('robots now', robotHash)
-		setTimeout(function() {
-			move(playerBoardMove)
-		},5000);
+		runOneRegister(oneRegister)
+		// console.log('robo hash', robotHash)
 
 		function buildMap(){
 		  renderer.render(stage);
@@ -281,15 +337,13 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 });
 
 function robotImage (robotName) {
-	return robotName.toLowerCase().replace(/ /g,'') + '.png';
+	return '/img/robots/' + robotName.toLowerCase().replace(/ /g,'') + 'Arrow.png';
 }
 
 function getRotation (orig, next){
-	console.log('orig and next', orig, next)
 	if(orig[0] + next[0] ===  0 || orig[1] + next[1] === 0) return Math.PI;
 	else {
 	  var dot = -orig[0]*next[1] + orig[1]*next[0];
-	  console.log('dot', dot)
 	  var rad = Math.asin(dot);
   	return rad;
 	}
