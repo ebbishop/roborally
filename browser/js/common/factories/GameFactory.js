@@ -12,7 +12,7 @@ app.factory('GameFactory', function($http){
 	GameFactory.getGame = function(gameId){
 		return $http.get('/api/game/' + gameId)
 		.then(function(res){
-		  	return res.data;
+			return res.data
 		});
 	}
 

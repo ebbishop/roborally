@@ -1,4 +1,4 @@
-app.controller("CreategameController", function($scope, boards, GameFactory, $state) {
+app.controller("CreateGameController", function($scope, boards, GameFactory, $state) {
 
 	$scope.boards = boards
 
@@ -6,8 +6,9 @@ app.controller("CreategameController", function($scope, boards, GameFactory, $st
 
 	$scope.CreateGame = function(game) {
 		return GameFactory.createPlayerAndGame(game)
-		.then(function(newGame) {
-			$state.go('lobby')
+		.then(function(gameInfo) {
+			console.log('this is the response', gameInfo)
+			$state.go('waitingroom', {id: gameInfo._id})
 		})
 	}
 })

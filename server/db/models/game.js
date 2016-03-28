@@ -31,7 +31,8 @@ var gameSchema = new mongoose.Schema({
   },
   state: {
     type: String,
-    enum: ['decision', 'run'],
+    enum: ['decision', 'run', 'waiting'],
+    default: 'waiting'
   },
   currentCard: {
     type: Number,

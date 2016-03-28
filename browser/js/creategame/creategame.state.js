@@ -1,7 +1,7 @@
 app.config(function($stateProvider){
 	$stateProvider.state('creategame', {
 		url: '/creategame',
-		controller: 'CreategameController',
+		controller: 'CreateGameController',
 		templateUrl: 'js/creategame/creategame.html',
 		resolve: {
 			boards: function(BoardFactory) {
