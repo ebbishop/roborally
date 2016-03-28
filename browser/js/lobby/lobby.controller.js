@@ -4,6 +4,6 @@ app.controller("LobbyController", function($scope, FirebaseFactory) {
 	
 	var allGames = FirebaseFactory.getBase()
 	$scope.games = allGames
-	console.log(allGames)
+	// console.log(allGames)
 
 })
