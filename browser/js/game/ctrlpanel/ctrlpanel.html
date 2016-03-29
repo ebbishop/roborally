@@ -1,28 +1,30 @@
 <div class>
 	<div class="row" id="dealt">
 		<div class="col-md-5" id="left">
-			<div class="panel panel-default">
-				<div class="panel-body">
-					Lives Left<br>
-					<span class="glyphicon glyphicon-cog"></span>
-					<span class="glyphicon glyphicon-cog"></span>
-					<span class="glyphicon glyphicon-cog"></span>
+			<div class="panel lives-panel">
+				<div >
+					<h4>Lives Remaining</h4>
+					<div>
+						<span class="life"></span>
+						<span class="life"></span>
+						<span class="dead"></span>
+					</div>
 				</div>
 			</div>
 
 			<div>
-				<img src="/img/robots/hammerbot.png"/>
+				<img id="myrobo" src="/img/robots/hammerbot.png"/ height="120" width="120">
 			</div><br>
 
 			<div>
-				<button type="button" class="btn btn-success" ng-click="sendRegister()" style="width: 100%; display: block; margin: 0 auto;">Ready</button>
+				<button type="button" class="btn-ready" ng-click="sendRegister()"><strong><larger>READY</larger></strong></button>
 			</div>
 
 		</div>
 
 		<div class="col-md-7" id="right">
 			<div ng-repeat="row in cards track by $index">
-				<span ng-repeat="card in row track by $index" ng-click="clickedCard(card)" carddata="{{card.priority}}" class="with-card" draggable><img src="/img/cards/{{card.name}}.png" height="100" width="70"></span>
+				<span ng-repeat="card in row track by $index" ng-click="clickedCard(card)" carddata="{{card.priority}}" class="empty-card caution" draggable><img src="/img/cards/{{card.name}}.png" height="100" width="70"></span>
 			</div>
 		</div>
 	</div>
@@ -40,14 +42,14 @@
 		<span class="glyphicon glyphicon-alert"></span>
 		<span class="glyphicon glyphicon-alert"></span>
 		<span class="glyphicon glyphicon-alert"></span>
-		<span class="glyphicon glyphicon-alert"></span>
+		<span class="glyphicon glyphicon-alert danger"></span>
 	</div>
 
 	<div class="row" id="register">
-		<span class="register empty-card" droppable></span>
-		<span class="register empty-card" droppable></span>
-		<span class="register empty-card" droppable></span>
-		<span class="register empty-card" droppable></span>
-		<span class="register empty-card" droppable></span>
+		<span class="register empty-card empty" droppable></span>
+		<span class="register empty-card empty" droppable></span>
+		<span class="register empty-card empty" droppable></span>
+		<span class="register empty-card empty" droppable></span>
+		<span class="register empty-card empty" droppable></span>
 	</div>
 </div>
