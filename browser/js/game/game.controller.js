@@ -21,7 +21,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 		}
 		else console.log('NOT all players are ready')
 	}, true);
-	
+	 
 	// $scope.fbPlayers.$loaded()
 	// .then(function() {
 	// 	$scope.readyArr = []
