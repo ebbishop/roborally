@@ -3,7 +3,8 @@
 }
 
 body {
-  background: #fdfdfd;
+  background: #211e1f;
+  padding-top: 70px;
 }
 
 @mixin clearfix {
@@ -19,14 +20,83 @@ body {
   margin: 0 auto;
 }
 
+canvas{
+  border: solid #211e1f 4px;
+}
+
+.danger{
+  color: #fce917;
+}
+
+.lives-panel{
+  padding: 10px;
+  background-color: #d0d9d7;
+  border: solid #211e1f 2px;
+  border-radius: 0;
+  margin: 5px;
+  width: 100%;
+}
+
+.lives-panel h4{
+  padding: 3px;
+  margin: auto;
+}
+
+#myrobo{
+  margin-top: 5px;
+}
+
+.empty{
+  background-color: #d0d9d7
+}
+
+.life{
+  line-height: 30px;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: #317E2A;
+  border: solid 2px #205C1F;
+  display: inline-block;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.dead{
+  line-height: 30px;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: #787878;
+  border: solid 2px #221A0B;
+  display: inline-block;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.btn-ready{
+  height: 80px;
+  width: 80px !important;
+  background-color: #ab0929;
+  border: solid #211e1f 2px;
+  border-radius: 40px;
+  margin: auto;
+  display: block;
+}
+
 .empty-card{
   height: 100px;
   width: 70px;
-  border: solid 1px black;
+  border: solid 2px black;
   display: inline-block;
   padding: 0;
+  vertical-align: top
 }
 
+.caution{
+  background-image: url("img/caution.png");
+  border: solid #211e1f 1px;
+}
 
 @import 'directives/main';
 @import 'home/main';
