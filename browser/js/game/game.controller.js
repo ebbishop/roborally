@@ -1,6 +1,8 @@
-app.controller('GameCtrl', function($scope, $state, theGame, $q){
+app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 
 	$scope.game = theGame;
+	$scope.player = thePlayer
+
 	$scope.boardObj = $scope.game.board
 	$scope.docks = $scope.game.board.dockLocations
 	$scope.lasers = $scope.game.board.laserLocations
@@ -203,6 +205,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 			      	stage.addChild(robot);
 			      	robotHash[player.name] = robot;
 			      	robotHash[player.name].bearing = player.bearing;
+			      	robotHash[player.name].location = player.location;
 			      	renderer.render(stage)
 				}
 			})
@@ -223,6 +226,9 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 				})
 				.then(function() {
 					return promiseForMoveRobot();
+				})
+				.then(function() {
+					robot.location = player.location;
 				})
 
 				function turnRobot() {
@@ -265,24 +271,27 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 				function moveRobot(resolve) {
 					var row = player.location[0] + 0.5;
 					var col = player.location[1] + 0.5;
+					// console.log(robot.location, player.location)
+					var direction;
+					if(robot.location[0] > player.location[0]) direction = 'north';
+					else if(robot.location[0] < player.location[0]) direction = 'south';
+					else if(robot.location[1] > player.location[1]) direction = 'east';
+					else if(robot.location[1] < player.location[1]) direction = 'west'
 
-					if(!turn && robot.position.x >= imgSize * row && (compass == 'north' || compass == undefined)) {
-						compass = 'north';
+					if(!turn && robot.position.x >= imgSize * row && direction == 'north') {
+						console.log('got here')
 				        requestAnimationFrame(moveRobot.bind(null, resolve));
 				        robot.position.x -= 1;
 				  	} 
-				  	else if(!turn && robot.position.x <= imgSize * row) {
-				  		compass = "south";
+				  	else if(!turn && robot.position.x <= imgSize * row && direction == 'south') {
 				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.x += 1;
 				  	}
-				  	else if(!turn && robot.position.y >= imgSize * col && (compass == 'east' || compass == undefined)) {
-				  		compass = 'east';
+				  	else if(!turn && robot.position.y >= imgSize * col && direction == 'east') {
 				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.y -= 1;
 				  	} 		
-				  	else if(!turn && robot.position.y <= imgSize * col) {
-				  		compass = "west";
+				  	else if(!turn && robot.position.y <= imgSize * col && direction == 'west') {
 				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.y += 1;
 				  	} 
