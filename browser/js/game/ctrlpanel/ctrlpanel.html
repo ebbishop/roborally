@@ -24,7 +24,7 @@
 
 		<div class="col-md-7" id="right">
 			<div ng-repeat="row in cards track by $index">
-				<span ng-repeat="card in row track by $index" ng-click="clickedCard(card)" carddata="{{card.priority}}" class="empty-card caution" draggable><img src="/img/cards/{{card.name}}.png" height="100" width="70"></span>
+				<span ng-repeat="card in row track by $index" carddata="{{card.priority}}" class="empty-card" draggable><img src="/img/cards/{{card.name}}.png" height="100" width="70"></span>
 			</div>
 		</div>
 	</div>

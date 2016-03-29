@@ -155,6 +155,7 @@ app.directive('droppable', function(){
     scope: {},
     link: function(scope, element){
       var el = element[0];
+      el.droppable = true;
 
       el.addEventListener('dragover', function(ev){
         ev.dataTransfer.dropEffect = 'move';
@@ -174,26 +175,32 @@ app.directive('droppable', function(){
       }, false);
 
       el.addEventListener('drop', function(ev){
-        if(ev.stopPropagation) ev.stopPropagation();
-        this.classList.remove('over');
+        if(this.droppable){
+          if(ev.stopPropagation) ev.stopPropagation();
+          this.classList.remove('over');
 
-        var cardId = ev.dataTransfer.getData('Text');
-        this.carddata = cardId;
+          var cardId = ev.dataTransfer.getData('Text');
+          this.carddata = cardId;
 
-        //add image to register
-        var item = document.createElement('img');
-        item.src = "/img/cards/" + programCards[cardId/10-1].name + ".png"
-        item.height = 100;
-        item.width = 70;
-        // this.removeChild(this.childNodes[0]);
-        this.appendChild(item);
+          //add image to register
+          var item = document.createElement('img');
+          item.src = "/img/cards/" + programCards[cardId/10-1].name + ".png"
+          item.height = 100;
+          item.width = 70;
+          this.appendChild(item);
+          this.droppable = false;
 
-        var handCard = document.querySelectorAll('[carddata="' + cardId + '"]')[0];
-        // handCard.classList.add('empty-card');
-        handCard.removeAttribute('carddata');
-        handCard.removeChild(handCard.childNodes[0]);
 
-        return false;
+          var handCard = document.querySelectorAll('[carddata="' + cardId + '"]')[0];
+          handCard.removeAttribute('carddata');
+          handCard.removeChild(handCard.childNodes[0]);
+          handCard.classList.add('empty');
+          handCard.addAttribute('droppable');
+          handCard.droppable = true;
+          // handCard.removeAttribute('draggable');
+          // handCard.addAttribute('droppable');
+          return false;
+        }
       }, false);
     }
   }
