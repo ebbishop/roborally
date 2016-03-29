@@ -29,8 +29,8 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
   	.add("img/spritesheet.json")
   	.load(setup);
 
-  	var id = PIXI.loader.resources["img/spritesheet.json"].textures; 
-    var imgSizeActual = 150 
+  	var id = PIXI.loader.resources["img/spritesheet.json"].textures;
+    var imgSizeActual = 150
 	var imgScale = 4
 	var imgSize = imgSizeActual/imgScale
 
@@ -38,7 +38,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 
 	    var stage = new Container();
 	    var renderer = autoDetectRenderer(imgSize*16,imgSize*12);
-	    document.getElementById("boardContainer").appendChild(renderer.view)
+	    document.getElementById("board-container").appendChild(renderer.view)
 
 
 		//factor to rescale images by. This number can be changed
@@ -60,10 +60,10 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 		      var tileSrc = $scope.board[col][row] + '.jpg';
 		                                                          //150x150 is the actual image size
 		      var tile = new Sprite(resources["img/spritesheet.json"].textures[tileSrc]);
-		      
+
 		      tile.position.x = imgSize*row
 		      tile.position.y = imgSize*cols - imgSize - imgSize * col;
-		      //rescales the 150px tile image to be 4 times smaller 
+		      //rescales the 150px tile image to be 4 times smaller
 		      tile.scale.set(1/imgScale, 1/imgScale);
 
 		      stage.addChild(tile)
@@ -85,28 +85,28 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 				var line = new PIXI.Graphics;
 				var xFrom, yFrom, xTo, yTo;
 				if($scope.lasers[i][3] === "h" && $scope.lasers[i][0][0] > $scope.lasers[i][i][1][0]) {
-					xFrom = $scope.lasers[i][0][0] 
+					xFrom = $scope.lasers[i][0][0]
 					yFrom = $scope.lasers[i][0][1] + 0.5
-					xTo = $scope.lasers[i][1][0] 
+					xTo = $scope.lasers[i][1][0]
 					yTo = $scope.lasers[i][1][1] + 0.5
 				}
 				else if($scope.lasers[i][3] === "h") {
-					xFrom = $scope.lasers[i][0][0] 
+					xFrom = $scope.lasers[i][0][0]
 					yFrom = $scope.lasers[i][0][1] + 0.5
-					xTo = $scope.lasers[i][1][0] 
+					xTo = $scope.lasers[i][1][0]
 					yTo = $scope.lasers[i][1][1] + 0.5
 				}
 				else if($scope.lasers[i][3] === "v" && $scope.lasers[i][0][1] > $scope.lasers[i][1][1]) {
 					xFrom = $scope.lasers[i][0][0] + 0.5
-					yFrom = $scope.lasers[i][0][1] 
+					yFrom = $scope.lasers[i][0][1]
 					xTo = $scope.lasers[i][1][0] + 0.5
-					yTo = $scope.lasers[i][1][1] 
+					yTo = $scope.lasers[i][1][1]
 				}
 				else {
 					xFrom = $scope.lasers[i][0][0] + 0.5
-					yFrom = $scope.lasers[i][0][1] 
+					yFrom = $scope.lasers[i][0][1]
 					xTo = $scope.lasers[i][1][0] + 0.5
-					yTo = $scope.lasers[i][1][1] 
+					yTo = $scope.lasers[i][1][1]
 				}
 
 				line.lineStyle(1, 0xff0000)
@@ -114,7 +114,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 				line.lineTo(xTo*imgSize, yTo*imgSize)
 
 				stage.addChild(line)
-			    
+
 			}
 		}
 
@@ -123,54 +123,54 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 		//seed for original location
 		var players = [
 		  { name: "player3", location: [14,3], bearing: [-1, 0], robot: "Twonky", priorityVal: null },
-		  // { name: "player1", location: [15,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: null },
-		  // { name: "player2", location: [14,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: null }
+		  { name: "player1", location: [15,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: null },
+		  { name: "player2", location: [14,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: null }
 		]
 
 		var oneRegister = [
 			[ //cardmove1,
-			  { name: "player3", location: [15,3], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 }
-			  // { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			  // { name: "player2", location: [11,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
+			  { name: "player3", location: [15,3], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
+			  { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+			  { name: "player2", location: [11,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
 			],
 
 			[// boardmove1,
-				{ name: "player3", location: [15,4], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 }
-				// { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			// 	{ name: "player2", location: [10,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
+				{ name: "player3", location: [15,4], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
+				{ name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+				{ name: "player2", location: [10,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
 			],
 
 			[ //cardmove2,
-			  { name: "player3", location: [15,4], bearing: [0, 1], robot: "Twonky", priorityVal: 800 }
-			  // { name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
-			  // { name: "player2", location: [8,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 },
+			  { name: "player3", location: [15,4], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
+			  { name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
+			  { name: "player2", location: [8,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 },
 			],
 
 			[ //boardmove2
-				{ name: "player3", location: [15,5], bearing: [0, 1], robot: "Twonky", priorityVal: 800 }
-				// { name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
-				// { name: "player2", location: [8,8], bearing: [0, -1], robot: "Spin Bot", priorityVal: 200 }
+				{ name: "player3", location: [15,5], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
+				{ name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
+				{ name: "player2", location: [8,8], bearing: [0, -1], robot: "Spin Bot", priorityVal: 200 }
 			],
 			[ //cardmove3,
-			  { name: "player3", location: [15,3], bearing: [0, 1], robot: "Twonky", priorityVal: 800 }
-			  // { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			  // { name: "player2", location: [8,8], bearing: [0, 1], robot: "Spin Bot", priorityVal: 200 },
+			  { name: "player3", location: [15,3], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
+			  { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+			  { name: "player2", location: [8,8], bearing: [0, 1], robot: "Spin Bot", priorityVal: 200 },
 			],
 
 			[ //boardmove3
-				{ name: "player3", location: [15,4], bearing: [0, 1], robot: "Twonky", priorityVal: 800 }
-				// { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-				// { name: "player2", location: [8,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
+				{ name: "player3", location: [15,4], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
+				{ name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+				{ name: "player2", location: [8,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
 			],
 			[ //cardmove4
-				{ name: "player3", location: [15,5], bearing: [0, 1], robot: "Twonky", priorityVal: 800 }
-				// { name: "player1", location: [10,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-				// { name: "player2", location: [6,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
+				{ name: "player3", location: [15,5], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
+				{ name: "player1", location: [10,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+				{ name: "player2", location: [6,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
 			],
 			[ //boardmove4,
-			  { name: "player3", location: [15,3], bearing: [0, 1], robot: "Twonky", priorityVal: 800 }
-			  // { name: "player1", location: [9,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			  // { name: "player2", location: [6,7], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
+			  { name: "player3", location: [15,3], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
+			  { name: "player1", location: [9,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+			  { name: "player2", location: [6,7], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
 			]
 		]
 
@@ -204,7 +204,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 			      	robotHash[player.name] = robot;
 			      	robotHash[player.name].bearing = player.bearing;
 			      	renderer.render(stage)
-				}	
+				}
 			})
 		}
 
@@ -263,7 +263,6 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 				}
 
 				function moveRobot(resolve) {
-					console.log(idx, compass)
 					var row = player.location[0] + 0.5;
 					var col = player.location[1] + 0.5;
 
@@ -289,13 +288,13 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 				  	} 
 				  	else {
 				  		resolve();
-				  	} 	
-				}	
+				  	}
+				}
 				function promiseForMoveRobot(){
 					return $q(function(resolve, reject){
-						moveRobot(resolve);	
+						moveRobot(resolve);
 					});
-					
+
 				}
 
 			}, $q.resolve())

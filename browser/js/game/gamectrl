@@ -19,13 +19,13 @@ app.controller('GameCtrl', function($scope, $state, theGame){
 	}
 	// console.log($scope.docks)
 
-    var imgSizeActual = 150 
+    var imgSizeActual = 150
 	var imgScale = 4
 	var imgSize = imgSizeActual/imgScale
 
     var stage = new PIXI.Container();
     var renderer = PIXI.autoDetectRenderer(imgSize*16,imgSize*12);
-    document.getElementById("boardContainer").appendChild(renderer.view)
+    document.getElementById("board-container").appendChild(renderer.view)
 
 
 
@@ -49,10 +49,10 @@ app.controller('GameCtrl', function($scope, $state, theGame){
 	      var tileSrc = '/img/tiles/' + $scope.board[col][row] + '.jpg';
 	                                                          //150x150 is the actual image size
 	      var tile = new PIXI.extras.TilingSprite.fromImage(tileSrc, imgSizeActual, imgSizeActual)
-	      
+
 	      tile.position.x = imgSize*row
 	      tile.position.y = imgSize*cols - imgSize - imgSize * col;
-	      //rescales the 150px tile image to be 4 times smaller 
+	      //rescales the 150px tile image to be 4 times smaller
 	      tile.scale.set(1/imgScale, 1/imgScale);
 
 	      stage.addChild(tile)
@@ -74,28 +74,28 @@ app.controller('GameCtrl', function($scope, $state, theGame){
 			var line = new PIXI.Graphics;
 			var xFrom, yFrom, xTo, yTo;
 			if($scope.lasers[i][3] === "h" && $scope.lasers[i][0][0] > $scope.lasers[i][i][1][0]) {
-				xFrom = $scope.lasers[i][0][0] 
+				xFrom = $scope.lasers[i][0][0]
 				yFrom = $scope.lasers[i][0][1] + 0.5
-				xTo = $scope.lasers[i][1][0] 
+				xTo = $scope.lasers[i][1][0]
 				yTo = $scope.lasers[i][1][1] + 0.5
 			}
 			else if($scope.lasers[i][3] === "h") {
-				xFrom = $scope.lasers[i][0][0] 
+				xFrom = $scope.lasers[i][0][0]
 				yFrom = $scope.lasers[i][0][1] + 0.5
-				xTo = $scope.lasers[i][1][0] 
+				xTo = $scope.lasers[i][1][0]
 				yTo = $scope.lasers[i][1][1] + 0.5
 			}
 			else if($scope.lasers[i][3] === "v" && $scope.lasers[i][0][1] > $scope.lasers[i][1][1]) {
 				xFrom = $scope.lasers[i][0][0] + 0.5
-				yFrom = $scope.lasers[i][0][1] 
+				yFrom = $scope.lasers[i][0][1]
 				xTo = $scope.lasers[i][1][0] + 0.5
-				yTo = $scope.lasers[i][1][1] 
+				yTo = $scope.lasers[i][1][1]
 			}
 			else {
 				xFrom = $scope.lasers[i][0][0] + 0.5
-				yFrom = $scope.lasers[i][0][1] 
+				yFrom = $scope.lasers[i][0][1]
 				xTo = $scope.lasers[i][1][0] + 0.5
-				yTo = $scope.lasers[i][1][1] 
+				yTo = $scope.lasers[i][1][1]
 			}
 
 			line.lineStyle(1, 0xff0000)
@@ -103,7 +103,7 @@ app.controller('GameCtrl', function($scope, $state, theGame){
 			line.lineTo(xTo*imgSize, yTo*imgSize)
 
 			stage.addChild(line)
-		    
+
 		}
 	}
 
@@ -148,7 +148,7 @@ app.controller('GameCtrl', function($scope, $state, theGame){
 		      	robotHash[player.name].bearing = player.bearing;
 		      	renderer.render(stage)
 		      	// movePlayer();
-			}	
+			}
 		})
 			console.log('robohash', robotHash)
 	}
@@ -198,8 +198,8 @@ app.controller('GameCtrl', function($scope, $state, theGame){
 			        requestAnimationFrame(moveRobot);
 			        robot.position.x -= 1;
 			        renderer.render(stage);
-			  	} 		
-			}	
+			  	}
+			}
 		})
 	}
 
