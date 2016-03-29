@@ -49,6 +49,7 @@ var moveBlocked = {
 playerSchema.methods.playCard = function(i){
   var cardNum = this.register[i];
   var card = programCards[(cardNum/10)-1];
+  console.log('this is the card in playCard', this.register)
   this.rotate(card.rotation);
   this.cardMove(card.magnitude);
 };
@@ -190,7 +191,6 @@ playerSchema.methods.setRegister = function(cards) {
       this.register[i] = cards.shift()
     };
   }
-  
   console.log('player in setRegister method', this)
 };
 

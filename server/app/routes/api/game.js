@@ -58,43 +58,15 @@ router.get('/:gameId/start', function(req, res, next) {
 	})
 })
 
-//deal cards to all players in game when game is active and state is in 'decision' mode
-router.get('/:gameId/cards', function(req, res, next) {
-	var gameId = req.params.gameId;
-	if (req.game.active === true && req.game.state === 'decision') {
-		Player.find({game: gameId})
-		.then(function(players) {
-			//assuming dealCards is a method on the Player model
-			//assuming dealCards updates hand of each player with the dealt cards
-			return Promise.map(players, function(player) {
-				return player.dealCards(gameId)
-			})
-		})
-		.then(function(updatedPlayers) {
-			//create or update player's hand in firebase
-			//player's hand will be in separate 'child' node so it can be private
-			return Promise.map(updatedPlayers, function(player) {
-				return firebaseHelper.getConnection(player.game).child(player._id).child('hand').set(player.hand)
-			})
-		})
-		.then(function() {
-			res.status(201).send(gameId)
-		})
-		.then(null, next)
-	}
-	else {
-		res.status(400).send('Unable to deal cards');
-	}
-})
-
 //check to see if all players in game in ready state
 router.get('/:gameId/ready', function(req, res, next) {
-	var gameId = req.params.gameId;
-	Player.find({game: gameId})
-	.then(function(players) {
-		//function to check to see if all players are in ready state?
-		//if all players in ready state, kick off game logic?
-	})
+	console.log('this is the game', req.game)
+	console.log('BEFORE we runOneRegister')
+
+	req.game.runOneRegister()
+	
+	console.log('AFTER we runOneRegister')
+	res.send('front-end after runOneRegister')
 })
 
 module.exports = router;

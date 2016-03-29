@@ -55,43 +55,20 @@ router.post('/', function(req, res, next) {
 //sending register to firebase --> might not need it?
 router.put('/:playerId/setcards', function(req, res, next) {
 	var cards = req.body.register
-	console.log('these are the cards', cards)
-	var id = req.params.playerId
-	var game = req.body.gameId
-	console.log('this is the player: ', req.player)
+	var gameId = req.body.gameId
 
 	req.player.iAmReady(cards)
-	console.log('player now', req.player)
-    // firebaseHelper.getConnection(game).child(id).child.set(req.player)
+	console.log('this is the req.player after iAmReady', req.player)
 
-	res.end()
-	
-
-	// Player.findById(id)
-	// .then(function(player) {
-	// 	console.log('the player again:', player)
-	// 	return player.iAmReady(cards)
-	// })
-	// .then(function(stuff) {
-	// 	res.send(stuff)
-	// })
-	// .then(null, next)
-
-	// req.player.setRegister(req.body)
-	// .then(function(register) {
-	// 	firebaseHelper.getConnection(req.player.game).child(req.player._id).child('register').set(register)
-	// 	res.status(201).send(req.player.game)
-	// })
-	// .then(null, next)
-})
-
-//sets ready status of player to True after cards are registered
-router.put('/:playerId/ready', function(req, res, next) {
-	req.player.iAmReady(req.player.register)
-	.then(function() {
-		res.sendStatus(201)
+	Promise.all([
+		req.player.save(), 
+		Game.findById(gameId).populate('players')
+	])	
+	.spread(function(player, game) {
+		console.log('game players: ', game.players)
+		firebaseHelper.getConnection(gameId).child('game').set(game.toObject())
+		res.send(gameId)
 	})
-	.then(null, next)
 })
 
 //empty register
