@@ -99,9 +99,9 @@ app.directive('ctrlpanel', function (PlayerFactory) {
           console.log('this is the scope in directive:', scope)
 
           function chop(arr){
-              var cards = arr.map(function(c){
+            var cards = arr.map(function(c){
               return programCards[(c/10)-1]
-            })
+            });
             var chopped = [];
             var subArr = [];
             for (var i = 0; i < arr.length; i++){
