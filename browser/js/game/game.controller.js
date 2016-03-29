@@ -123,54 +123,54 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 		//seed for original location
 		var players = [
 		  { name: "player3", location: [14,3], bearing: [-1, 0], robot: "Twonky", priorityVal: null },
-		  { name: "player1", location: [14,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: null },
-		  { name: "player2", location: [14,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: null },
+		  // { name: "player1", location: [15,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: null },
+		  // { name: "player2", location: [14,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: null }
 		]
 
 		var oneRegister = [
 			[ //cardmove1,
-			  { name: "player3", location: [15,3], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
-			  { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			  { name: "player2", location: [11,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 },
+			  { name: "player3", location: [15,3], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 }
+			  // { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+			  // { name: "player2", location: [11,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
 			],
 
 			[// boardmove1,
-				{ name: "player3", location: [15,4], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
-				{ name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-				{ name: "player2", location: [10,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
+				{ name: "player3", location: [15,4], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 }
+				// { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+			// 	{ name: "player2", location: [10,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
 			],
 
 			[ //cardmove2,
-			  { name: "player3", location: [15,4], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-			  { name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
-			  { name: "player2", location: [8,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 },
+			  { name: "player3", location: [15,4], bearing: [0, 1], robot: "Twonky", priorityVal: 800 }
+			  // { name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
+			  // { name: "player2", location: [8,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 },
 			],
 
 			[ //boardmove2
-				{ name: "player3", location: [15,5], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-				{ name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
-				{ name: "player2", location: [8,8], bearing: [0, -1], robot: "Spin Bot", priorityVal: 200 }
+				{ name: "player3", location: [15,5], bearing: [0, 1], robot: "Twonky", priorityVal: 800 }
+				// { name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
+				// { name: "player2", location: [8,8], bearing: [0, -1], robot: "Spin Bot", priorityVal: 200 }
 			],
 			[ //cardmove3,
-			  { name: "player3", location: [15,3], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-			  { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			  { name: "player2", location: [8,8], bearing: [0, 1], robot: "Spin Bot", priorityVal: 200 },
+			  { name: "player3", location: [15,3], bearing: [0, 1], robot: "Twonky", priorityVal: 800 }
+			  // { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+			  // { name: "player2", location: [8,8], bearing: [0, 1], robot: "Spin Bot", priorityVal: 200 },
 			],
 
 			[ //boardmove3
-				{ name: "player3", location: [15,4], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-				{ name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
-				{ name: "player2", location: [8,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
+				{ name: "player3", location: [15,4], bearing: [0, 1], robot: "Twonky", priorityVal: 800 }
+				// { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+				// { name: "player2", location: [8,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
 			],
 			[ //cardmove4
-				{ name: "player3", location: [15,5], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-				{ name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-				{ name: "player2", location: [8,9], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
+				{ name: "player3", location: [15,5], bearing: [0, 1], robot: "Twonky", priorityVal: 800 }
+				// { name: "player1", location: [10,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+				// { name: "player2", location: [6,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
 			],
 			[ //boardmove4,
-			  { name: "player3", location: [15,3], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-			  { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			  { name: "player2", location: [8,10], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 },
+			  { name: "player3", location: [15,3], bearing: [0, 1], robot: "Twonky", priorityVal: 800 }
+			  // { name: "player1", location: [9,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+			  // { name: "player2", location: [6,7], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
 			]
 		]
 
@@ -185,7 +185,6 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 
 		var robotHash = {};
 
-		// var flattenedRegister = _.flatten(oneRegister)
 
 		function drawRobots(initial) {
 			initial.forEach(function(player, idx){
@@ -194,8 +193,11 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 				function createSprite() {
 					var robotImg = robotImage(player.robot);
 					var robot = new Sprite(PIXI.Texture.fromImage(robotImg))
-					robot.position.x = imgSize*player.location[0];
-			        robot.position.y = imgSize*player.location[1];
+					//anchoring the roation to the at the center of the sprite which is why we offset the position by 0.5 as well
+					robot.anchor.x = 0.5;
+					robot.anchor.y = 0.5;
+					robot.position.x = imgSize*(player.location[0] + 0.5);
+			        robot.position.y = imgSize*(player.location[1] + 0.5);
 			        robot.scale.set(1/imgScale, 1/imgScale);
 
 			      	stage.addChild(robot);
@@ -207,53 +209,41 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 		}
 
 		function runOneRegister (register) {
-			move(_.flatten(register))
-			.then(function() {
-				console.log(robotHash)
-			})
+			move(_.flatten(register)).then(function(){console.log(robotHash)})
 		}
 
 		function move(playerObjs) {
 			return playerObjs.reduce(function(acc, player, idx){
 				var robot = robotHash[player.name];
 				var turn = false;
-				var direction;
+				var compass;
 
 				return acc.then(function() {
-					return turnAndMove()	
-				});
-
-				function turnAndMove() {
-					return turnRobot().then(function() {
-
-						return promiseForMoveRobot();
-					})
-				}
+					return turnRobot()	
+				})
+				.then(function() {
+					return promiseForMoveRobot();
+				})
 
 				function turnRobot() {
-					if(player.bearing[0] !== robot.bearing[0] && player.bearing[1] !== robot.bearing[1]) {
-						var degreesToRotate = getRotation(robot.bearing, player.bearing);
+					if(player.bearing[0] !== robot.bearing[0] || player.bearing[1] !== robot.bearing[1]) {
+						var radians = getRotation(robot.bearing, player.bearing);
+						var amtToRotate = radians + robot.rotation
 						robot.bearing = player.bearing;
 						var direction; //clockwise or counterclockwise
-						robot.pivot.set(0.5, 0.5)
-						// var container = new Container();
-						// container.position.x = robot.position.x + imgSize/2
-						// container.position.y = robot.position.y + imgSize/2
-						// container.pivot.set(robot.position.x + imgSize/2, robot.position.y + imgSize/2)
-						// container.addChild(robot);
-						// stage.addChild(container);
+
 						turn = true;
 						return promiseForRotate();
 
 						function rotate(resolve) {
-							if(robot.rotation <= degreesToRotate && direction == "clockwise" || direction == undefined) {
+							if(robot.rotation <= amtToRotate && direction == "clockwise" || direction == undefined) {
 								direction = "clockwise";
-								robot.rotation += 0.1	
+								robot.rotation += 0.03;	
 								requestAnimationFrame(rotate.bind(null, resolve));
 							}
-							else if(robot.rotation >= degreesToRotate) {
+							else if(robot.rotation >= amtToRotate) {
 								direction = "counterclockwise";
-								robot.rotation -= 0.1;
+								robot.rotation -= 0.03;
 								requestAnimationFrame(rotate.bind(null, resolve));
 							}
 							else {
@@ -273,26 +263,31 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 				}
 
 				function moveRobot(resolve) {
-					if(!turn && robot.position.x >= imgSize * player.location[0] && direction == 'north' || direction == undefined) {
-						direction = 'north';
+					console.log(idx, compass)
+					var row = player.location[0] + 0.5;
+					var col = player.location[1] + 0.5;
+
+					if(!turn && robot.position.x >= imgSize * row && (compass == 'north' || compass == undefined)) {
+						compass = 'north';
 				        requestAnimationFrame(moveRobot.bind(null, resolve));
 				        robot.position.x -= 1;
 				  	} 
-				  	else if(!turn && robot.position.x <= imgSize * player.location[0]) {
-				  		direction = "south";
+				  	else if(!turn && robot.position.x <= imgSize * row) {
+				  		compass = "south";
 				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.x += 1;
 				  	}
-				  	else if(!turn && robot.position.y <= imgSize * player.location[1]) {
-				  		direction = "west";
-				  		requestAnimationFrame(moveRobot.bind(null, resolve));
-				  		robot.position.y += 1;
-				  	} 		
-				  	else if(!turn && robot.position.y >= imgSize & player.location[1] && direction == 'east') {
-				  		direction = 'east';
+				  	else if(!turn && robot.position.y >= imgSize * col && (compass == 'east' || compass == undefined)) {
+				  		compass = 'east';
 				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.y -= 1;
-				  	} else {
+				  	} 		
+				  	else if(!turn && robot.position.y <= imgSize * col) {
+				  		compass = "west";
+				  		requestAnimationFrame(moveRobot.bind(null, resolve));
+				  		robot.position.y += 1;
+				  	} 
+				  	else {
 				  		resolve();
 				  	} 	
 				}	
@@ -306,15 +301,6 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 			}, $q.resolve())
 		}
 
-		// function promiseForMoving (oneMove) {
-		// 	return $q(function(resolve, reject) {
-		// 		move(oneMove);
-		// 	});
-		// }
-
-
-
-
 		buildTiles();
 		drawDocks();
 		drawDockLine();
@@ -327,8 +313,8 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q){
 		  renderer.render(stage);
 		  requestAnimationFrame(buildMap);
 		}
-		if($scope.game) {
 
+		if($scope.game) {
 			buildMap();
 		}
 	}
