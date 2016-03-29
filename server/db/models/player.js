@@ -160,8 +160,9 @@ playerSchema.methods.touchFlag = function() {
 }
 
 // route? <--- player clicks ready and sends cards in order
-playerSchema.iAmReady = function(cards) {
+playerSchema.methods.iAmReady = function(cards) {
   this.ready = true;
+  console.log('player in iAmReady method', this)
   this.setRegister(cards);
 }
 
@@ -189,6 +190,8 @@ playerSchema.methods.setRegister = function(cards) {
       this.register[i] = cards.shift()
     };
   }
+  
+  console.log('player in setRegister method', this)
 };
 
 playerSchema.methods.emptyRegister = function() {

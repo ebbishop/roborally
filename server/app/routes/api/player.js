@@ -20,7 +20,6 @@ router.param('playerId', function(req, res, next, playerId) {
 	.then(null, next)
 })
 
-//get player
 router.get('/:playerId', function(req, res) {
 	res.json(req.player)
 })
@@ -55,12 +54,35 @@ router.post('/', function(req, res, next) {
 //each player selects cards and sets register
 //sending register to firebase --> might not need it?
 router.put('/:playerId/setcards', function(req, res, next) {
-	req.player.setRegister(req.body)
-	.then(function(register) {
-		firebaseHelper.getConnection(req.player.game).child(req.player._id).child('register').set(register)
-		res.status(201).send(req.player.game)
-	})
-	.then(null, next)
+	var cards = req.body.register
+	console.log('these are the cards', cards)
+	var id = req.params.playerId
+	var game = req.body.gameId
+	console.log('this is the player: ', req.player)
+
+	req.player.iAmReady(cards)
+	console.log('player now', req.player)
+    // firebaseHelper.getConnection(game).child(id).child.set(req.player)
+
+	res.end()
+	
+
+	// Player.findById(id)
+	// .then(function(player) {
+	// 	console.log('the player again:', player)
+	// 	return player.iAmReady(cards)
+	// })
+	// .then(function(stuff) {
+	// 	res.send(stuff)
+	// })
+	// .then(null, next)
+
+	// req.player.setRegister(req.body)
+	// .then(function(register) {
+	// 	firebaseHelper.getConnection(req.player.game).child(req.player._id).child('register').set(register)
+	// 	res.status(201).send(req.player.game)
+	// })
+	// .then(null, next)
 })
 
 //sets ready status of player to True after cards are registered

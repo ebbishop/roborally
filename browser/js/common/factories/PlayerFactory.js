@@ -17,7 +17,7 @@ app.factory('PlayerFactory', function($http) {
 	}
 
 	PlayerFactory.sendRegister = function(register, gameId, playerId) {
-		return $http.put('/api/player/', {params:{"register": register, "gameId": gameId, "playerId": playerId}})
+		return $http.put('/api/player/' + playerId + '/setcards', {register: register, gameId: gameId})
 	}
 
 	return PlayerFactory
