@@ -1,22 +1,28 @@
-<div class="game-container container">
+<div class="game-container container-fluid">
 
-  <h1 class="game-name">{{game.name}}</h1>
   <div class="col-md-3">
-    <div class="h3">Active Players</div class="h3">
+    <h1 class="game-name">{{game.name}}</h1>
+    <div class="container">
+      <div class="game-board-thumb"><img height="200" width="200" src="{{game.board.thumbnail}}"></div>
+      <div class="">{{game.board.name}}</div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <h1 class="game-name">Active Players</h1>
     <ul class="list-group">
       <li class="list-group-item" ng-repeat="player in players">{{player.name}}</li>
     </ul>
 
   </div>
-  <div class="col-md-3">
-    <div>Ready?</div>
-    <button type="button" class="btn-ready" ng-click="startGame()"><strong><larger>GO</larger></strong></button>
-  </div>
-  <div class="col-md-6">
-    <div class="container">
-      <div class="game-name">{{game.board.name}}</div>
-      <div class="game-board-thumb"><img src="{{game.board.thumbnail}}"></div>
+  <div class="col-md-4">
+    <div class="centerer">
+      <h1 class="game-name">My Robot:</h1>
+      <img id="myrobo" src="/img/robots/hammerbot.png"/ height="120" width="120">
     </div>
+  </div>
+  <div class="col-md-3">
+    <h1 class="game-name">Ready?</h1>
+    <button type="button" class="btn-ready" ng-click="startGame()"><strong><larger>GO</larger></strong></button>
   </div>
 
 </div>

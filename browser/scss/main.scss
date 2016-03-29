@@ -21,6 +21,7 @@ body {
   margin: auto;
   margin-top: 30px;
   padding: 20px;
+  border-radius: 4px;
 }
 
 .game-container li{
@@ -57,25 +58,15 @@ canvas {
 .game-name{
   font-size: 2em;
   font-weight: bold;
-
 }
 
 .danger{
   color: #fce917;
 }
 
-.lives-panel{
-  padding: 10px;
-  background-color: #d0d9d7;
-  border: solid #211e1f 2px;
-  border-radius: 0;
-  margin: 5px;
-  width: 100%;
-}
-
-.lives-panel h4{
-  padding: 3px;
-  margin: auto;
+.centerer{
+  padding-left: calc(100%-150)/2;
+  padding-right: calc(100%-150)/2;
 }
 
 .game-name {
@@ -88,6 +79,21 @@ canvas {
 
 .empty{
   background-color: #d0d9d7
+}
+
+.lives-panel{
+  padding: 10px;
+  background-color: #d0d9d7;
+  border: solid #211e1f 2px;
+  border-radius: 3px;
+  margin: 5px;
+  width: 100%;
+}
+
+.lives-panel h4{
+  padding: 3px;
+  margin: auto;
+  border-radius: 3px;
 }
 
 .life{
@@ -128,6 +134,7 @@ canvas {
   height: 100px;
   width: 70px;
   border: solid 2px black;
+  border-radius: 3px;
   display: inline-block;
   padding: 0;
   vertical-align: top

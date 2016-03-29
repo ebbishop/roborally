@@ -222,7 +222,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 				var compass;
 
 				return acc.then(function() {
-					return turnRobot()	
+					return turnRobot()
 				})
 				.then(function() {
 					return promiseForMoveRobot();
@@ -244,7 +244,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 						function rotate(resolve) {
 							if(robot.rotation <= amtToRotate && direction == "clockwise" || direction == undefined) {
 								direction = "clockwise";
-								robot.rotation += 0.03;	
+								robot.rotation += 0.03;
 								requestAnimationFrame(rotate.bind(null, resolve));
 							}
 							else if(robot.rotation >= amtToRotate) {
@@ -279,10 +279,9 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 					else if(robot.location[1] < player.location[1]) direction = 'west'
 
 					if(!turn && robot.position.x >= imgSize * row && direction == 'north') {
-						console.log('got here')
 				        requestAnimationFrame(moveRobot.bind(null, resolve));
 				        robot.position.x -= 1;
-				  	} 
+				  	}
 				  	else if(!turn && robot.position.x <= imgSize * row && direction == 'south') {
 				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.x += 1;
@@ -290,11 +289,11 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 				  	else if(!turn && robot.position.y >= imgSize * col && direction == 'east') {
 				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.y -= 1;
-				  	} 		
+				  	}
 				  	else if(!turn && robot.position.y <= imgSize * col && direction == 'west') {
 				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.y += 1;
-				  	} 
+				  	}
 				  	else {
 				  		resolve();
 				  	}
