@@ -23,5 +23,12 @@ app.factory('GameFactory', function($http){
 		})
 	}
 
+	GameFactory.startRound = function(gameId) {
+		return $http.get('/api/game/' + gameId + '/ready')
+		.then(function(res) {
+			return res.data
+		})
+	}
+
 	return GameFactory;
 })
