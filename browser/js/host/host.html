@@ -1,27 +1,22 @@
-<div class="container">
+<div class="game-container container">
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="wrapper" style="text-align: center">
-                <button ng-click="startGame()" class="btn btn-success" style="width: 300px;">Start Game</button>
-            </div><br>
-        </div>
+  <h1 class="game-name">{{game.name}}</h1>
+  <div class="col-md-3">
+    <div class="h3">Active Players</div class="h3">
+    <ul class="list-group">
+      <li class="list-group-item" ng-repeat="player in players">{{player.name}}</li>
+    </ul>
+
+  </div>
+  <div class="col-md-3">
+    <div>Ready?</div>
+    <button type="button" class="btn-ready" ng-click="startGame()"><strong><larger>GO</larger></strong></button>
+  </div>
+  <div class="col-md-6">
+    <div class="container">
+      <div class="game-name">{{game.board.name}}</div>
+      <div class="game-board-thumb"><img src="{{game.board.thumbnail}}"></div>
     </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <h2>{{game.name}}</h2><br>
-            <h5>Active Players</h5>
-            <div ng-repeat="player in players">
-                {{player.name}}
-            </div>
-
-        </div>
-
-        <div class="col-md-6">
-            <h2>{{game.board.name}}</h2><br>
-            <img src="{{game.board.thumbnail}}">
-        </div>
-    </div>
+  </div>
 
 </div>
