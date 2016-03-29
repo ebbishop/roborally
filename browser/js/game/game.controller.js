@@ -3,6 +3,33 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 	$scope.game = theGame;
 	$scope.player = thePlayer
 
+	$scope.fbPlayers = FirebaseFactory.getConnection($scope.game._id + '/game' + '/players')
+	console.log('these are the players: ', $scope.fbPlayers)
+
+	$scope.$watch('fbPlayers', function(players) {
+		for(var key in players) {
+			if(players.hasOwnProperty(key) && key[0] !== '$'){
+				if (!players[key].ready) return
+			}
+		}
+		if(players[0]) {
+			console.log("all players are ready - before startRound")
+			return GameFactory.startRound($scope.game._id)
+			.then(function(response) {
+				console.log('respone after startRound: ', response)
+			})
+		}
+		else console.log('NOT all players are ready')
+	}, true);
+	 
+	// $scope.fbPlayers.$loaded()
+	// .then(function() {
+	// 	$scope.readyArr = []
+	// 	for (var i=0; i<$scope.fbPlayers.players.length; i++) {
+	// 		if ($scope.fbPlayers.players[i].ready === false) $scope.readyArr.push($scope.fbPlayers.players[i].ready)
+	// 		// console.log($scope.fbPlayers.players[i].ready)
+	// 	}
+
 	$scope.boardObj = $scope.game.board
 	$scope.docks = $scope.game.board.dockLocations
 	$scope.lasers = $scope.game.board.laserLocations
