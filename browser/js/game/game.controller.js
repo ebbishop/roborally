@@ -14,10 +14,25 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 	return idents;
 	}
 
+
 	$scope.board = [];
 	for(var i = 0; i <= 11; i ++){
 		$scope.board.push(collectOneCol(i));
 	}
+
+	// console.log('board', $scope.board)
+
+	// function getWallsInRow(row) {
+	// 	var wallsArrPositions = [];
+	// 	var wallIdentifiers = [2, 8, 9, 37, 85, 90, 94, 98];
+	// 	for(var i = 0; i < $scope.board[row]; i++) {
+	// 		console.log('scopeboardrow', $scope.board[row])
+	// 		if(wallIdentifiers.indexOf($scope.board[row][i]) > -1) wallsArrPositions.push(i);
+	// 	}
+	// 	return wallsArrPositions;
+	// }
+
+	// console.log('walls in row2', getWallsInRow(2))
 
 	var Container = PIXI.Container,
     autoDetectRenderer = PIXI.autoDetectRenderer,
@@ -241,6 +256,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 					return shootRobotLasers();
 				})
 				.then(function() {
+					// console.log(robotHash)
 					stage.removeChild(particle);
 					renderer.render(stage)
 				})
