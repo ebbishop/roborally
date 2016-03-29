@@ -1,3 +1,7 @@
+SET HASH OF GAMES
+set player ready - in firebase, when register is set.
+
+
 g.checkReady <---add listener????
   g.areAllPlayersReady
   g.runOneRound
@@ -96,4 +100,3 @@ hash of games: {
 
 
 
-  

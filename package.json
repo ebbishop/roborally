@@ -1,7 +1,7 @@
 {
-  "name": "FullstackGeneratedApp",
+  "name": "RoboMayhem",
   "version": "1.0.0",
-  "description": "A generated project at Fullstack Academy",
+  "description": "A web-based game of chaos and destruction",
   "main": "server/start.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha tests/server/models/gamelogic-test.js",
