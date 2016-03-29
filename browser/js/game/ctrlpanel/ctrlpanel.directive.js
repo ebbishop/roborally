@@ -85,18 +85,21 @@ var programCards = [
                { name: 'f3', priority: 840 } ];
 
 
-app.directive('ctrlpanel', function () {
+app.directive('ctrlpanel', function (PlayerFactory) {
 
     return {
         restrict: 'E',
         templateUrl: '/js/game/ctrlPanel/ctrlpanel.html',
         scope: {
-        	game: '='
+        	game: '=',
+          player: '='
         },
         // controller: 'CtrlPanelCtrl',
         link: function(scope){
+          console.log('this is the scope in directive:', scope)
+
           function chop(arr){
-                        var cards = arr.map(function(c){
+              var cards = arr.map(function(c){
               return programCards[(c/10)-1]
             })
             var chopped = [];
@@ -113,6 +116,16 @@ app.directive('ctrlpanel', function () {
           }
 
           scope.cards = chop([100, 340, 720, 10, 200, 820, 700, 530, 610]);
+
+          scope.register = [100, 340, 720, 10, 200];
+
+          scope.sendRegister = function(register, gameId, playerId) {
+            return PlayerFactory.sendRegister(scope.register, scope.game._id, scope.player._id)
+            .then(function(response) {
+              console.log('send register response:' ,response)
+            })
+          }
+
         }
     }
 });

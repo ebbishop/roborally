@@ -1,6 +1,8 @@
-app.controller('GameCtrl', function($scope, $state, theGame, $q){
+app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 
 	$scope.game = theGame;
+	$scope.player = thePlayer
+
 	$scope.boardObj = $scope.game.board
 	$scope.docks = $scope.game.board.dockLocations
 	$scope.lasers = $scope.game.board.laserLocations

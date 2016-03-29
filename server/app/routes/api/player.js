@@ -20,6 +20,11 @@ router.param('playerId', function(req, res, next, playerId) {
 	.then(null, next)
 })
 
+//get player
+router.get('/:playerId', function(req, res) {
+	res.json(req.player)
+})
+
 router.post('/', function(req, res, next) {
 	var name = req.body.params.data.playerName
 	var robot = req.body.params.data.robot.name

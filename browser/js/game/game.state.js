@@ -7,6 +7,9 @@ app.config(function ($stateProvider) {
       resolve: {
         theGame: function(GameFactory, $stateParams) {
           return GameFactory.getGame($stateParams.gameId);
+        },
+        thePlayer: function (PlayerFactory, $stateParams) {
+          return PlayerFactory.getPlayer($stateParams.playerId)
         }
       }
     })
