@@ -136,6 +136,7 @@ gameSchema.methods.runBelts = function(type){
 
 gameSchema.methods.getTileAt = function (position) {
   // position is array = [row, col]
+  console.log('this is the position', position)
   var colStr = 'col' + position[1].toString();
   return this.board[colStr][position[0]];
 }
@@ -327,11 +328,12 @@ gameSchema.methods.emptyRegisters = function(){
 gameSchema.methods.assignDocks = function() {
   console.log('got to assignDocks')
   var game = this;
-  var docks = [1,2,3,4,5,6,7,8];
+  var docks = [0,1,2,3,4,5,6,7];
   this.players.forEach(function(player){
     var playerKey = player._id.toString()
-    var dock = _.sample(docks);
-    player.dock = dock;
+    var d = _.sample(docks);
+    player.dock = game.docks[d];
+    player.position = game.docks[d];
     docks.splice(docks.indexOf(dock),1);
     console.log('this is dock', dock)
     firebaseHelper.getConnection(game._id).child(playerKey).child('dock').set(dock)
@@ -346,7 +348,7 @@ gameSchema.methods.initializeGame = function (){
 
 gameSchema.methods.pushGameState = function(){
   var publicPlayerArray = this.players.map(function(player){
-    var p;
+    var p = {};
     p._id = player._id;
     p.position = player.position;
     p.bearing = player.bearing;

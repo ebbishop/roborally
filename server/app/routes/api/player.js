@@ -31,7 +31,7 @@ router.post('/', function(req, res, next) {
 	var currentGame = firebaseHelper.getConnection(gameID)
 
 
-	console.log('this is body', req.body)
+	// console.log('this is body', req.body)
 
 	var playerKey;
 	Player.create({name: name, robot: robot})
@@ -58,17 +58,36 @@ router.put('/:playerId/setcards', function(req, res, next) {
 	var gameId = req.body.gameId
 
 	req.player.iAmReady(cards)
-	console.log('this is the req.player after iAmReady', req.player)
 
-	Promise.all([
-		req.player.save(), 
-		Game.findById(gameId).populate('players')
-	])	
-	.spread(function(player, game) {
-		console.log('game players: ', game.players)
-		firebaseHelper.getConnection(gameId).child('game').set(game.toObject())
-		res.send(gameId)
+	Player.findByIdAndUpdate(req.player._id, {$set: req.player})
+	.then(function(player) {
+		console.log('this is the player after UPDATE', JSON.stringify(player))
+		return Game.findById(gameId).populate('players')
 	})
+	.then(function(updatedGame) {
+		console.log('this is the updatedGame in a promise: ', JSON.stringify(updatedGame))
+		firebaseHelper.getConnection(gameId).child('game').set(updatedGame.toObject())
+	})
+
+	// req.player.register = req.player.register
+	// console.log('this is the req.player BEFORE SAVE', req.player)
+	// // req.player.register = [1,2,3,4,5];
+	// return req.player.save()
+	// .then(function() {
+	// })
+
+	res.end()
+
+	// Promise.all([
+	// 	req.player.save(), 
+	// 	Game.findById(gameId).populate('players')
+	// ])	
+	// .spread(function(player, game) {
+	// 	console.log('this is the req.player AFTER SAVE', player)
+	// 	console.log('this is the game players AFTER SAVE', game.players)
+	// 	firebaseHelper.getConnection(gameId).child('game').set(game.toObject())
+	// 	res.send(gameId)
+	// })
 })
 
 //empty register
