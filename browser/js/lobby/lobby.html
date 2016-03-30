@@ -1,6 +1,4 @@
 <div class="game-container" id="lobby">
-
-
     <div class="row">
       <div class="col-md-12">
         <h1 class="page-header center"><strong>CHOOSE YOUR BATTLE</strong></h1>
@@ -9,9 +7,9 @@
 
     <div class="row">
       <div class="col-md-4 col-md-offset-2 center">
-        <h2>Join An Game</h2>
+        <h2>Join A Game</h2>
       	<div class="row" ng-repeat="(key,game) in games" ng-show="game.game.state==='waiting'">
-            <div class="col-md-3 col-md-offset-3"><button ui-sref="waitingroom({id:'{{key}}'})" class="btn-ready-sm vcenter"><strong>JOIN</strong></button></div>
+            <div class="col-md-3 col-md-offset-3"><button class="btn-ready-sm vcenter" ui-sref="waitingroom({id:'{{key}}'})"><strong>JOIN</strong></button></div>
             <div class="col-md-6">
               <h4>{{game.game.name}}</h4>
               <small><strong>Current Players:</strong></small>
@@ -20,16 +18,6 @@
           </div>
       	</div>
       </div>
-
-<!--         <div class="row">
-            <div class="col-md-12">
-            	<div class="wrapper" ng-repeat="(key,game) in games" style="text-align: center">
-                    <button ui-sref="waitingroom({id:'{{key}}'})">Click</button>
-            		<h3>Game Name: {{game.game.name}}</h3>
-                    <h4>Game Status: {{game.game.state}}</h4>
-            	</div><br>
-            </div>
-        </div> -->
 
       <div class="col-md-6 center">
         <h2>Start A New Game</h2>

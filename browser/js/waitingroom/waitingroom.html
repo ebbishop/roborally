@@ -1,36 +1,45 @@
-<div class="container">
-	<div class="row">
-		<div class="col-md-6">
-			<h2>{{game.name}}</h2><br>
-			<h5>Active Players</h5>
-			<div ng-repeat="player in players">
-			{{player.name}}
-			</div>
+<div class="game-container container">
+  <h1 class="center"><strong>Join {{game.name | uppercase}}</strong></h1>
+  	<div class="center"><small><uppercase>waiting for the host...</uppercase></small></div>
+  <div class="row">
+  	<!-- <div class="col-md-4" ng-show="activated">{{player.name}}</div> -->
+    <div class="col-md-4" ng-hide="activated">
+      <form name="CreatePlayerForm" novalidate ng-submit="CreatePlayer(player)">
 
-		</div>
+        <div class="form-group">
+          <label class="game-name">Your Name</label>
+          <input type="text" class="form-control game-name-sm" id="playerName" placeholder="Player Name" ng-model="player.playerName" ng-required="true"></input>
+        </div>
 
-		<div class="col-md-6">
-			<h2>{{game.board.name}}</h2><br>
-			<img src="{{game.board.thumbnail}}">
-		</div>
-	</div>
+        <div class="form-group">
+          <label class="game-name">Select Your Robot</label>
+          <div class="center" ng-repeat="robot in robots">
+            <input type="radio" ng-model="player.robot" ng-value="{{robot}}" ng-required="true">
+              <img height="150" width="150" src="{{robot.imgUrl}}">
+            </input>
+            <div><label class="game-name-sm"><strong>{{robot.name | uppercase}}</strong></label></div>
+          </div>
+        </div>
 
-	<div class="row">
-		<form name="CreatePlayerForm" novalidate ng-submit="CreatePlayer(player)">
-		    <div class="form-group">
-		  		<label for="name">Player Name</label>
-		  		<input type="text" class="form-control" id="playerName" placeholder="Player Name" ng-model="player.playerName" ng-required="true">
-		    </div>
-		    <div class="form-group">
-		        <label>Select Robot</label>
-		        <div ng-repeat="robot in robots">
-		            <label>
-		                <input type="radio" ng-model="player.robot" ng-value="{{robot}}" ng-required="true"><img src="{{robot.imgUrl}}"></input>
-		            </label>
-		        </div>
-		    </div>
-			<button type="submit" class="btn btn-default">Join Game</button>
-		</form>
-	</div>
+        <div class="center">
+          <button type="submit" class="btn-ready"><strong>JOIN GAME</strong></button>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-md-4 center" ng-class="{'col-md-offset-2': activated}">
+      <h2 class="game-name">The Course</h2>
+      <div class="game-board-thumb"><img src="{{game.board.thumbnail}}"></div>
+      <div>{{game.board.name | uppercase}}</div>
+    </div>
+
+    <div class="col-md-4 center">
+      <h2 class="game-name">Active Players</h2>
+      <ul class="list-group">
+        <li class="list-group-item" ng-repeat="player in players">{{player.name}}</li>
+      </ul>
+    </div>
+
+  </div>
 
 </div>
