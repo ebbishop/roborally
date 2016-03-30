@@ -49,7 +49,6 @@ var moveBlocked = {
 playerSchema.methods.playCard = function(i){
   var cardNum = this.register[i];
   var card = programCards[(cardNum/10)-1];
-  console.log('this is the card in playCard', this.register)
   this.rotate(card.rotation);
   this.cardMove(card.magnitude);
 };
@@ -163,7 +162,6 @@ playerSchema.methods.touchFlag = function() {
 // route? <--- player clicks ready and sends cards in order
 playerSchema.methods.iAmReady = function(cards) {
   this.ready = true;
-  console.log('player in iAmReady method', this)
   this.setRegister(cards);
 }
 
@@ -191,7 +189,6 @@ playerSchema.methods.setRegister = function(cards) {
       this.register[i] = cards.shift()
     // };
   }
-  console.log('player in setRegister method', this)
 };
 
 playerSchema.methods.emptyRegister = function() {

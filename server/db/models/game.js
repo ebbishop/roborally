@@ -74,7 +74,7 @@ function getRotation (orig, next){
 gameSchema.methods.runOneRound = function () {
   while (this.currentCard < 5){
     this.runOneRegister();
-    this.pushGameState();
+    // this.pushGameState();
     this.runBelts(2);
     this.runBelts(1);
     this.runPushers();
@@ -117,7 +117,9 @@ gameSchema.methods.runOneRegister = function () {
 gameSchema.methods.runBelts = function(type){
   var game = this;
   var tile;
+  console.log('these are the players in runBelts', game.players)
   this.players.forEach(function(player){
+    console.log('this is the player position in runBelts', player.position)
     tile = game.getTileAt(player.position);
     if(tile.conveyor && tile.conveyor[0].magnitude >= type) {
       var c = tile.conveyor[0];
@@ -136,7 +138,7 @@ gameSchema.methods.runBelts = function(type){
 
 gameSchema.methods.getTileAt = function (position) {
   // position is array = [row, col]
-  console.log('this is the position', position)
+  console.log('this is the position in getTileAt', position)
   var colStr = 'col' + position[1].toString();
   return this.board[colStr][position[0]];
 }
@@ -337,7 +339,6 @@ gameSchema.methods.assignDocks = function() {
     player.dock = game.board.dockLocations[i];
     player.position = game.board.dockLocations[i];
     docks.splice(docks.indexOf(i),1);
-    firebaseHelper.getConnection(game._id).child(playerKey).child('dock').set(player.dock.toObject());
   });
 }
 
@@ -374,15 +375,12 @@ gameSchema.methods.pushGameState = function(){
 }
 
 gameSchema.methods.sendGameStates = function(){
-  console.log('GOT to sendGameStates')
   var gameId = this._id.toString();
-  console.log('this is the gameId', gameId)
 
   var phaseToSend = hashOfGames[this._id]
   console.log('this is the game to send to firebase', JSON.stringify(phaseToSend))
 
   firebaseHelper.getConnection(gameId).child('phases').set(JSON.stringify(phaseToSend));
-  console.log('Line 381', this.players);
 
   var privatePlayerArray = this.players.map(function(player){
     var p={};
@@ -396,8 +394,6 @@ gameSchema.methods.sendGameStates = function(){
     var playerId = player._id.toString()
     firebaseHelper.getConnection(gameId).child(playerId).set(player.hand.toObject())
   });
-
-  // console.log('END of sendGameStates')
 
 }
 

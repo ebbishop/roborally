@@ -61,11 +61,9 @@ router.put('/:playerId/setcards', function(req, res, next) {
 
 	Player.findByIdAndUpdate(req.player._id, {$set: req.player})
 	.then(function(player) {
-		console.log('this is the player after UPDATE', JSON.stringify(player))
 		return Game.findById(gameId).populate('players')
 	})
 	.then(function(updatedGame) {
-		console.log('this is the updatedGame in a promise: ', JSON.stringify(updatedGame))
 		firebaseHelper.getConnection(gameId).child('game').set(updatedGame.toObject())
 	})
 
