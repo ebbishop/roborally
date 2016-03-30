@@ -19,7 +19,7 @@ var gameSchema = new mongoose.Schema({
   players: [{type: mongoose.Schema.Types.ObjectId, ref: 'Player'}],
   host: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Player'  
+    ref: 'Player'
   },
   board: {
     type: mongoose.Schema.Types.ObjectId,
@@ -331,12 +331,12 @@ gameSchema.methods.assignDocks = function() {
   var docks = [0,1,2,3,4,5,6,7];
   this.players.forEach(function(player){
     var playerKey = player._id.toString()
-    var d = _.sample(docks);
-    player.dock = game.docks[d];
-    player.position = game.docks[d];
-    docks.splice(docks.indexOf(dock),1);
-    console.log('this is dock', dock)
-    firebaseHelper.getConnection(game._id).child(playerKey).child('dock').set(dock)
+    var i = _.sample(docks);
+    console.log('assigning dock at ', game.board.dockLocations[i], 'to player', player._id);
+    player.dock = game.board.dockLocations[i];
+    player.position = game.board.dockLocations[i];
+    docks.splice(docks.indexOf(i),1);
+    firebaseHelper.getConnection(game._id).child(playerKey).child('dock').set(player.dock.toObject());
   });
 }
 
