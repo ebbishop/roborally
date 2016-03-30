@@ -271,18 +271,21 @@ gameSchema.methods.touchFlags = function(){
 
 gameSchema.methods.dealCards = function() {
   var self = this;
+  console.log('dealing cards');
   this.players.forEach(function(player){
-    var playerKey = player._id.toString()
+    // var playerKey = player._id.toString()
     var deck = _.shuffle(self.deck)
     var numCardsToDeal = 9-player.damage;
-
+    console.log('dearling', numCardsToDeal, 'to', player._id);
     if(numCardsToDeal > self.deck.length) {
       self.shuffleDeck()
     }
 
     var cardsToDeal = deck.splice(0,numCardsToDeal);
+    console.log('dealing', cardsToDeal);
     player.hand = cardsToDeal;
-    firebaseHelper.getConnection(self._id).child(playerKey).child('hand').set(cardsToDeal)
+    console.log('player.hand', player.hand);
+    // firebaseHelper.getConnection(self._id).child(playerKey).child('hand').set(cardsToDeal)
   });
 }
 
@@ -326,13 +329,11 @@ gameSchema.methods.emptyRegisters = function(){
 }
 
 gameSchema.methods.assignDocks = function() {
-  console.log('got to assignDocks')
   var game = this;
   var docks = [0,1,2,3,4,5,6,7];
   this.players.forEach(function(player){
     var playerKey = player._id.toString()
     var i = _.sample(docks);
-    console.log('assigning dock at ', game.board.dockLocations[i], 'to player', player._id);
     player.dock = game.board.dockLocations[i];
     player.position = game.board.dockLocations[i];
     docks.splice(docks.indexOf(i),1);
@@ -344,21 +345,24 @@ gameSchema.methods.assignDocks = function() {
 gameSchema.methods.initializeGame = function (){
   this.assignDocks();
   this.dealCards();
+  this.pushGameState();
+  this.sendGameStates();
 };
 
 gameSchema.methods.pushGameState = function(){
+  console.log('GOT to pushGameState')
   var publicPlayerArray = this.players.map(function(player){
     var p = {};
     p._id = player._id;
     p.position = player.position;
+    p.robot = player.robot;
     p.bearing = player.bearing;
     p.damage = player.damage;
-    p.lives = player.lives;
+    p.livesRemaining = player.livesRemaining;
     p.register = player.register;
     p.flagCount = player.flagCount;
     return p;
   });
-
   var state = {players: publicPlayerArray, isWon: this.isWon};
   if(!hashOfGames[this._id]){
     hashOfGames[this._id] = [state]
@@ -370,19 +374,30 @@ gameSchema.methods.pushGameState = function(){
 }
 
 gameSchema.methods.sendGameStates = function(){
-  myFireBaseGame = firebaseHelper.getConnection(this._id);
-  myFireBaseGame.child('phases').set(hashOfGames[this._id])
+  console.log('GOT to sendGameStates')
+  var gameId = this._id.toString();
+  console.log('this is the gameId', gameId)
+
+  var phaseToSend = hashOfGames[this._id]
+  console.log('this is the game to send to firebase', JSON.stringify(phaseToSend))
+
+  firebaseHelper.getConnection(gameId).child('phases').set(JSON.stringify(phaseToSend));
+  console.log('Line 381', this.players);
 
   var privatePlayerArray = this.players.map(function(player){
-    var p;
-    p._id = player[i]._id;
-    p.hand = player[i].hand;
+    var p={};
+    p._id = player._id;
+    p.hand = player.hand;
     return p;
   });
 
+
   privatePlayerArray.forEach(function(player){
-    myFireBaseGame.child('private').child(player._id).set(player.hand);
+    var playerId = player._id.toString()
+    firebaseHelper.getConnection(gameId).child(playerId).set(player.hand.toObject())
   });
+
+  // console.log('END of sendGameStates')
 
 }
 
