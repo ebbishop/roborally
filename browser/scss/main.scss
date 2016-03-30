@@ -38,6 +38,8 @@ canvas {
 }
 .game-board-thumb img{
   border: solid #211e1f 2px;
+  height: 240px;
+  width: 240px;
 }
 
 #damage {
@@ -60,13 +62,15 @@ canvas {
   font-weight: bold;
 }
 
+.game-name-sm{
+  font-size: 1.4em;
+  font-weight: bold;
+}
 .danger{
   color: #fce917;
 }
-
-.centerer{
-  padding-left: calc(100%-150)/2;
-  padding-right: calc(100%-150)/2;
+.center{
+  text-align: center;
 }
 
 .game-name {
@@ -120,6 +124,7 @@ canvas {
   margin-right: 5px;
 }
 
+
 .btn-ready{
   height: 80px;
   width: 80px !important;
@@ -127,7 +132,8 @@ canvas {
   border: solid #211e1f 2px;
   border-radius: 40px;
   margin: auto;
-  display: block;
+  vertical-align: center;
+  display: inline-block;
 }
 
 .empty-card{

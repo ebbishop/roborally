@@ -64,7 +64,7 @@ router.get('/:gameId/ready', function(req, res, next) {
 	console.log('BEFORE we runOneRegister')
 
 	req.game.runOneRound()
-	
+
 	console.log('AFTER we runOneRegister')
 	res.send('front-end after runOneRegister')
 })
