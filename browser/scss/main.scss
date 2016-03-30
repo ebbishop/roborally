@@ -28,7 +28,7 @@ body {
   font-size: 1.2em;
   border-color: #211e1f;
   background-color: #d0d9d7;
-  border-radius: 0px !important;
+  border-radius: 2px;
 }
 
 canvas {
@@ -57,11 +57,22 @@ canvas {
   padding-bottom: 60px;
 }
 
+.no-box-list{
+  background-color: transparent !important;
+  font-size: 1em;
+  list-style: none;
+}
+
 .game-name{
   font-size: 2em;
   font-weight: bold;
 }
 
+.vcenter {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
 .game-name-sm{
   font-size: 1.4em;
   font-weight: bold;
@@ -163,8 +174,27 @@ canvas {
   border: solid #211e1f 1px;
 }
 
+.create-game{
+  width: 100px;
+  height: 100px;
+  border-radius: 50px;
+  background-color: #317E2A;
+  border: solid 2px #205C1F;
+  display: inline-block;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+
 #register {
   margin-left: 10px;
+}
+
+.list-group-item-sm {
+  border-color: #211e1f;
+  background-color: #d0d9d7;
+  border-radius: 3px !important;
+  padding: 3px 5px;
 }
 @import 'directives/main';
 @import 'home/main';
