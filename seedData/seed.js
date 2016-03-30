@@ -265,7 +265,8 @@ var boards = [
     col9: [2, 71, 1, 13, 1, 13, 1, 13, 1, 13, 73, 4, 2, 1, 5, 4],
     col10: [1, 76, 72, 84, 72, 84, 84, 72, 84, 72, 77, 1, 1, 1, 1, 1],
     col11: [30, 1, 3, 1, 3, 1, 1, 3, 1, 3, 1, 1, 1, 1, 5, 1],
-    dockLocations: dock2
+    dockLocations: dock2,
+    thumbnail: '/img/thumbnails/checkmate.png'
   },
   {
     name: 'Chop Shop Challenge',

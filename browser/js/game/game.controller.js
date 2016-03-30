@@ -1,12 +1,38 @@
-app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
+app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, FirebaseFactory){
 
 	$scope.game = theGame;
 	$scope.player = thePlayer
 
+	$scope.fbPlayers = FirebaseFactory.getConnection($scope.game._id + '/game' + '/players')
+	console.log('these are the players: ', $scope.fbPlayers)
+
+	$scope.$watch('fbPlayers', function(players) {
+		for(var key in players) {
+			if(players.hasOwnProperty(key) && key[0] !== '$'){
+				if (!players[key].ready) return
+			}
+		}
+		if(players[0]) {
+			console.log("all players are ready - before startRound")
+			return GameFactory.startRound($scope.game._id)
+			.then(function(response) {
+				console.log('respone after startRound: ', response)
+			})
+		}
+		else console.log('NOT all players are ready')
+	}, true);
+	 
+	// $scope.fbPlayers.$loaded()
+	// .then(function() {
+	// 	$scope.readyArr = []
+	// 	for (var i=0; i<$scope.fbPlayers.players.length; i++) {
+	// 		if ($scope.fbPlayers.players[i].ready === false) $scope.readyArr.push($scope.fbPlayers.players[i].ready)
+	// 		// console.log($scope.fbPlayers.players[i].ready)
+	// 	}
+
 	$scope.boardObj = $scope.game.board
 	$scope.docks = $scope.game.board.dockLocations
 	$scope.lasers = $scope.game.board.laserLocations
-	// console.log($scope.lasers)
 	function collectOneCol(n){
 	var key = 'col' + n.toString();
 	var idents = $scope.boardObj[key].map(function(tile){
@@ -15,11 +41,25 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 	return idents;
 	}
 
+
 	$scope.board = [];
 	for(var i = 0; i <= 11; i ++){
 		$scope.board.push(collectOneCol(i));
 	}
-	// console.log($scope.docks)
+
+	// console.log('board', $scope.board)
+
+	// function getWallsInRow(row) {
+	// 	var wallsArrPositions = [];
+	// 	var wallIdentifiers = [2, 8, 9, 37, 85, 90, 94, 98];
+	// 	for(var i = 0; i < $scope.board[row]; i++) {
+	// 		console.log('scopeboardrow', $scope.board[row])
+	// 		if(wallIdentifiers.indexOf($scope.board[row][i]) > -1) wallsArrPositions.push(i);
+	// 	}
+	// 	return wallsArrPositions;
+	// }
+
+	// console.log('walls in row2', getWallsInRow(2))
 
 	var Container = PIXI.Container,
     autoDetectRenderer = PIXI.autoDetectRenderer,
@@ -173,6 +213,16 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 			  { name: "player3", location: [15,3], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
 			  { name: "player1", location: [9,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
 			  { name: "player2", location: [6,7], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
+			],
+			[ //cardmove5
+				{ name: "player3", location: [15,3], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
+				{ name: "player1", location: [7,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+				{ name: "player2", location: [5,7], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
+			],
+			[ //boardmove5,
+			  { name: "player3", location: [15,4], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
+			  { name: "player1", location: [6,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
+			  { name: "player2", location: [5,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
 			]
 		]
 
@@ -212,7 +262,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 		}
 
 		function runOneRegister (register) {
-			move(_.flatten(register)).then(function(){console.log(robotHash)})
+			move(_.flatten(register));
 		}
 
 		function move(playerObjs) {
@@ -220,15 +270,22 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 				var robot = robotHash[player.name];
 				var turn = false;
 				var compass;
+				var particle;
 
 				return acc.then(function() {
-					return turnRobot()
+					return turnRobot()	
 				})
 				.then(function() {
 					return promiseForMoveRobot();
 				})
 				.then(function() {
 					robot.location = player.location;
+					return shootRobotLasers();
+				})
+				.then(function() {
+					// console.log(robotHash)
+					stage.removeChild(particle);
+					renderer.render(stage)
 				})
 
 				function turnRobot() {
@@ -241,10 +298,16 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 						turn = true;
 						return promiseForRotate();
 
+						function promiseForRotate () {
+							return $q(function(resolve, reject){
+								rotate(resolve);
+							})
+						}
+
 						function rotate(resolve) {
 							if(robot.rotation <= amtToRotate && direction == "clockwise" || direction == undefined) {
 								direction = "clockwise";
-								robot.rotation += 0.03;
+								robot.rotation += 0.03;	
 								requestAnimationFrame(rotate.bind(null, resolve));
 							}
 							else if(robot.rotation >= amtToRotate) {
@@ -256,53 +319,97 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 								resolve();
 							}
 						}
-
-						function promiseForRotate () {
-							return $q(function(resolve, reject){
-								rotate(resolve);
-							})
-						}
 					}
+
 					else {
 						return $q.resolve();
 					}
+				}
+				
+				function promiseForMoveRobot(){
+					return $q(function(resolve, reject){
+						moveRobot(resolve);
+					});
 				}
 
 				function moveRobot(resolve) {
 					var row = player.location[0] + 0.5;
 					var col = player.location[1] + 0.5;
-					// console.log(robot.location, player.location)
-					var direction;
-					if(robot.location[0] > player.location[0]) direction = 'north';
-					else if(robot.location[0] < player.location[0]) direction = 'south';
-					else if(robot.location[1] > player.location[1]) direction = 'east';
-					else if(robot.location[1] < player.location[1]) direction = 'west'
+					if(robot.location[0] > player.location[0]) compass = 'north';
+					else if(robot.location[0] < player.location[0]) compass = 'south';
+					else if(robot.location[1] > player.location[1]) compass = 'east';
+					else if(robot.location[1] < player.location[1]) compass = 'west'
 
-					if(!turn && robot.position.x >= imgSize * row && direction == 'north') {
+					if(!turn && robot.position.x >= imgSize * row && compass == 'north') {
 				        requestAnimationFrame(moveRobot.bind(null, resolve));
 				        robot.position.x -= 1;
-				  	}
-				  	else if(!turn && robot.position.x <= imgSize * row && direction == 'south') {
+				  	} 
+				  	else if(!turn && robot.position.x <= imgSize * row && compass == 'south') {
 				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.x += 1;
 				  	}
-				  	else if(!turn && robot.position.y >= imgSize * col && direction == 'east') {
+				  	else if(!turn && robot.position.y >= imgSize * col && compass == 'east') {
 				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.y -= 1;
-				  	}
-				  	else if(!turn && robot.position.y <= imgSize * col && direction == 'west') {
+				  	} 		
+				  	else if(!turn && robot.position.y <= imgSize * col && compass == 'west') {
 				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.y += 1;
-				  	}
+				  	} 
 				  	else {
 				  		resolve();
 				  	}
 				}
-				function promiseForMoveRobot(){
-					return $q(function(resolve, reject){
-						moveRobot(resolve);
-					});
 
+				function shootRobotLasers() {
+					// var particle;
+					var offset;
+					var myReq;
+					if(player.bearing[0] !== 0) particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-h.png'))
+					else particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-v.png')) 	
+
+
+					particle.position.x = imgSize*(player.location[0] + 0.5 + player.bearing[0]) - 5;
+			        particle.position.y = imgSize*(player.location[1] + 0.5 - player.bearing[1]) - 5;
+			        particle.scale.set(1/imgScale, 1/imgScale);
+
+			      	stage.addChild(particle);
+			      	renderer.render(stage)
+
+
+			      	return promiseForShooting()
+			
+
+					function promiseForShooting () {
+						return $q(function(resolve, reject){
+							shoot(resolve)
+						})
+						// .then(function() {
+						// 	particle.destroy();
+						// })
+					}
+
+					function shoot(resolve) {
+						if(!particle) return;
+						if(player.bearing[0] === -1 && particle.position.x >= 30) {
+					        requestAnimationFrame(shoot.bind(null, resolve));
+					        particle.position.x -= 10;
+					  	} 
+					  	else if(player.bearing[0] === 1 && particle.position.x <= imgSize*rows) {
+					  		requestAnimationFrame(shoot.bind(null, resolve));
+					  		particle.position.x += 10;
+					  	}
+					  	else if(player.bearing[1] === 1 && particle.position.y >= 0) {
+					  		requestAnimationFrame(shoot.bind(null, resolve));
+					  		particle.position.y -= 10;
+					  	} 		
+					  	else if(player.bearing[1] === -1 && particle.position.y <= imgSize*cols) {
+					  		requestAnimationFrame(shoot.bind(null, resolve));
+					  		particle.position.y += 10;
+					  	} else  {
+					  		resolve();
+					  	}
+					}
 				}
 
 			}, $q.resolve())
@@ -314,7 +421,6 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer){
 		drawLasers();
 		drawRobots(players);
 		runOneRegister(oneRegister)
-		// console.log('robo hash', robotHash)
 
 		function buildMap(){
 		  renderer.render(stage);
