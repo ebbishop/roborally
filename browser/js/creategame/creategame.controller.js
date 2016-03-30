@@ -2,7 +2,7 @@ app.controller("CreateGameController", function($scope, boards, GameFactory, $st
 
 	$scope.boards = boards
 
-	$scope.robots = [{name: "Spin Bot", imgUrl: "/img/robots/spinbot.jpg"}, {name: "Twonky", imgUrl: "/img/robots/twonky.jpg"}, {name: "Zoom Bot", imgUrl: "/img/robots/zoombot.jpg"}]
+	$scope.robots = [{name: "Spin Bot", imgUrl: "/img/robots/spinbot.png"}, {name: "Twonky", imgUrl: "/img/robots/twonky.png"}, {name: "Zoom Bot", imgUrl: "/img/robots/zoombot.png"}]
 
 	$scope.CreateGame = function(game) {
     console.log('creating this game', game)
