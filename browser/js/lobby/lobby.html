@@ -1,20 +1,25 @@
 <div class="game-container" id="lobby">
 
-	<div class="container">
 
-        <div class="row">
-            <div class="col-md-12">
-                <h1 class="page-header" style="text-align: center">RoboRally Game Lobby</h1>
-            </div>
-        </div>
+    <div class="row">
+      <div class="col-md-12">
+        <h1 class="page-header center"><strong>CHOOSE YOUR BATTLE</strong></h1>
+      </div>
+    </div>
 
-        <div class="row">
-            <div class="col-md-12">
-            	<div class="wrapper" style="text-align: center">
-            		<button ui-sref="creategame" class="btn btn-success" style="width: 300px;">Create New Game</button>
-            	</div><br>
-            </div>
-        </div>
+    <div class="row">
+      <div class="col-md-4 col-md-offset-2 center">
+        <h2>Join An Game</h2>
+      	<div class="row" ng-repeat="(key,game) in games" ng-show="game.game.state==='waiting'">
+            <div class="col-md-3 col-md-offset-3"><button ui-sref="waitingroom({id:'{{key}}'})" class="btn-ready-sm vcenter"><strong>JOIN</strong></button></div>
+            <div class="col-md-6">
+              <h4>{{game.game.name}}</h4>
+              <small><strong>Current Players:</strong></small>
+              <ul class="list-group"><li class="no-box-list" ng-repeat="player in game.game.players"><small>{{player.name}}</small></li></ul>
+            <hr>
+          </div>
+      	</div>
+      </div>
 
         <div class="row">
             <div class="col-md-12">
@@ -26,6 +31,14 @@
             </div>
         </div>
 
-	</div>
+      <div class="col-md-6 center">
+        <h2>Start A New Game</h2>
+        <div class="wrapper center">
+          <button ui-sref="creategame" class="create-game"><strong>CREATE GAME</strong></button>
+        </div><br>
+      </div>
+
+    </div>
+
 
 </div>
