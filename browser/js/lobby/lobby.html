@@ -2,28 +2,33 @@
 
 	<div class="container">
 
-        <div class="row">
-            <div class="col-md-12">
-                <h1 class="page-header" style="text-align: center">RoboRally Game Lobby</h1>
-            </div>
-        </div>
+    <div class="row">
+      <div class="col-md-12">
+        <h1 class="page-header" style="text-align: center">LET THE MAYHEM BEGIN</h1>
+      </div>
+    </div>
 
-        <div class="row">
-            <div class="col-md-12">
-            	<div class="wrapper" style="text-align: center">
-            		<button ui-sref="creategame" class="btn btn-success" style="width: 300px;">Create New Game</button>
-            	</div><br>
+    <div class="row">
+      <div class="col-md-6">
+        <h2 class="right">Join A Game</h2>
+      	<div class="row" ng-repeat="game in games" ng-show="game.game.state==='waiting'">
+            <button class="btn-ready-sm pull-right">JOIN</button>
+            <div class="pull-right">
+              <h4>{{game.game.name}}</h4>
+              <small>Current Players: </small>
+              <small ng-repeat="player in game.game.players">{{player.name}}</small>
+              <hr>
             </div>
-        </div>
+      	</div><br>
+      </div>
 
-        <div class="row">
-            <div class="col-md-12">
-            	<div class="wrapper" ng-repeat="game in games" style="text-align: center">
-            		<h3>Game Name: {{game.game.name}}</h3>
-                    <h4>Game Status: {{game.game.state}}</h4>
-            	</div><br>
-            </div>
-        </div>
+      <div class="col-md-6 center">
+        <div class="wrapper" style="text-align: center">
+          <button ui-sref="creategame" class="btn btn-success" style="width: 300px;">Create New Game</button>
+        </div><br>
+      </div>
+
+    </div>
 
 	</div>
 

@@ -136,6 +136,18 @@ canvas {
   display: inline-block;
 }
 
+.btn-ready-sm{
+  height: 50px;
+  width: 50px !important;
+  background-color: #ab0929;
+  border: solid #211e1f 2px;
+  border-radius: 25px;
+  margin: 10px;
+  vertical-align: center;
+  display: inline-block;
+  /*float: left;*/
+}
+
 .empty-card{
   height: 100px;
   width: 70px;
