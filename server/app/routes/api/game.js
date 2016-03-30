@@ -60,10 +60,10 @@ router.get('/:gameId/start', function(req, res, next) {
 
 //check to see if all players in game in ready state
 router.get('/:gameId/ready', function(req, res, next) {
-	console.log('this is the game', req.game)
+	// console.log('this is the game', req.game)
 	console.log('BEFORE we runOneRegister')
 
-	req.game.runOneRegister()
+	req.game.runOneRound()
 	
 	console.log('AFTER we runOneRegister')
 	res.send('front-end after runOneRegister')
