@@ -187,9 +187,9 @@ playerSchema.methods.checkDamage = function() {
 // after first round, assume that we call empty register before setRegister
 playerSchema.methods.setRegister = function(cards) {
   for (var i=0; i<5; i++) {
-    if (this.register[i] === 0) {
+    // if (this.register[i] === 0) {
       this.register[i] = cards.shift()
-    };
+    // };
   }
   console.log('player in setRegister method', this)
 };

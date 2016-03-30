@@ -1,4 +1,4 @@
-app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, FirebaseFactory){
+app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, FirebaseFactory, GameFactory){
 
 	$scope.game = theGame;
 	$scope.player = thePlayer
