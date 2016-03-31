@@ -12,7 +12,6 @@ require('./player');
 var Player = mongoose.model('Player');
 var Board = mongoose.model('Board');
                       //x5 hands
-var hashOfGames = {}; //[[game.players after card move], [game.players after board move]];
 
 var gameSchema = new mongoose.Schema({
   name: String,
@@ -54,6 +53,8 @@ var gameSchema = new mongoose.Schema({
 });
 
 gameSchema.plugin(deepPopulate);
+// AK: Maybe do something like this, to always populate the game object when it's loaded from Mongo?
+gameSchema.post('init', function(game) { game.deepPopulate(); })
 gameSchema.set('versionKey',false );
 
 
@@ -156,10 +157,9 @@ gameSchema.methods.runGears = function(){
 }
 
 gameSchema.methods.runPushers = function(){
-  var game = this;
   var pushType = (this.currentCard % 2) + 1;
-  this.players.forEach(function(p){
-    var tile = game.getTileAt(p.position);
+  this.players.forEach(function(p) {
+    var tile = this.getTileAt(p.position);
     if(tile.edgeN === 'push' + pushType.toString()) {
       p.boardMove([1, 0]);
     }
@@ -172,7 +172,7 @@ gameSchema.methods.runPushers = function(){
     if(tile.edgeW === 'push' + pushType.toString()) {
       p.boardMove([0, 1]);
     }
-  })
+  }, this) // You can pass a context (this) as a second argument to forEach
 }
 
 gameSchema.methods.getPlayerAt = function(position){
@@ -351,6 +351,11 @@ gameSchema.methods.initializeGame = function (){
 
 gameSchema.methods.pushGameState = function(){
   console.log('GOT to pushGameState')
+  // AK: Making this copy is useless. The players' hands are already stored in Firebase
+  // in sendGameStates.
+  // 
+  // You'll need to use Firebase validation rules to restrict read access. Don't worry
+  // about it for now.
   var publicPlayerArray = this.players.map(function(player){
     var p = {};
     p._id = player._id;
@@ -363,36 +368,43 @@ gameSchema.methods.pushGameState = function(){
     p.flagCount = player.flagCount;
     return p;
   });
-  var state = {players: publicPlayerArray, isWon: this.isWon};
-  if(!hashOfGames[this._id]){
-    hashOfGames[this._id] = [state]
-  }else if(this.currentCard===0){
-    hashOfGames[this._id] = [state];
-  }else{
-    hashOfGames[this._id].push(state);
-  }
+    var state = {players: publicPlayerArray, isWon: this.isWon};
+    // AK: You can attach states to the game model object:
+    this.states = this.currentCard ? (this.states || []) : []    
+    this.states.push(state)
 }
 
 gameSchema.methods.sendGameStates = function(){
   var gameId = this._id.toString();
 
-  var roundToSend = hashOfGames[this._id];
+  var roundToSend = this.states;
 
+  // AK: JSON.stringifying into Firebase feels off. Can we sync the object tree instead?
   firebaseHelper.getConnection(gameId).child('phases').set(JSON.stringify(roundToSend));
 
-  var privatePlayerArray = this.players.map(function(player){
-    var p={};
-    p._id = player._id;
-    p.hand = player.hand;
-    return p;
-  });
-
-  privatePlayerArray.forEach(function(player){
+  this.players.forEach(function(player){
     var playerId = player._id.toString();
     firebaseHelper.getConnection(gameId).child(playerId).set(player.hand.toObject());
   });
-
 }
+
+gameSchema.methods.start = function() {
+    var state = req.game.state;
+    var id = req.params.gameId;
+    var game = firebaseHelper.getConnection(id);
+    req.game.set({state: 'decision'});
+
+    return this.save() // AK: why are we saving before we initialize?
+	.then(function(updatedGame) {
+	    updatedGame.initializeGame();
+	    return Promise.all([
+                Promise.map(updatedGame.players, function(player) {
+		    return player.save();
+	        }),
+                updatedGame.save(),                
+            ]);
+	});
+};
 
 
 mongoose.model('Game', gameSchema);

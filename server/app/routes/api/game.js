@@ -46,26 +46,14 @@ router.get('/:gameId', function(req, res) {
 })
 
 router.get('/:gameId/start', function(req, res, next) {
-	var state = req.game.state;
-	var id = req.params.gameId;
-	var game = firebaseHelper.getConnection(id);
-	req.game.set({state: 'decision'});
-
-	req.game.save()
-	.then (function(updatedGame) {
-		updatedGame.initializeGame();
-		return Promise.all([Promise.map(updatedGame.players, function(player){
-			return player.save()
-		}),updatedGame.save()]);
-	})
-	.then(function(){
-		res.send(id);
-	})
+    req.game.start().then(function() {
+        res.send(req.params.gameId) // AK: game._id?
+    });
 })
 
 //check to see if all players in game in ready state
 router.get('/:gameId/ready', function(req, res, next) {
-	Game.findById(req.game._id)
+    Game.findById(req.game._id)
 	.deepPopulate(['players.player', 'host']).exec()
 	.then(function(updatedGame) {
 	})
