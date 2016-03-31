@@ -18,7 +18,6 @@ app.controller("WaitingRoomController", function($scope, game, $stateParams, Pla
 			var id = playerInfo.playerId
 			$scope.$watch('localGame.$value', function(state) {
 				if (state === 'decision') {
-					console.log('got here')
 					$state.go('game', {gameId: $scope.gameID, playerId: id})
 				}
 			})
