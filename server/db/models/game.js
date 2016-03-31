@@ -74,7 +74,7 @@ function getRotation (orig, next){
 gameSchema.methods.runOneRound = function () {
   while (this.currentCard < 5){
     this.runOneRegister();
-    // this.pushGameState();
+    this.pushGameState();
     this.runBelts(2);
     this.runBelts(1);
     this.runPushers();
