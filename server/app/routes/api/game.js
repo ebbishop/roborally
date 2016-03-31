@@ -47,34 +47,32 @@ router.get('/:gameId', function(req, res) {
 
 router.get('/:gameId/start', function(req, res, next) {
 	var state = req.game.state;
-	var id = req.params.gameId
-	var game = firebaseHelper.getConnection(id)
-	req.game.set({state: 'decision'})
+	var id = req.params.gameId;
+	var game = firebaseHelper.getConnection(id);
+	req.game.set({state: 'decision'});
+
 	req.game.save()
 	.then (function(updatedGame) {
-		updatedGame.initializeGame()
-		game.child('game').set(updatedGame.toObject())
-		res.send(id)
+		updatedGame.initializeGame();
+		return Promise.all([Promise.map(updatedGame.players, function(player){
+			return player.save()
+		}),updatedGame.save()]);
+	})
+	.then(function(){
+		res.send(id);
 	})
 })
 
 //check to see if all players in game in ready state
 router.get('/:gameId/ready', function(req, res, next) {
-	// console.log('this is the game', req.game)
-	console.log('BEFORE we runOneRegister')
-
-	req.game.runOneRound()
-
-	console.log('AFTER we runOneRegister')
+	Game.findById(req.game._id)
+	.deepPopulate(['players.player', 'host']).exec()
+	.then(function(updatedGame) {
+	})
 	res.send('front-end after runOneRegister')
 })
 
 module.exports = router;
-
-
-
-
-
 
 
 

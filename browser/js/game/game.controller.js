@@ -13,15 +13,17 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 			}
 		}
 		if(players[0]) {
-			console.log("all players are ready - before startRound")
+			console.log("all players are ready - before startRound");
 			return GameFactory.startRound($scope.game._id)
 			.then(function(response) {
-				console.log('respone after startRound: ', response)
+				console.log('respone after startRound: ', response);
 			})
 		}
-		else console.log('NOT all players are ready')
+		else {
+			console.log('NOT all players are ready');
+		}
 	}, true);
-	 
+
 	// $scope.fbPlayers.$loaded()
 	// .then(function() {
 	// 	$scope.readyArr = []
@@ -29,6 +31,8 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 	// 		if ($scope.fbPlayers.players[i].ready === false) $scope.readyArr.push($scope.fbPlayers.players[i].ready)
 	// 		// console.log($scope.fbPlayers.players[i].ready)
 	// 	}
+
+
 
 	$scope.boardObj = $scope.game.board
 	$scope.docks = $scope.game.board.dockLocations
@@ -273,7 +277,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 				var particle;
 
 				return acc.then(function() {
-					return turnRobot()	
+					return turnRobot()
 				})
 				.then(function() {
 					return promiseForMoveRobot();
@@ -307,7 +311,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 						function rotate(resolve) {
 							if(robot.rotation <= amtToRotate && direction == "clockwise" || direction == undefined) {
 								direction = "clockwise";
-								robot.rotation += 0.03;	
+								robot.rotation += 0.03;
 								requestAnimationFrame(rotate.bind(null, resolve));
 							}
 							else if(robot.rotation >= amtToRotate) {
@@ -325,7 +329,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 						return $q.resolve();
 					}
 				}
-				
+
 				function promiseForMoveRobot(){
 					return $q(function(resolve, reject){
 						moveRobot(resolve);
@@ -343,7 +347,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 					if(!turn && robot.position.x >= imgSize * row && compass == 'north') {
 				        requestAnimationFrame(moveRobot.bind(null, resolve));
 				        robot.position.x -= 1;
-				  	} 
+				  	}
 				  	else if(!turn && robot.position.x <= imgSize * row && compass == 'south') {
 				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.x += 1;
@@ -351,11 +355,11 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 				  	else if(!turn && robot.position.y >= imgSize * col && compass == 'east') {
 				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.y -= 1;
-				  	} 		
+				  	}
 				  	else if(!turn && robot.position.y <= imgSize * col && compass == 'west') {
 				  		requestAnimationFrame(moveRobot.bind(null, resolve));
 				  		robot.position.y += 1;
-				  	} 
+				  	}
 				  	else {
 				  		resolve();
 				  	}
@@ -366,7 +370,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 					var offset;
 					var myReq;
 					if(player.bearing[0] !== 0) particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-h.png'))
-					else particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-v.png')) 	
+					else particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-v.png'))
 
 
 					particle.position.x = imgSize*(player.location[0] + 0.5 + player.bearing[0]) - 5;
@@ -378,7 +382,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 
 
 			      	return promiseForShooting()
-			
+
 
 					function promiseForShooting () {
 						return $q(function(resolve, reject){
@@ -394,7 +398,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 						if(player.bearing[0] === -1 && particle.position.x >= 30) {
 					        requestAnimationFrame(shoot.bind(null, resolve));
 					        particle.position.x -= 10;
-					  	} 
+					  	}
 					  	else if(player.bearing[0] === 1 && particle.position.x <= imgSize*rows) {
 					  		requestAnimationFrame(shoot.bind(null, resolve));
 					  		particle.position.x += 10;
@@ -402,7 +406,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 					  	else if(player.bearing[1] === 1 && particle.position.y >= 0) {
 					  		requestAnimationFrame(shoot.bind(null, resolve));
 					  		particle.position.y -= 10;
-					  	} 		
+					  	}
 					  	else if(player.bearing[1] === -1 && particle.position.y <= imgSize*cols) {
 					  		requestAnimationFrame(shoot.bind(null, resolve));
 					  		particle.position.y += 10;

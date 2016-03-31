@@ -94,7 +94,7 @@ app.directive('ctrlpanel', function (PlayerFactory) {
         	game: '=',
           player: '='
         },
-        // controller: 'CtrlPanelCtrl',
+        controller: 'CtrlPanelCtrl',
         link: function(scope){
           console.log('this is the scope in directive:', scope)
 
