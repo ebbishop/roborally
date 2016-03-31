@@ -185,9 +185,9 @@ playerSchema.methods.checkDamage = function() {
 // after first round, assume that we call empty register before setRegister
 playerSchema.methods.setRegister = function(cards) {
   for (var i=0; i<5; i++) {
-    // if (this.register[i] === 0) {
+    if (this.register[i] === 0) {
       this.register[i] = cards.shift()
-    // };
+    };
   }
 };
 
@@ -196,10 +196,14 @@ playerSchema.methods.emptyRegister = function() {
   var keep = this.register.slice(9-this.damage);
   var zeros = Array((9-this.damage)).fill(0).slice(0,5);
   this.register = zeros.concat(keep);
+
+  var discard = this.hand.filter(function(card){
+    if(keep.indexOf(card)>-1) return false
+    else return true;
+  })
+
   return discard;
 }
-
-
 
 
 //potentially use to deal with pushing adjacent players?
