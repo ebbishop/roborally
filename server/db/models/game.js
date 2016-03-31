@@ -400,6 +400,7 @@ gameSchema.methods.pushGameState = function(){
     p.livesRemaining = player.livesRemaining;
     p.register = player.register;
     p.flagCount = player.flagCount;
+    p.name = player.name
     return p;
   });
   var state = {players: publicPlayerArray, isWon: this.isWon};
@@ -420,6 +421,7 @@ gameSchema.methods.sendGameStates = function(){
   var roundToSend = hashOfGames[this._id];
 
   firebaseHelper.getConnection(gameId).child('phases').set(JSON.stringify(roundToSend));
+  // firebaseHelper.getConnection(gameId).child('phases').set(roundToSend.toObject());  
 
   var privatePlayerArray = this.players.map(function(player){
     var p={};
