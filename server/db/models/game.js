@@ -121,8 +121,9 @@ gameSchema.methods.runOneRegister = function () {
 gameSchema.methods.runBelts = function(type){
   var game = this;
   var tile;
-
+  console.log('running belt type', type);
   this.players.forEach(function(player){
+    console.log('player pos', player.position);
     tile = game.getTileAt(player.position);
     if(tile.conveyor && tile.conveyor[0].magnitude >= type) {
       var c = tile.conveyor[0];
@@ -295,20 +296,23 @@ gameSchema.methods.touchFlags = function(){
 
 gameSchema.methods.dealCards = function() {
   var self = this;
+
   this.players.forEach(function(player){
     // var playerKey = player._id.toString()
-    var deck = _.shuffle(self.deck)
+    self.deck = _.shuffle(self.deck)
     var numCardsToDeal = 9-player.damage;
 
     if(numCardsToDeal > self.deck.length) {
       self.shuffleDeck()
     }
 
-    var cardsToDeal = deck.splice(0,numCardsToDeal);
+    var cardsToDeal = self.deck.splice(0,numCardsToDeal);
+    console.log('cards left in deck', self.deck.length);
     player.hand = cardsToDeal;
-    // firebaseHelper.getConnection(self._id).child(playerKey).child('hand').set(cardsToDeal)
   });
+
   console.log('dealt cards');
+  console.log('cards left in deck', self.deck.length);
 }
 
 gameSchema.methods.shuffleDeck = function() {
@@ -411,6 +415,10 @@ gameSchema.methods.sendGameStates = function(){
     p.hand = player.hand;
     return p;
   });
+
+  console.log('current deck has this many cards:', this.deck.length, this.deck);
+  console.log('current discard has this many cards:', this.discard.length, this.discard);
+  console.log('total cards', (this.deck.length + this.discard.length));
 
   privatePlayerArray.forEach(function(player){
     var playerId = player._id.toString();
