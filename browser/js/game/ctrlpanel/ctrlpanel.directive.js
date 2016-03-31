@@ -116,18 +116,8 @@ app.directive('ctrlpanel', function (PlayerFactory) {
           }
 
           scope.cards = chop([100, 340, 720, 10, 200, 820, 700, 530, 610]);
-
-          scope.register = [100, 340, 720, 10, 200];
-
-          scope.sendRegister = function(register, gameId, playerId) {
-            return PlayerFactory.sendRegister(scope.register, scope.game._id, scope.player._id)
-            .then(function(response) {
-              console.log('send register response:' ,response)
-            })
-          }
-
-        }
     }
+  }
 });
 
 
