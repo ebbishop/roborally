@@ -5,10 +5,6 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
 	$scope.fbPlayer = FirebaseFactory.getConnection($scope.gameId + '/game/' + $scope.playerId);
 	$scope.playerHand = FirebaseFactory.getConnection($scope.gameId + '/' + $scope.playerId);
 
-	// $scope.register
-	// $scope.clickedCard = function(card){
-
-	// }
 	var handArr = [];
 	setTimeout(function() {
 
@@ -25,18 +21,24 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
 	},500)
 
 
-	$scope.register = [100, 340, 720, 10, 200];
 
 	$scope.sendRegister = function() {
-		// console.log(document.getElementById("register").children.childNodes)
-		console.log('sending register', $scope.register, $scope.gameId, $scope.playerId);
-		return PlayerFactory.sendRegister($scope.register, $scope.gameId, $scope.playerId)
-		.then(function(response) {
-		  console.log('send register response:' ,response)
-    })
-  }
+		var register = [getCardVal(0), getCardVal(1), getCardVal(2), getCardVal(3), getCardVal(4)];
+		if(register.indexOf(0) > -1) return;
+		else {
+			console.log('sending register', register, $scope.gameId, $scope.playerId);
+			return PlayerFactory.sendRegister(register, $scope.gameId, $scope.playerId)
+			.then(function(response) {
+			  console.log('send register response:' ,response)
+	    	})		
+		}
+	}
 })
 
+function getCardVal(registerNum) {
+	console.log('got in getCardVal')
+	return Number(document.getElementById("register").children[registerNum].getAttribute('carddata'));
+}
 
 function chop(arr){
 	var cards = arr.map(function(c){

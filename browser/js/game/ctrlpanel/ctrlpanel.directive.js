@@ -33,10 +33,13 @@ app.directive('draggable', function(){
 
 app.directive('droppable', function(){
   return {
-    scope: {},
-    link: function(scope, element){
+    scope: {
+      register: '='
+    },
+    link: function(scope, element, attrs){
       var el = element[0];
       el.droppable = true;
+
 
       el.addEventListener('dragover', function(ev){
         ev.dataTransfer.dropEffect = 'move';
@@ -61,13 +64,20 @@ app.directive('droppable', function(){
           this.classList.remove('over');
 
           var cardId = ev.dataTransfer.getData('Text');
-          this.carddata = cardId;
+
+          // this.addAttribute('carddata');
+          // scope.cardVal = cardId;
+          // scope.registerPosition = this.id
+
+          // scope.$apply();
+
 
           //add image to register
           var item = document.createElement('img');
           item.src = "/img/cards/" + programCards[cardId/10-1].name + ".png"
           item.height = 100;
           item.width = 70;
+          attrs.$set('carddata', cardId);
           this.appendChild(item);
           this.droppable = false;
 
@@ -76,8 +86,8 @@ app.directive('droppable', function(){
           handCard.removeAttribute('carddata');
           handCard.removeChild(handCard.childNodes[0]);
           handCard.classList.add('empty');
-          handCard.addAttribute('droppable');
-          handCard.droppable = true;
+          // handCard.addAttribute('droppable');
+          // handCard.droppable = true;
           // handCard.removeAttribute('draggable');
           // handCard.addAttribute('droppable');
           return false;
