@@ -69,6 +69,7 @@ gameSchema.methods.runOneRound = function () {
   this.setNotReady();
   while (this.currentCard < 5){
     this.runOneRegister();
+    this.checkEdgeOrPit();
     this.pushGameState();
     this.runBelts(2);
     this.runBelts(1);
@@ -118,6 +119,16 @@ gameSchema.methods.runOneRegister = function () {
   console.log('finished running register', this.currentCard);
 }
 
+gameSchema.methods.checkEdgeOrPit = function(){
+  var game = this;
+  this.players.forEach(function(p){
+    var tile = game.getTileAt(p.position)
+    if(!tile || tile.floor === "pit"){
+      p.loseLife();
+    }
+  });
+}
+
 gameSchema.methods.runBelts = function(type){
   var game = this;
   var tile;
@@ -138,6 +149,7 @@ gameSchema.methods.runBelts = function(type){
       player.boardMove(c.bearing);
     }
   });
+  this.checkEdgeOrPit();
   console.log('finished running belts', type, 'on card', this.currentCard);
 }
 
@@ -393,7 +405,7 @@ gameSchema.methods.pushGameState = function(){
   var state = {players: publicPlayerArray, isWon: this.isWon};
   if(!hashOfGames[this._id]){
     hashOfGames[this._id] = [state]
-  }else if(this.currentCard===0 && hashOfGames[this._id].length === 10){
+  }else if(this.currentCard===0 && hashOfGames[this._id].length===10){
     hashOfGames[this._id] = [state];
   }else{
     hashOfGames[this._id].push(state);
