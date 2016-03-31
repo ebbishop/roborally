@@ -64,11 +64,18 @@ router.get('/:gameId/start', function(req, res, next) {
 
 //check to see if all players in game in ready state
 router.get('/:gameId/ready', function(req, res, next) {
+	console.log('hit ready route');
 	Game.findById(req.game._id)
-	.deepPopulate(['players.player', 'host']).exec()
+	.deepPopulate(['board.col0', 'board.col1', 'board.col2', 'board.col3', 'board.col4',
+        'board.col5', 'board.col6', 'board.col7', 'board.col8', 'board.col9', 'board.col10',
+        'board.col11', 'players.player', 'host']).exec()
 	.then(function(updatedGame) {
+		return updatedGame.runOneRound()
 	})
-	res.send('front-end after runOneRegister')
+	.then(null, console.error)
+	.then(function(){
+		res.send('front-end after runOneRegister')
+	})
 })
 
 module.exports = router;

@@ -27,15 +27,15 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
 
 	$scope.register = [100, 340, 720, 10, 200];
 
-	$scope.sendRegister = function(register, gameId, playerId) {
-  		// console.log(document.getElementById("register").children.childNodes)
+	$scope.sendRegister = function() {
+		// console.log(document.getElementById("register").children.childNodes)
+		console.log('sending register', $scope.register, $scope.gameId, $scope.playerId);
 		return PlayerFactory.sendRegister($scope.register, $scope.gameId, $scope.playerId)
 		.then(function(response) {
-		console.log('send register response:' ,response)
-		})
-	}
+		  console.log('send register response:' ,response)
+    })
+  }
 })
-
 
 
 function chop(arr){
