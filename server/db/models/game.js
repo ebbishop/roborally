@@ -57,12 +57,6 @@ gameSchema.plugin(deepPopulate);
 gameSchema.set('versionKey',false );
 
 
-var laserBlockedBy = {
-  'N': {exit: 'edgeN', enter: 'edgeS'},
-  'S': {exit: 'edgeS', enter: 'edgeN'},
-  'E': {exit: 'edgeE', enter: 'edgeW'},
-  'W': {exit: 'edgeW', enter: 'edgeE'}
-};
 
 function getRotation (orig, next){
   var dot = -orig[0]*next[1] + orig[1]*next[0];
@@ -72,6 +66,7 @@ function getRotation (orig, next){
 }
 
 gameSchema.methods.runOneRound = function () {
+  this.setNotReady();
   while (this.currentCard < 5){
     this.runOneRegister();
     this.pushGameState();
@@ -89,10 +84,11 @@ gameSchema.methods.runOneRound = function () {
     if(!this.isWon){
       this.currentCard ++;
     }else{
+      console.log('game is won');
       break; //game over! is this a good idea?
     }
   }
-
+  console.log('finished running round');
   if(!this.isWon){
     this.currentCard = 0;
     this.emptyRegisters()
@@ -101,6 +97,13 @@ gameSchema.methods.runOneRound = function () {
   }
 
   this.sendGameStates()
+}
+
+gameSchema.methods.setNotReady = function(){
+  this.players.forEach(function(p){
+    p.ready = false;
+  });
+  firebaseHelper.getConnection(this._id.toString()).child('game').set(this.toObject());
 }
 
 gameSchema.methods.runOneRegister = function () {
@@ -112,14 +115,14 @@ gameSchema.methods.runOneRegister = function () {
   this.players.forEach(function(player){
     player.playCard(currentCard)
   })
+  console.log('finished running register', this.currentCard);
 }
 
 gameSchema.methods.runBelts = function(type){
   var game = this;
   var tile;
-  console.log('these are the players in runBelts', game.players)
+
   this.players.forEach(function(player){
-    console.log('this is the player position in runBelts', player.position)
     tile = game.getTileAt(player.position);
     if(tile.conveyor && tile.conveyor[0].magnitude >= type) {
       var c = tile.conveyor[0];
@@ -133,14 +136,17 @@ gameSchema.methods.runBelts = function(type){
 
       player.boardMove(c.bearing);
     }
-  })
+  });
+  console.log('finished running belts', type, 'on card', this.currentCard);
 }
 
 gameSchema.methods.getTileAt = function (position) {
   // position is array = [row, col]
-  console.log('this is the position in getTileAt', position)
   var colStr = 'col' + position[1].toString();
-  return this.board[colStr][position[0]];
+  if(this.board[colStr] && this.board[colStr][position[0]]){
+    return this.board[colStr][position[0]];
+  }
+  return;
 }
 
 gameSchema.methods.runGears = function(){
@@ -152,7 +158,8 @@ gameSchema.methods.runGears = function(){
     } else if (tile.floor === 'gearCCW') {
       p.rotate(-90);
     }
-  })
+  });
+  console.log('finished running gears', this.currentCard);
 }
 
 gameSchema.methods.runPushers = function(){
@@ -172,7 +179,8 @@ gameSchema.methods.runPushers = function(){
     if(tile.edgeW === 'push' + pushType.toString()) {
       p.boardMove([0, 1]);
     }
-  })
+  });
+  console.log('ran pushers of type', pushType, 'for card', this.currentCard);
 }
 
 gameSchema.methods.getPlayerAt = function(position){
@@ -184,63 +192,75 @@ gameSchema.methods.getPlayerAt = function(position){
 
 gameSchema.methods.fireRobotLasers = function (){
   var game = this;
-  players.forEach(function(p){
-    fireOneLaser({
+  this.players.forEach(function(p){
+    game.fireOneLaser({
       start: [p.position[0]+ p.bearing[0], p.position[1]+p.bearing[1]],
       qty: 1,
       bearing: p.bearing,
     })
   });
+  console.log('finished firing robot lasers');
 };
 
 gameSchema.methods.fireBoardLasers = function (){
   for (var i = 0; i < 12; i ++){
     this.fireLasersInCol(i);
   }
+  console.log('finished firing board lasers');
 }
 
 gameSchema.methods.fireLasersInCol = function (col) {
   var colStr = 'col' + col.toString();
+  var game = this;
   this.board[colStr].forEach(function(tile, i){
-    if(tile.edgeN.slice(0,4) === 'wall') {
-      this.fireOneLaser({start: [i, col], qty:Number(tile.edgeN[4]), bearing: [1, 0, 'S']});
+    if(tile.edgeN && tile.edgeN.slice(0,4) === 'wall') {
+      game.fireOneLaser({start: [i, col], qty:Number(tile.edgeN[4]), bearing: [1, 0, 'S']});
     }
-    if(tile.edgeE.slice(0,4) === 'wall') {
-      this.fireOneLaser({start: [i, col], qty:Number(tile.edgeE[4]), bearing: [0, -1, 'W']});
+    if(tile.edgeE && tile.edgeE.slice(0,4) === 'wall') {
+      game.fireOneLaser({start: [i, col], qty:Number(tile.edgeE[4]), bearing: [0, -1, 'W']});
     }
-    if(tile.edgeS.slice(0,4) === 'wall') {
-      this.fireOneLaser({start: [i, col], qty:Number(tile.edgeS[4]), bearing: [-1, 0, 'N']});
+    if(tile.edgeS && tile.edgeS.slice(0,4) === 'wall') {
+      game.fireOneLaser({start: [i, col], qty:Number(tile.edgeS[4]), bearing: [-1, 0, 'N']});
     }
-    if(tile.edgeW.slice(0,4) === 'wall') {
-      this.fireOneLaser({start: [i, col], qty:Number(tile.edgeW[4]), bearing: [0, 1, 'E']});
+    if(tile.edgeW && tile.edgeW.slice(0,4) === 'wall') {
+      game.fireOneLaser({start: [i, col], qty:Number(tile.edgeW[4]), bearing: [0, 1, 'E']});
     }
-  })
+  });
 }
+
+
+var laserBlockedBy = {
+  'N': {exit: 'edgeN', enter: 'edgeS'},
+  'S': {exit: 'edgeS', enter: 'edgeN'},
+  'E': {exit: 'edgeE', enter: 'edgeW'},
+  'W': {exit: 'edgeW', enter: 'edgeE'}
+};
 
 gameSchema.methods.fireOneLaser = function(laser){
   var nextLoc = [laser.start[0]+laser.bearing[0], laser.start[1]+laser.bearing[1]];
   var tile, p;
-
    //find a player at the current location
   p = this.getPlayerAt(laser.start);
 
   if( p.length > 0 ){
     //if there is a player, apply damage and quit
-    p.applyDamage(laser.qty);  //evaluate damage
+    p[0].applyDamage(laser.qty);  //evaluate damage
     return;
   }
 
   //otherwise, get this tile to see if beam can exit
   tile = this.getTileAt(laser.start);
-
   // if beam cannot exit tile, quit
-  if (tile[laserBlockedBy[laser.bearing[2]]['exit']]) return;
-
+  if (!tile || tile[laserBlockedBy[laser.bearing[2]]['exit']]){
+    return;
+  }
   //otherwise, check next tile for entering
-  nextTile = getTileAt(nextLoc);
+  var nextTile = this.getTileAt(nextLoc);
 
   //if beam cannot enter next tile, quit
-  if(nextTile[laserBlockedBy[laser.bearing[2]]['enter']]) return;
+  if(!nextTile || nextTile[laserBlockedBy[laser.bearing[2]]['enter']]) {
+    return;
+  }
 
   // otherwise, call again with the next tile's location
   // if next loc isn't on board, quit
@@ -256,7 +276,8 @@ gameSchema.methods.touchRepairs = function(){
     if (tile.floor === 'wrench1' || tile.floor === 'wrench2') {
       player.applyDamage(-1);
     }
-  })
+  });
+  console.log('touched repairs');
 }
 
 gameSchema.methods.touchFlags = function(){
@@ -268,7 +289,8 @@ gameSchema.methods.touchFlags = function(){
       player.touchFlag(tile.flag);
       player.applyDamage(-1);
     }
-  })
+  });
+  console.log('touched flags');
 }
 
 gameSchema.methods.dealCards = function() {
@@ -283,17 +305,16 @@ gameSchema.methods.dealCards = function() {
     }
 
     var cardsToDeal = deck.splice(0,numCardsToDeal);
-    console.log('dealing', cardsToDeal);
     player.hand = cardsToDeal;
-    console.log('player.hand', player.hand);
     // firebaseHelper.getConnection(self._id).child(playerKey).child('hand').set(cardsToDeal)
   });
+  console.log('dealt cards');
 }
 
 gameSchema.methods.shuffleDeck = function() {
-  var cards = this.deck.concat(this.discardDeck);
+  var cards = this.deck.concat(this.discard);
   this.deck = _.shuffle(cards);
-  this.discardDeck = [];
+  this.discard = [];
 };
 
 gameSchema.methods.areAllPlayersReady = function() {
@@ -324,9 +345,12 @@ gameSchema.methods.initiateDecisionState = function(){
 }
 
 gameSchema.methods.emptyRegisters = function(){
+  var game = this;
   this.players.forEach(function(p){
-    this.discard.concat(p.emptyRegister());
-  })
+    var discarded = p.emptyRegister();
+    game.discard = game.discard.concat(discarded);
+  });
+  console.log('emptied registers');
 }
 
 gameSchema.methods.assignDocks = function() {
@@ -350,7 +374,6 @@ gameSchema.methods.initializeGame = function (){
 };
 
 gameSchema.methods.pushGameState = function(){
-  console.log('GOT to pushGameState')
   var publicPlayerArray = this.players.map(function(player){
     var p = {};
     p._id = player._id;
@@ -366,11 +389,13 @@ gameSchema.methods.pushGameState = function(){
   var state = {players: publicPlayerArray, isWon: this.isWon};
   if(!hashOfGames[this._id]){
     hashOfGames[this._id] = [state]
-  }else if(this.currentCard===0){
+  }else if(this.currentCard===0 && hashOfGames[this._id].length === 10){
     hashOfGames[this._id] = [state];
   }else{
     hashOfGames[this._id].push(state);
   }
+  var len = hashOfGames[this._id].length
+  console.log('current game state', len-1, hashOfGames[this._id][len-1].players)
 }
 
 gameSchema.methods.sendGameStates = function(){
