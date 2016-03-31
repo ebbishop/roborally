@@ -127,6 +127,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 		}
 
 		function drawLasers() {
+		        if(!$scope.lasers) return;
 			for(var i = 0; i < $scope.lasers.length; i++) {
 				var line = new PIXI.Graphics;
 				var xFrom, yFrom, xTo, yTo;
