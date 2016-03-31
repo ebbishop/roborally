@@ -34,7 +34,6 @@ router.post('/', function(req, res, next) {
 		var playerKey = updatedGame.host._id.toString()
 		var newGame = firebaseHelper.getConnection(updatedGame._id)
 		newGame.child('game').set(updatedGame.toObject())
-		newGame.child(playerKey).set(updatedGame.host.toObject())
 		res.status(201).json(updatedGame)
 	})
 	.then(null, next)
@@ -50,7 +49,7 @@ router.get('/:gameId/start', function(req, res, next) {
 	var id = req.params.gameId;
 	var game = firebaseHelper.getConnection(id);
 	req.game.set({state: 'decision'});
-
+	game.child("game").set(req.game.toObject())
 	req.game.save()
 	.then (function(updatedGame) {
 		updatedGame.initializeGame();

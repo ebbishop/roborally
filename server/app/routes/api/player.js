@@ -37,7 +37,6 @@ router.post('/', function(req, res, next) {
 	Player.create({name: name, robot: robot})
 	.then(function(player) {
 		playerKey = player._id.toString()
-		currentGame.child(playerKey).set(player.toObject())
 		return Game.findByIdAndUpdate(gameID, {$addToSet: {players: player}})
 	})
 	.then(function(game){
