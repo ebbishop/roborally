@@ -11,7 +11,7 @@
     </div>
 
     <div class="form-group">
-      <label class="game-name">Select Board</label>
+      <label class="game-name" style="text-align:center">Select Board</label>
       <div class="center" ng-repeat="board in boards">
         <input class="game-board-thumb" type="radio" ng-model="game.board" ng-value="{{board}}" ng-required="true"><img height="200" width="200" src="{{board.thumbnail}}"></input>
         <div><label class="game-name-sm"><strong>{{board.name | uppercase }}</strong></label></div>
