@@ -249,7 +249,8 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 
 				function createSprite() {
 					var robotImg = robotImage(player.robot);
-					var robot = new Sprite(PIXI.Texture.fromImage(robotImg))
+					var robot = new Sprite(resources["img/spritesheet.json"].textures[robotImg])
+					// var robot = new Sprite(PIXI.Texture.fromImage(robotImg))
 					//anchoring the roation to the at the center of the sprite which is why we offset the position by 0.5 as well
 					robot.anchor.x = 0.5;
 					robot.anchor.y = 0.5;
@@ -370,8 +371,14 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 					// var particle;
 					var offset;
 					var myReq;
-					if(player.bearing[0] !== 0) particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-h.png'))
-					else particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-v.png'))
+
+					new Sprite(resources["img/spritesheet.json"].textures['robolaser-h.png'])
+
+					if(player.bearing[0] !== 0) particle = new Sprite(resources["img/spritesheet.json"].textures['robolaser-h.png'])
+					else particle = new Sprite(resources["img/spritesheet.json"].textures['robolaser-v.png'])
+
+					// if(player.bearing[0] !== 0) particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-h.png'))
+					// else particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-v.png'))
 
 
 					particle.position.x = imgSize*(player.location[0] + 0.5 + player.bearing[0]) - 5;
@@ -441,7 +448,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 });
 
 function robotImage (robotName) {
-	return '/img/robots/' + robotName.toLowerCase().replace(/ /g,'') + 'Arrow.png';
+	return robotName.toLowerCase().replace(/ /g,'') + 'Arrow.png';
 }
 
 function getRotation (orig, next){
