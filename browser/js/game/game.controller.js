@@ -75,8 +75,8 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
   	.add("img/spritesheet.json")
   	.load(setup);
 
-  	var id = PIXI.loader.resources["img/spritesheet.json"].textures;
-    var imgSizeActual = 150
+	var id = PIXI.loader.resources["img/spritesheet.json"].textures;
+  var imgSizeActual = 150
 	var imgScale = 4
 	var imgSize = imgSizeActual/imgScale
 
@@ -167,51 +167,58 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 
 		var robotHash = {};
 		window.robots = robotHash
-
+		$scope.nextPhase = 0;
 		var phases = new Firebase("https://gha-roborally.firebaseio.com/" + $scope.game._id + '/phases')
 		phases.on('value', function(data) {
+
 			var phases = JSON.parse(data.val())
 			console.log('this is the data in phases ', phases)
 
-			// var players = phases.players.val()
-			// console.log('players in array format? ', players)
-			// var players = phase[0].players
-			if(Object.keys(robotHash).length === 0) drawRobots(phases)
-			runOneRegister(phases)
-			// drawRobots(JSON.parse(data.val()))
+			if(Object.keys(robotHash).length === 0) drawRobots(phases.slice($scope.nextPhase))
+			runOneRegister(phases.slice($scope.nextPhase));
+			$scope.nextPhase = phases.length;
+
+			if(!$scope.$$phase){
+				$scope.$digest();
+			}
+
 		})
 
+		function createSprite(player) {
+			var robotImg = robotImage(player.robot);
+			var robot = new Sprite(PIXI.Texture.fromImage(robotImg))
 
+			robot.anchor.x = 0.5;
+			robot.anchor.y = 0.5;
+			robot.position.x = imgSize*(player.position[0] + 0.5);
+      robot.position.y = imgSize*(11-player.position[1] + 0.5);
+      //needs initial direction/rotation here?
+      robot.scale.set(1/imgScale, 1/imgScale);
 
-		function drawRobots(phases) {
-			phases[0].players.forEach(function(player, idx){
-				if(!robotHash[player.name]) createSprite();
+    	stage.addChild(robot);
+    	robotHash[player.name] = robot;
+    	robotHash[player.name].bearing = player.bearing;
+    	robotHash[player.name].location = player.position;
+    	renderer.render(stage);
 
-				function createSprite() {
-					var robotImg = robotImage(player.robot);
-					var robot = new Sprite(PIXI.Texture.fromImage(robotImg))
-					//anchoring the roation to the at the center of the sprite which is why we offset the position by 0.5 as well
-					robot.anchor.x = 0.5;
-					robot.anchor.y = 0.5;
-					robot.position.x = imgSize*(player.position[0] + 0.5);
-	        robot.position.y = imgSize*(11-player.position[1] + 0.5);
-	        robot.scale.set(1/imgScale, 1/imgScale);
-
-	      	stage.addChild(robot);
-	      	robotHash[player.name] = robot;
-	      	robotHash[player.name].bearing = player.bearing;
-	      	robotHash[player.name].location = player.position;
-	      	renderer.render(stage)
-				}
-			})
+    	if(!$scope.$$phase){
+    		console.log('not digesting');
+    		$scope.$digest();
+    	}
 
 		}
 
+		function drawRobots(phases) {
+			phases[0].players.forEach(function(player){
+				if(!robotHash[player.name]) createSprite(player);
+			})
+		}
+
 		function runOneRegister (register) {
-			var registerArr = []
+			var registerArr = [];
 			register.forEach(function(playerMove){
 				registerArr.push(playerMove.players);
-			})
+			});
 			console.log('regist', registerArr);
 			console.log('flattened register', _.flatten(registerArr))
 			// console.log('flattened register', _.flatten(register))
@@ -259,22 +266,20 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 
 						function rotate(resolve) {
 							if(robot.rotation <= amtToRotate && direction == "clockwise" || direction == undefined) {
+								console.log('turning clockwise')
 								direction = "clockwise";
 								robot.rotation += 0.03;
 								requestAnimationFrame(rotate.bind(null, resolve));
-							}
-							else if(robot.rotation >= amtToRotate) {
+							}	else if(robot.rotation >= amtToRotate) {
+								console.log('turning counter clockwise');
 								direction = "counterclockwise";
 								robot.rotation -= 0.03;
 								requestAnimationFrame(rotate.bind(null, resolve));
-							}
-							else {
+							}	else {
 								resolve();
 							}
 						}
-					}
-
-					else {
+					} else {
 						return $q.resolve();
 					}
 				}
@@ -290,8 +295,8 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 					var col = 11-player.position[1] + 0.5;
 					if(robot.location[0] > player.position[0]) compass = 'north';
 					else if(robot.location[0] < player.position[0]) compass = 'south';
-					else if(robot.location[1] > 11-player.position[1]) compass = 'east';
-					else if(robot.location[1] < 11-player.position[1]) compass = 'west'
+					else if(robot.location[1] < 11-player.position[1]) compass = 'east';
+					else if(robot.location[1] > 11-player.position[1]) compass = 'west'
 
 					if(!turn && robot.position.x >= imgSize * row && compass == 'north') {
 				        requestAnimationFrame(moveRobot.bind(null, resolve));

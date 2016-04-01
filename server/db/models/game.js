@@ -409,7 +409,7 @@ gameSchema.methods.pushGameState = function(){
   var state = {players: publicPlayerArray, isWon: this.isWon};
   if(!hashOfGames[this._id]){
     hashOfGames[this._id] = [state]
-  }else if(this.currentCard===0 && hashOfGames[this._id].length===10){
+  }else if(this.currentCard===0 && hashOfGames[this._id].length>=10){
     hashOfGames[this._id] = [state];
   }else{
     hashOfGames[this._id].push(state);
@@ -428,7 +428,7 @@ gameSchema.methods.sendGameStates = function(){
   var gameId = this._id.toString();
 
   var roundToSend = hashOfGames[this._id];
-
+  console.log('count of phases sent:', hashOfGames[this._id].length)
   firebaseHelper.getConnection(gameId).child('phases').set(JSON.stringify(roundToSend));
   // firebaseHelper.getConnection(gameId).child('phases').set(roundToSend.toObject());
 

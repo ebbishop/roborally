@@ -4,7 +4,7 @@ app.controller("HostController", function($scope, game, $stateParams, FirebaseFa
 	var hostID = $stateParams.hostId
 
 	var localGamePlayers = FirebaseFactory.getConnection(gameID + '/game' + '/players')
-	$scope.players = localGamePlayers	
+	$scope.players = localGamePlayers
 
 	$scope.game = game
 
@@ -14,6 +14,9 @@ app.controller("HostController", function($scope, game, $stateParams, FirebaseFa
 			console.log('this is the response', response)
 			//we need to call intialize game function here to set the docks
 			//initial position should also be the dock position
+			if(!$scope.$$phase){
+				$scope.$digest();
+			}
 			$state.go('game', {gameId: response, playerId: hostID})
 		})
 	}

@@ -1,55 +1,60 @@
 app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, PlayerFactory){
 
-	$scope.gameId = $stateParams.gameId;
-	$scope.playerId = $stateParams.playerId;
-	$scope.fbPlayer = FirebaseFactory.getConnection($scope.gameId + '/game/' + $scope.playerId);
-	$scope.playerHand = FirebaseFactory.getConnection($scope.gameId + '/' + $scope.playerId);
-
-	var handArr = [];
+  $scope.gameId = $stateParams.gameId;
+  $scope.playerId = $stateParams.playerId;
+  $scope.fbPlayer = FirebaseFactory.getConnection($scope.gameId + '/game/' + $scope.playerId);
+  $scope.playerHand = FirebaseFactory.getConnection($scope.gameId + '/' + $scope.playerId);
 
 
-     var hand = new Firebase("https://resplendent-torch-4322.firebaseio.com/" + $scope.gameId + '/' + $scope.playerId)
-     hand.on('value', function(data){
-          var cards = data.val();
-          for(var i = 0; i < cards.length; i++) {
-               handArr.push(cards[i])
-          }
-          $scope.cards = chop(handArr);
 
-     })
+    var hand = new Firebase("https://gha-roborally.firebaseio.com/" + $scope.gameId + '/' + $scope.playerId)
+    hand.on('value', function(data){
+      var cards = data.val();
+      var handArr = [];
+      console.log('cards from firebase', cards);
+      for(var i = 0; i < cards.length; i++) {
+           handArr.push(cards[i])
+      }
+      $scope.cards = chop(handArr);
 
-	$scope.sendRegister = function() {
-		var register = [getCardVal(0), getCardVal(1), getCardVal(2), getCardVal(3), getCardVal(4)];
-		if(register.indexOf(0) > -1) return;
-		else {
-			console.log('sending register', register, $scope.gameId, $scope.playerId);
-			return PlayerFactory.sendRegister(register, $scope.gameId, $scope.playerId)
-			.then(function(response) {
-			  console.log('send register response:' ,response)
-	    	})		
-		}
-	}
+      if(!$scope.$$phase){
+        $scope.$digest();
+      }
+    });
+
+  $scope.sendRegister = function() {
+    var register = [getCardVal(0), getCardVal(1), getCardVal(2), getCardVal(3), getCardVal(4)];
+    if(register.indexOf(0) > -1) return;
+    else {
+      console.log('sending register', register, $scope.gameId, $scope.playerId);
+      return PlayerFactory.sendRegister(register, $scope.gameId, $scope.playerId)
+      .then(function(response) {
+        console.log('send register response:' ,response)
+        })
+    }
+
+  }
 })
 
 function getCardVal(registerNum) {
-	console.log('got in getCardVal')
-	return Number(document.getElementById("register").children[registerNum].getAttribute('carddata'));
+  console.log('got in getCardVal')
+  return Number(document.getElementById("register").children[registerNum].getAttribute('carddata'));
 }
 
 function chop(arr){
-	var cards = arr.map(function(c){
-	  return programCards[(c/10)-1]
-	});
-	var chopped = [];
-	var subArr = [];
-	for (var i = 0; i < arr.length; i++){
-	  subArr.push(programCards[arr[i]/10 - 1]);
-	  if(subArr.length === 3){
-	    chopped.push(subArr);
-	    subArr = [];
-	  }
-	}
-	return chopped;
+  var cards = arr.map(function(c){
+    return programCards[(c/10)-1]
+  });
+  var chopped = [];
+  var subArr = [];
+  for (var i = 0; i < arr.length; i++){
+    subArr.push(programCards[arr[i]/10 - 1]);
+    if(subArr.length === 3){
+      chopped.push(subArr);
+      subArr = [];
+    }
+  }
+  return chopped;
 }
 
 var programCards = [
