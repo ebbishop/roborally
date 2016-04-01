@@ -136,8 +136,19 @@ canvas {
   margin-right: 5px;
 }
 
-
 .btn-ready{
+  height: 80px;
+  width: 80px !important;
+  background-color: #ab0929;
+  border: solid #211e1f 2px;
+  border-radius: 40px;
+  color: white;
+  margin: auto;
+  vertical-align: center;
+  display: inline-block;
+}
+
+.btn-ready-game{
   height: 66px;
   width: 66px !important;
   background-color: #ab0929;
@@ -148,7 +159,6 @@ canvas {
   display: block;
   margin: auto auto;
   border-top: 5px;
-
 }
 
 .btn-ready-sm{
