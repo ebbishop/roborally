@@ -4,7 +4,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 	$scope.player = thePlayer
 
 	$scope.fbPlayers = FirebaseFactory.getConnection($scope.game._id + '/game' + '/players')
-	console.log('these are the players: ', $scope.fbPlayers)
+	// console.log('these are the players: ', $scope.fbPlayers)
 
 	$scope.$watch('fbPlayers', function(players) {
 		for(var key in players) {
@@ -165,24 +165,26 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 			}
 		}
 
-
-		var phases = new Firebase("https://resplendent-torch-4322.firebaseio.com/" + $scope.game._id + '/phases')
-		phases.on('value', function(data) {
-			var phase = JSON.parse(data.val())
-			var players = phase[0].players
-			drawRobots(players)
-			runOneRegister(players)
-			// drawRobots(JSON.parse(data.val()))
-		})
-
 		var robotHash = {};
 		window.robots = robotHash
 
+		var phases = new Firebase("https://gha-roborally.firebaseio.com/" + $scope.game._id + '/phases')
+		phases.on('value', function(data) {
+			var phases = JSON.parse(data.val())
+			console.log('this is the data in phases ', phases)
 
-		function drawRobots(initial) {
-			console.log('this is the value that we passed in to draw robots', initial)
-			initial.forEach(function(player, idx){
-				console.log('before the IF statement')
+			// var players = phases.players.val()
+			// console.log('players in array format? ', players)
+			// var players = phase[0].players
+			if(Object.keys(robotHash).length === 0) drawRobots(phases)
+			runOneRegister(phases)
+			// drawRobots(JSON.parse(data.val()))
+		})
+
+
+
+		function drawRobots(phases) {
+			phases[0].players.forEach(function(player, idx){
 				if(!robotHash[player.name]) createSprite();
 
 				function createSprite() {
@@ -206,7 +208,14 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 		}
 
 		function runOneRegister (register) {
-			move(_.flatten(register));
+			var registerArr = []
+			register.forEach(function(playerMove){
+				registerArr.push(playerMove.players);
+			})
+			console.log('regist', registerArr);
+			console.log('flattened register', _.flatten(registerArr))
+			// console.log('flattened register', _.flatten(register))
+			move(_.flatten(registerArr));
 		}
 
 		function move(playerObjs) {
@@ -223,7 +232,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 					return promiseForMoveRobot();
 				})
 				.then(function() {
-					robot.location = player.location;
+					robot.location = player.position;
 					return shootRobotLasers();
 				})
 				.then(function() {
@@ -277,12 +286,12 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 				}
 
 				function moveRobot(resolve) {
-					var row = player.location[0] + 0.5;
-					var col = player.location[1] + 0.5;
-					if(robot.location[0] > player.location[0]) compass = 'north';
-					else if(robot.location[0] < player.location[0]) compass = 'south';
-					else if(robot.location[1] > player.location[1]) compass = 'east';
-					else if(robot.location[1] < player.location[1]) compass = 'west'
+					var row = player.position[0] + 0.5;
+					var col = player.position[1] + 0.5;
+					if(robot.location[0] > player.position[0]) compass = 'north';
+					else if(robot.location[0] < player.position[0]) compass = 'south';
+					else if(robot.location[1] > player.position[1]) compass = 'east';
+					else if(robot.location[1] < player.position[1]) compass = 'west'
 
 					if(!turn && robot.position.x >= imgSize * row && compass == 'north') {
 				        requestAnimationFrame(moveRobot.bind(null, resolve));
@@ -313,8 +322,8 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 					else particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-v.png'))
 
 
-					particle.position.x = imgSize*(player.location[0] + 0.5 + player.bearing[0]) - 5;
-			        particle.position.y = imgSize*(player.location[1] + 0.5 - player.bearing[1]) - 5;
+					particle.position.x = imgSize*(player.position[0] + 0.5 + player.bearing[0]) - 5;
+			        particle.position.y = imgSize*(player.position[1] + 0.5 - player.bearing[1]) - 5;
 			        particle.scale.set(1/imgScale, 1/imgScale);
 
 			      	stage.addChild(particle);

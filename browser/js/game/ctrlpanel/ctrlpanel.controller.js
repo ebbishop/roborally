@@ -6,7 +6,7 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
 	$scope.playerHand = FirebaseFactory.getConnection($scope.gameId + '/' + $scope.playerId);
 
 	var handArr = [];
-	// setTimeout(function() {
+	setTimeout(function() {
 
 		$scope.playerHand.$loaded()
 		.then(function() {
@@ -18,7 +18,7 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
 			console.log('this is the handArr', handArr);
 			$scope.cards = chop(handArr);
 		})
-	// },500)
+	},500)
 
 
 
