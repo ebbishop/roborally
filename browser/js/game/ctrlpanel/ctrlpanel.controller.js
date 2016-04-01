@@ -9,7 +9,6 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
 
 
      var hand = new Firebase("https://resplendent-torch-4322.firebaseio.com/" + $scope.gameId + '/' + $scope.playerId)
-     console.log("https://resplendent-torch-4322.firebaseio.com/" + $scope.gameId + '/' + $scope.playerId)
      hand.on('value', function(data){
           var cards = data.val();
           for(var i = 0; i < cards.length; i++) {
