@@ -134,14 +134,11 @@ playerSchema.methods.cardMove = function (magnitude) {
   // var checkMove = this.checkMove()
 
   // if (checkMove === true) {
-    while (magnitude > 0) {
+    while (Math.abs(magnitude) > 0) {
       newCol += this.bearing[1];
       newRow += this.bearing[0];
 
-      // var edgeOrPit = this.checkForEdgeOrPit(newRow, newCol)
-      // if (edgeOrPit === true) return this.loseLife();
-
-      magnitude--
+      magnitude += magnitude > 0 ? -1 : 1
     }
 
     this.position = [newRow, newCol]
