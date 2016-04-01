@@ -194,14 +194,14 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 					robot.anchor.x = 0.5;
 					robot.anchor.y = 0.5;
 					robot.position.x = imgSize*(player.position[0] + 0.5);
-			        robot.position.y = imgSize*(player.position[1] + 0.5);
-			        robot.scale.set(1/imgScale, 1/imgScale);
+	        robot.position.y = imgSize*(11-player.position[1] + 0.5);
+	        robot.scale.set(1/imgScale, 1/imgScale);
 
-			      	stage.addChild(robot);
-			      	robotHash[player.name] = robot;
-			      	robotHash[player.name].bearing = player.bearing;
-			      	robotHash[player.name].location = player.position;
-			      	renderer.render(stage)
+	      	stage.addChild(robot);
+	      	robotHash[player.name] = robot;
+	      	robotHash[player.name].bearing = player.bearing;
+	      	robotHash[player.name].location = player.position;
+	      	renderer.render(stage)
 				}
 			})
 
@@ -287,11 +287,11 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 
 				function moveRobot(resolve) {
 					var row = player.position[0] + 0.5;
-					var col = player.position[1] + 0.5;
+					var col = 11-player.position[1] + 0.5;
 					if(robot.location[0] > player.position[0]) compass = 'north';
 					else if(robot.location[0] < player.position[0]) compass = 'south';
-					else if(robot.location[1] > player.position[1]) compass = 'east';
-					else if(robot.location[1] < player.position[1]) compass = 'west'
+					else if(robot.location[1] > 11-player.position[1]) compass = 'east';
+					else if(robot.location[1] < 11-player.position[1]) compass = 'west'
 
 					if(!turn && robot.position.x >= imgSize * row && compass == 'north') {
 				        requestAnimationFrame(moveRobot.bind(null, resolve));
@@ -315,7 +315,6 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 				}
 
 				function shootRobotLasers() {
-					// var particle;
 					var offset;
 					var myReq;
 					if(player.bearing[0] !== 0) particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-h.png'))
@@ -323,30 +322,27 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 
 
 					particle.position.x = imgSize*(player.position[0] + 0.5 + player.bearing[0]) - 5;
-			        particle.position.y = imgSize*(player.position[1] + 0.5 - player.bearing[1]) - 5;
-			        particle.scale.set(1/imgScale, 1/imgScale);
+	        particle.position.y = imgSize*(11-player.position[1] + 0.5 - player.bearing[1]) - 5;
+	        particle.scale.set(1/imgScale, 1/imgScale);
 
-			      	stage.addChild(particle);
-			      	renderer.render(stage)
+	      	stage.addChild(particle);
+	      	renderer.render(stage)
 
 
-			      	return promiseForShooting()
+	      	return promiseForShooting()
 
 
 					function promiseForShooting () {
 						return $q(function(resolve, reject){
 							shoot(resolve)
 						})
-						// .then(function() {
-						// 	particle.destroy();
-						// })
 					}
 
 					function shoot(resolve) {
 						if(!particle) return;
-						if(player.bearing[0] === -1 && particle.position.x >= 30) {
-					        requestAnimationFrame(shoot.bind(null, resolve));
-					        particle.position.x -= 10;
+						if(player.bearing[0] === -1 && particle.position.x >= 0) {
+				        requestAnimationFrame(shoot.bind(null, resolve));
+				        particle.position.x -= 10;
 					  	}
 					  	else if(player.bearing[0] === 1 && particle.position.x <= imgSize*rows) {
 					  		requestAnimationFrame(shoot.bind(null, resolve));
@@ -400,77 +396,3 @@ function getRotation (orig, next){
   	return rad;
 	}
 }
-
-/* var player1, player2, player3;
-		//seed for original location
-		var players = [
-		  { name: "player3", location: [14,3], bearing: [-1, 0], robot: "Twonky", priorityVal: null },
-		  { name: "player1", location: [15,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: null },
-		  { name: "player2", location: [14,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: null }
-		]
-
-		var oneRegister = [
-			[ //cardmove1,
-			  { name: "player3", location: [15,3], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
-			  { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			  { name: "player2", location: [11,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
-			],
-
-			[// boardmove1,
-				{ name: "player3", location: [15,4], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
-				{ name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-				{ name: "player2", location: [10,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
-			],
-
-			[ //cardmove2,
-			  { name: "player3", location: [15,4], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-			  { name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
-			  { name: "player2", location: [8,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 },
-			],
-
-			[ //boardmove2
-				{ name: "player3", location: [15,5], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-				{ name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
-				{ name: "player2", location: [8,8], bearing: [0, -1], robot: "Spin Bot", priorityVal: 200 }
-			],
-			[ //cardmove3,
-			  { name: "player3", location: [15,3], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-			  { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			  { name: "player2", location: [8,8], bearing: [0, 1], robot: "Spin Bot", priorityVal: 200 },
-			],
-
-			[ //boardmove3
-				{ name: "player3", location: [15,4], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-				{ name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-				{ name: "player2", location: [8,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
-			],
-			[ //cardmove4
-				{ name: "player3", location: [15,5], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-				{ name: "player1", location: [10,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-				{ name: "player2", location: [6,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
-			],
-			[ //boardmove4,
-			  { name: "player3", location: [15,3], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-			  { name: "player1", location: [9,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			  { name: "player2", location: [6,7], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
-			],
-			[ //cardmove5
-				{ name: "player3", location: [15,3], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
-				{ name: "player1", location: [7,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-				{ name: "player2", location: [5,7], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
-			],
-			[ //boardmove5,
-			  { name: "player3", location: [15,4], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
-			  { name: "player1", location: [6,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			  { name: "player2", location: [5,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
-			]
-		]
-
-				/* bearings
-
-				[-1,0] N
-				[0, 1] E
-				[0, -1] W
-				[1, 0] S
-
-				*/

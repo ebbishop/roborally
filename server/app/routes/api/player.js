@@ -53,38 +53,21 @@ router.post('/', function(req, res, next) {
 //each player selects cards and sets register
 //sending register to firebase --> might not need it?
 router.put('/:playerId/setcards', function(req, res, next) {
-	var cards = req.body.register
-	var gameId = req.body.gameId
+	var cards = req.body.register;
+	var gameId = req.body.gameId;
 
-	req.player.iAmReady(cards)
+	req.player.register = cards;
+	req.player.iAmReady();
 
-	Player.findByIdAndUpdate(req.player._id, {$set: req.player})
-	.then(function(player) {
-		return Game.findById(gameId).populate('players')
+	req.player.save()
+	.then(function(p){
+		return Game.findById(gameId).populate('players');
 	})
 	.then(function(updatedGame) {
+		console.log('updated game', updatedGame.players[0])
 		firebaseHelper.getConnection(gameId).child('game').set(updatedGame.toObject())
+		res.end()
 	})
-
-	// req.player.register = req.player.register
-	// console.log('this is the req.player BEFORE SAVE', req.player)
-	// // req.player.register = [1,2,3,4,5];
-	// return req.player.save()
-	// .then(function() {
-	// })
-
-	res.end()
-
-	// Promise.all([
-	// 	req.player.save(), 
-	// 	Game.findById(gameId).populate('players')
-	// ])	
-	// .spread(function(player, game) {
-	// 	console.log('this is the req.player AFTER SAVE', player)
-	// 	console.log('this is the game players AFTER SAVE', game.players)
-	// 	firebaseHelper.getConnection(gameId).child('game').set(game.toObject())
-	// 	res.send(gameId)
-	// })
 })
 
 //empty register

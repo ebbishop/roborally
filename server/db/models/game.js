@@ -96,8 +96,8 @@ gameSchema.methods.runOneRound = function () {
     this.dealCards();
     this.initiateDecisionState();
   }
-
-  this.sendGameStates()
+  this.savePlayers();
+  this.sendGameStates();
 }
 
 gameSchema.methods.setNotReady = function(){
@@ -120,13 +120,14 @@ gameSchema.methods.runOneRegister = function () {
 }
 
 gameSchema.methods.checkEdgeOrPit = function(){
-  var game = this;
   this.players.forEach(function(p){
-    var tile = game.getTileAt(p.position)
+    var tile = this.getTileAt(p.position)
+    console.log('tile here', p.position, 'is', tile)
     if(!tile || tile.floor === "pit"){
+      console.log('abt to lose life from game');
       p.loseLife();
     }
-  });
+  }, this);
 }
 
 gameSchema.methods.runBelts = function(type){
@@ -140,6 +141,8 @@ gameSchema.methods.runBelts = function(type){
       var c = tile.conveyor[0];
       var nextPosition = [player.position[0] + c.bearing[0], player.position[1] + c.bearing[1]];
       var nextTile = game.getTileAt(nextPosition);
+      console.log('player on conveyor', type, 'at', player.position);
+      console.log('sending to', nextPosition, 'for tile', nextTile);
 
       if(nextTile.conveyor) {
         var deg = getRotation(c.bearing, nextTile.conveyor[0].bearing);
@@ -415,13 +418,19 @@ gameSchema.methods.pushGameState = function(){
   console.log('current game state', len-1, hashOfGames[this._id][len-1].players)
 }
 
+gameSchema.methods.savePlayers = function(){
+  return Promise.map(this.players, function(p){
+    return p.save()
+  })
+}
+
 gameSchema.methods.sendGameStates = function(){
   var gameId = this._id.toString();
 
   var roundToSend = hashOfGames[this._id];
 
   firebaseHelper.getConnection(gameId).child('phases').set(JSON.stringify(roundToSend));
-  // firebaseHelper.getConnection(gameId).child('phases').set(roundToSend.toObject());  
+  // firebaseHelper.getConnection(gameId).child('phases').set(roundToSend.toObject());
 
   var privatePlayerArray = this.players.map(function(player){
     var p={};
@@ -429,10 +438,6 @@ gameSchema.methods.sendGameStates = function(){
     p.hand = player.hand;
     return p;
   });
-
-  console.log('current deck has this many cards:', this.deck.length, this.deck);
-  console.log('current discard has this many cards:', this.discard.length, this.discard);
-  console.log('total cards', (this.deck.length + this.discard.length));
 
   privatePlayerArray.forEach(function(player){
     var playerId = player._id.toString();

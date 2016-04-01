@@ -49,8 +49,11 @@ var moveBlocked = {
 playerSchema.methods.playCard = function(i){
   var cardNum = this.register[i];
   var card = programCards[(cardNum/10)-1];
+  console.log('moving from', this.position, 'on card', card);
+
   this.rotate(card.rotation);
   this.cardMove(card.magnitude);
+  console.log('to:', this.position);
 };
 
 playerSchema.methods.rotate = function (rotation){
@@ -94,16 +97,20 @@ playerSchema.methods.boardMove = function (bearing) {
   // call when self.bearing is not relevant
   var newCol = this.position[0];
   var newRow = this.position[1];
-  newCol += bearing[0];
-  newRow += bearing[1];
+  newRow += bearing[0];
+  newCol += bearing[1];
   // check if move is possible
   // if(this.checkMove()) {
-    if (newCol < 0 || newRow < 0 || newCol > 11 || newRow > 15) return this.loseLife();
+    if (newCol < 0 || newRow < 0 || newCol > 11 || newRow > 15) {
+      console.log('losing life - out of bounds', newCol, newRow);
+      return this.loseLife();
+    }
     else this.set('position', [newCol, newRow]);
   // }
 };
 
 playerSchema.methods.loseLife = function() {
+  console.log('losing life');
   this.livesRemaining--;
   if (this.livesRemaining === 0) return this.killPlayer();
   else {
@@ -157,9 +164,9 @@ playerSchema.methods.touchFlag = function() {
 }
 
 // route? <--- player clicks ready and sends cards in order
-playerSchema.methods.iAmReady = function(cards) {
+playerSchema.methods.iAmReady = function() {
   this.ready = true;
-  this.setRegister(cards);
+  // this.setRegister(cards);
 }
 
 playerSchema.methods.applyDamage = function(hitCount) {
@@ -173,6 +180,7 @@ playerSchema.methods.accrueDamage = function(hitCount) {
 
 playerSchema.methods.checkDamage = function() {
   if (this.damage > 9) {
+    console.log('too much damage, lose life');
     this.loseLife();
     this.damage = 0;
   }

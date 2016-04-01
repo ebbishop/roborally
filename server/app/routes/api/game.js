@@ -70,6 +70,7 @@ router.get('/:gameId/ready', function(req, res, next) {
         'board.col5', 'board.col6', 'board.col7', 'board.col8', 'board.col9', 'board.col10',
         'board.col11', 'players.player', 'host']).exec()
 	.then(function(updatedGame) {
+		console.log('abt to run round:', updatedGame.players)
 		return updatedGame.runOneRound()
 	})
 	.then(null, console.error)
