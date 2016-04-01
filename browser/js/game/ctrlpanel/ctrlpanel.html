@@ -10,10 +10,10 @@
 						<span class="dead"></span>
 					</div>
 				</div>
-			</div>
+			</div><br>
 
 			<div>
-				<img id="myrobo" src="/img/robots/hammerbot.png"/ height="120" width="120">
+				<img id="myrobo" src={{robotImage(player.robot)}} height="120" width="120">
 			</div><br>
 
 			<div>
@@ -24,7 +24,7 @@
 
 		<div class="col-md-7" id="right">
 			<div ng-repeat="row in cards track by $index">
-				<span ng-repeat="card in row track by $index" carddata="{{card.priority}}" class="empty-card" draggable><img src="/img/cards/{{card.name}}.png" height="100" width="70"></span>
+				<span ng-repeat="card in row track by $index" carddata="{{card.priority}}" class="empty-card" draggable><img src="/img/cards/{{card.name}}.png" height="110" width="75"></span>
 			</div>
 		</div>
 	</div>

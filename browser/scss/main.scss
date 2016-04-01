@@ -45,9 +45,8 @@ canvas {
 #damage {
   width: 100%;
   display: block;
-  margin: 0 auto;
   font-size: 20px;
-  margin-left:25px
+  margin-left: 39px
 }
 
 
@@ -90,6 +89,8 @@ canvas {
 
 #myrobo{
   margin-top: 5px;
+  display: block;
+  margin: auto auto;
 }
 
 .empty{
@@ -137,15 +138,17 @@ canvas {
 
 
 .btn-ready{
-  height: 80px;
-  width: 80px !important;
+  height: 66px;
+  width: 66px !important;
   background-color: #ab0929;
   border: solid #211e1f 2px;
-  border-radius: 40px;
+  border-radius: 33px;
   color: white;
-  margin: auto;
   vertical-align: center;
-  display: inline-block;
+  display: block;
+  margin: auto auto;
+  border-top: 5px;
+
 }
 
 .btn-ready-sm{
@@ -162,8 +165,8 @@ canvas {
 }
 
 .empty-card{
-  height: 100px;
-  width: 70px;
+  height: 110px;
+  width: 75px;
   border: solid 2px black;
   border-radius: 3px;
   display: inline-block;
