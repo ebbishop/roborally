@@ -6,21 +6,17 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
 	$scope.playerHand = FirebaseFactory.getConnection($scope.gameId + '/' + $scope.playerId);
 
 	var handArr = [];
-	setTimeout(function() {
-
-		$scope.playerHand.$loaded()
-		.then(function() {
-		  	for(var key in $scope.playerHand) {
-				if($scope.playerHand.hasOwnProperty(key) && key[0] !== '$'){
-					handArr.push($scope.playerHand[key])
-				}
-			}
-			console.log('this is the handArr', handArr);
-			$scope.cards = chop(handArr);
-		})
-	},500)
 
 
+     var hand = new Firebase("https://resplendent-torch-4322.firebaseio.com/" + $scope.gameId + '/' + $scope.playerId)
+     hand.on('value', function(data){
+          var cards = data.val();
+          for(var i = 0; i < cards.length; i++) {
+               handArr.push(cards[i])
+          }
+          $scope.cards = chop(handArr);
+
+     })
 
 	$scope.sendRegister = function() {
 		var register = [getCardVal(0), getCardVal(1), getCardVal(2), getCardVal(3), getCardVal(4)];
