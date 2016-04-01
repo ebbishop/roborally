@@ -75,9 +75,9 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
   	.add("img/spritesheet.json")
   	.load(setup);
 
-  	var id = PIXI.loader.resources["img/spritesheet.json"].textures;
-    var imgSizeActual = 150
-	var imgScale = 4
+	var id = PIXI.loader.resources["img/spritesheet.json"].textures;
+  var imgSizeActual = 150;
+	var imgScale = 3;
 	var imgSize = imgSizeActual/imgScale
 
 	function setup() {

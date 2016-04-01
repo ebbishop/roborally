@@ -1,6 +1,6 @@
 var Firebase = require("firebase");
 var currentGame = {};
-var baseUrl = "https://resplendent-torch-4322.firebaseio.com/";
+var baseUrl = "https://gha-roborally.firebaseio.com/";
 
 /*
 -post save hook to send current game state to Firebase

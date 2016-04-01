@@ -2,7 +2,7 @@ app.factory('FirebaseFactory', function($firebaseObject) {
 
 	var FirebaseFactory = {};
 
-	var baseUrl = "https://resplendent-torch-4322.firebaseio.com/";
+	var baseUrl = "https://gha-roborally.firebaseio.com/";
 	var baseConnection = $firebaseObject(new Firebase(baseUrl))
 
 	FirebaseFactory.getConnection = function(key) {
