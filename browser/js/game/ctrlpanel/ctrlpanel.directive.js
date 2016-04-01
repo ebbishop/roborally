@@ -75,8 +75,8 @@ app.directive('droppable', function(){
           //add image to register
           var item = document.createElement('img');
           item.src = "/img/cards/" + programCards[cardId/10-1].name + ".png"
-          item.height = 100;
-          item.width = 70;
+          item.height = 110;
+          item.width = 75;
           attrs.$set('carddata', cardId);
           this.appendChild(item);
           this.droppable = false;
