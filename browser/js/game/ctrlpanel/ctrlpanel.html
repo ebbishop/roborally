@@ -29,9 +29,8 @@
 					<img id="myrobo" src={{robotImage(player.robot)}}>
 				</div>
 				<div class="col-md-6">
-					<div class="panel lives-panel">
+					<div class="panel lives-panel flags">
 						<h4>Flags Captured:</h4>
-						<span class="glyphicon glyphicon-flag"></span>
 						<span class="glyphicon glyphicon-flag"></span>
 						<span class="glyphicon glyphicon-flag"></span>
 						<span class="glyphicon glyphicon-flag"></span>
@@ -46,15 +45,19 @@
 				<span ng-repeat="card in row track by $index" carddata="{{card.priority}}" class="empty-card" draggable><img src="/img/cards/{{card.name}}.png"></span>
 			</div>
 		</div>
+
 	</div>
 	<br>
-	<div id="register">
-		<span class="register empty-card empty" droppable></span>
-		<span class="register empty-card empty" droppable></span>
-		<span class="register empty-card empty" droppable></span>
-		<span class="register empty-card empty" droppable></span>
-		<span class="register empty-card empty" droppable></span>
-		<button type="button" class="btn-ready-game vcenter" ng-click="sendRegister()"><strong><larger>READY</larger></strong></button>
+
+	<div>
+		<div id="register">
+			<span class="register empty-card empty" droppable></span>
+			<span class="register empty-card empty" droppable></span>
+			<span class="register empty-card empty" droppable></span>
+			<span class="register empty-card empty" droppable></span>
+			<span class="register empty-card empty" droppable></span>
+			<button type="button" class="btn-ready-game vcenter" ng-click="sendRegister()"><strong><larger>READY</larger></strong></button>
+		</div>
 	</div>
 
 

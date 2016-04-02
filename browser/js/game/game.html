@@ -1,11 +1,13 @@
-<div class="game-container-game container">
+<div class="game-container-game">
 	<div class="row">
+    
     <div class="col-md-6 center">
-      <div class="game-name">{{game.name | uppercase}}</div>
+     	<div class="game-name">{{game.name | uppercase}}</div>
   		<div id="board-container"></div>
     </div>
-		<div class="col-md-6 center">
-      <div class="game-name">{{player.name}}'s Control Panel</div>
+	
+	<div class="col-md-6 center">
+    	<div class="game-name">{{player.name}}'s Control Panel</div>
 			<ctrlpanel player="player" game="game"></ctrlpanel>
 		</div>
 	</div>

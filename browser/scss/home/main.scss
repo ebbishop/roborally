@@ -9,3 +9,22 @@
     text-align: center;
   }
 }
+
+
+#mainImg {
+	// position: absolute;
+	width: 100%;
+	margin-left: -.1em;
+	margin-right: -.1em;
+	margin-top: -3em; 
+}
+
+#logo {
+	margin-top: -3em;
+	position: block;
+} 
+
+#lobby-btn {
+	display: table;
+   margin: 0 auto
+}
