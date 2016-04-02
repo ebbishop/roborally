@@ -1,3 +1,4 @@
+<section id="creategame">
 
 <div class="game-container container">
 <h1 class="center page-header animate">INITIALIZE YOUR GAME</h1>
@@ -13,7 +14,7 @@
     <div class="form-group center">
       <label class="game-name">Select Board</label>
       <div class="center" ng-repeat="board in boards">
-        <input type="radio" ng-model="game.board" ng-value="{{board}}" ng-required="true"><img class="game-board-thumb" src="{{board.thumbnail}}"></input>
+        <input class="create-game-radio" type="radio" ng-model="game.board" ng-value="{{board}}" ng-required="true"><img class="game-board-thumb" src="{{board.thumbnail}}"></input>
         <div><label class="game-name-sm"><strong>{{board.name | uppercase }}</strong></label></div>
       </div>
     </div>
@@ -28,7 +29,7 @@
     <div class="form-group center">
       <label class="game-name">Select Avatar</label>
       <div class="center" ng-repeat="robot in robots">
-        <input type="radio" ng-model="game.robot" ng-value="{{robot}}" ng-required="true"><img class="robo-avatar" src="{{robot.imgUrl}}"></input>
+        <input class="create-game-radio" type="radio" ng-model="game.robot" ng-value="{{robot}}" ng-required="true"><img class="robo-avatar" src="{{robot.imgUrl}}"></input>
         <div><label class="game-name-sm"><strong>{{robot.name | uppercase }}</strong></label></div>
       </div>
     </div>
@@ -40,3 +41,5 @@
 </form>
 
 </div>
+
+</section>
