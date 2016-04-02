@@ -24,34 +24,25 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 		}
 	}, true);
 
-	// $scope.fbPlayers.$loaded()
-	// .then(function() {
-	// 	$scope.readyArr = []
-	// 	for (var i=0; i<$scope.fbPlayers.players.length; i++) {
-	// 		if ($scope.fbPlayers.players[i].ready === false) $scope.readyArr.push($scope.fbPlayers.players[i].ready)
-	// 		// console.log($scope.fbPlayers.players[i].ready)
-	// 	}
 
+	$scope.boardObj = $scope.game.board;
+	$scope.docks = $scope.game.board.dockLocations;
+	$scope.lasers = $scope.game.board.laserLocations;
 
-
-	$scope.boardObj = $scope.game.board
-	$scope.docks = $scope.game.board.dockLocations
-	$scope.lasers = $scope.game.board.laserLocations
 	function collectOneCol(n){
-	var key = 'col' + n.toString();
-	var idents = $scope.boardObj[key].map(function(tile){
-	  return tile.identifier;
-	});
-	return idents;
+		var key = 'col' + n.toString();
+		var idents = $scope.boardObj[key].map(function(tile){
+		  return tile.identifier;
+		});
+		return idents;
 	}
 
 
 	$scope.board = [];
+
 	for(var i = 0; i <= 11; i ++){
 		$scope.board.push(collectOneCol(i));
 	}
-
-	// console.log('board', $scope.board)
 
 	// function getWallsInRow(row) {
 	// 	var wallsArrPositions = [];
@@ -62,8 +53,6 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 	// 	}
 	// 	return wallsArrPositions;
 	// }
-
-	// console.log('walls in row2', getWallsInRow(2))
 
 	var Container = PIXI.Container,
     autoDetectRenderer = PIXI.autoDetectRenderer,
@@ -76,8 +65,9 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
   	.load(setup);
 
 	var id = PIXI.loader.resources["img/spritesheet.json"].textures;
-  var imgSizeActual = 150
-	var imgScale = 4
+
+  var imgSizeActual = 150;
+	var imgScale = 3;
 	var imgSize = imgSizeActual/imgScale
 
 	function setup() {
@@ -181,36 +171,29 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 			if(!$scope.$$phase){
 				$scope.$digest();
 			}
+		});
 
-		})
+		function drawRobots(initial) {
+			initial.forEach(function(player, idx){
+				if(robotHash[player.name] === undefined) createSprite();
 
-		function createSprite(player) {
-			var robotImg = robotImage(player.robot);
-			var robot = new Sprite(PIXI.Texture.fromImage(robotImg))
+				function createSprite() {
+					var robotImg = robotImage(player.robot);
+					var robot = new Sprite(resources["img/spritesheet.json"].textures[robotImg])
+					// var robot = new Sprite(PIXI.Texture.fromImage(robotImg))
+					//anchoring the roation to the at the center of the sprite which is why we offset the position by 0.5 as well
+					robot.anchor.x = 0.5;
+					robot.anchor.y = 0.5;
+					robot.position.x = imgSize*(player.location[0] + 0.5);
+			        robot.position.y = imgSize*(player.location[1] + 0.5);
+			        robot.scale.set(1/imgScale, 1/imgScale);
 
-			robot.anchor.x = 0.5;
-			robot.anchor.y = 0.5;
-			robot.position.x = imgSize*(player.position[0] + 0.5);
-      robot.position.y = imgSize*(11-player.position[1] + 0.5);
-      //needs initial direction/rotation here?
-      robot.scale.set(1/imgScale, 1/imgScale);
-
-    	stage.addChild(robot);
-    	robotHash[player.name] = robot;
-    	robotHash[player.name].bearing = player.bearing;
-    	robotHash[player.name].location = player.position;
-    	renderer.render(stage);
-
-    	if(!$scope.$$phase){
-    		console.log('not digesting');
-    		$scope.$digest();
-    	}
-
-		}
-
-		function drawRobots(phases) {
-			phases[0].players.forEach(function(player){
-				if(!robotHash[player.name]) createSprite(player);
+			      	stage.addChild(robot);
+			      	robotHash[player.name] = robot;
+			      	robotHash[player.name].bearing = player.bearing;
+			      	robotHash[player.name].location = player.location;
+			      	renderer.render(stage)
+				}
 			})
 		}
 
@@ -322,8 +305,14 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 				function shootRobotLasers() {
 					var offset;
 					var myReq;
-					if(player.bearing[0] !== 0) particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-h.png'))
-					else particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-v.png'))
+
+					new Sprite(resources["img/spritesheet.json"].textures['robolaser-h.png'])
+
+					if(player.bearing[0] !== 0) particle = new Sprite(resources["img/spritesheet.json"].textures['robolaser-h.png'])
+					else particle = new Sprite(resources["img/spritesheet.json"].textures['robolaser-v.png'])
+
+					// if(player.bearing[0] !== 0) particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-h.png'))
+					// else particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-v.png'))
 
 
 					particle.position.x = imgSize*(player.position[0] + 0.5 + player.bearing[0]) - 5;
@@ -390,7 +379,7 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 });
 
 function robotImage (robotName) {
-	return '/img/robots/' + robotName.toLowerCase().replace(/ /g,'') + 'Arrow.png';
+	return robotName.toLowerCase().replace(/ /g,'') + 'Arrow.png';
 }
 
 function getRotation (orig, next){

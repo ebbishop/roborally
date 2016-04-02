@@ -1,34 +1,34 @@
 
 <div class="game-container container">
-<h1 class="center page-header"><strong>INITIALIZE YOUR GAME</strong></h1>
+<h1 class="center page-header animate">INITIALIZE YOUR GAME</h1>
 <form name="CreateGameForm" novalidate ng-submit="CreateGame(game)">
   <div class="row">
 
   <div class="col-md-6">
-    <div class="form-group">
-  		<label class="game-name" for="name">Game Name</label>
-  		<input  type="text" class="form-control game-name-sm" id="gameName" placeholder="Game Name" ng-model="game.gameName" ng-required="true">
+    <div class="form-group center">
+  		<label class="game-name half" for="name">Game Name</label>
+  		<input  type="text" class="half form-control game-name-sm" id="gameName" placeholder="Game Name" ng-model="game.gameName" ng-required="true">
     </div>
 
-    <div class="form-group">
+    <div class="form-group center">
       <label class="game-name">Select Board</label>
       <div class="center" ng-repeat="board in boards">
-        <input class="game-board-thumb" type="radio" ng-model="game.board" ng-value="{{board}}" ng-required="true"><img height="200" width="200" src="{{board.thumbnail}}"></input>
+        <input type="radio" ng-model="game.board" ng-value="{{board}}" ng-required="true"><img class="game-board-thumb" src="{{board.thumbnail}}"></input>
         <div><label class="game-name-sm"><strong>{{board.name | uppercase }}</strong></label></div>
       </div>
     </div>
   </div>
 
   <div class="col-md-6">
-    <div class="form-group">
-  		<label class="game-name" for="name">Player Name</label>
-  		<input type="text" class="form-control game-name-sm" id="playerName" placeholder="Player Name" ng-model="game.playerName" ng-required="true">
+    <div class="form-group center">
+  		<label class="game-name half" for="name">Player Name</label>
+  		<input type="text" class="form-control game-name-sm half" id="playerName" placeholder="Player Name" ng-model="game.playerName" ng-required="true">
     </div>
 
-    <div class="form-group">
+    <div class="form-group center">
       <label class="game-name">Select Avatar</label>
       <div class="center" ng-repeat="robot in robots">
-        <input type="radio" ng-model="game.robot" ng-value="{{robot}}" ng-required="true"><img height="150" width="150" src="{{robot.imgUrl}}"></input>
+        <input type="radio" ng-model="game.robot" ng-value="{{robot}}" ng-required="true"><img class="robo-avatar" src="{{robot.imgUrl}}"></input>
         <div><label class="game-name-sm"><strong>{{robot.name | uppercase }}</strong></label></div>
       </div>
     </div>

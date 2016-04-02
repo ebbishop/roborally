@@ -5,22 +5,25 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
   $scope.fbPlayer = FirebaseFactory.getConnection($scope.gameId + '/game/' + $scope.playerId);
   $scope.playerHand = FirebaseFactory.getConnection($scope.gameId + '/' + $scope.playerId);
 
+ $scope.robots = [{name: "Hammer Bot", imgUrl: "/img/robots/hammerbot.png"}, {name: "Spin Bot", imgUrl: "/img/robots/spinbot.png"}, {name: "Twonky", imgUrl: "/img/robots/twonky.png"}, {name: "Zoom Bot", imgUrl: "/img/robots/zoombot.png"}]
 
+ $scope.robotImage = function (robotName) {
+  return '/img/robots/' + robotName.toLowerCase().replace(/ /g,'') + '.png';
+ }
 
-    var hand = new Firebase("https://gha-roborally.firebaseio.com/" + $scope.gameId + '/' + $scope.playerId)
-    hand.on('value', function(data){
-      var cards = data.val();
-      var handArr = [];
-      console.log('cards from firebase', cards);
-      for(var i = 0; i < cards.length; i++) {
-           handArr.push(cards[i])
-      }
-      $scope.cards = chop(handArr);
-
-      if(!$scope.$$phase){
-        $scope.$digest();
-      }
-    });
+  var hand = new Firebase("https://gha-roborally.firebaseio.com/" + $scope.gameId + '/' + $scope.playerId)
+  hand.on('value', function(data){
+    var cards = data.val();
+    var handArr = [];
+    console.log('cards from firebase', cards);
+    for(var i = 0; i < cards.length; i++) {
+         handArr.push(cards[i])
+    }
+    $scope.cards = chop(handArr);
+    if(!$scope.$$phase){
+      $scope.$digest();
+    }
+  });
 
   $scope.sendRegister = function() {
     var register = [getCardVal(0), getCardVal(1), getCardVal(2), getCardVal(3), getCardVal(4)];
@@ -34,28 +37,31 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
     }
 
   }
-})
 
-function getCardVal(registerNum) {
-  console.log('got in getCardVal')
-  return Number(document.getElementById("register").children[registerNum].getAttribute('carddata'));
-}
-
-function chop(arr){
-  var cards = arr.map(function(c){
-    return programCards[(c/10)-1]
-  });
-  var chopped = [];
-  var subArr = [];
-  for (var i = 0; i < arr.length; i++){
-    subArr.push(programCards[arr[i]/10 - 1]);
-    if(subArr.length === 3){
-      chopped.push(subArr);
-      subArr = [];
-    }
+  function getCardVal(registerNum) {
+    console.log('got in getCardVal')
+    return Number(document.getElementById("register").children[registerNum].getAttribute('carddata'));
   }
-  return chopped;
-}
+
+  function chop(arr){
+    var cards = arr.map(function(c){
+      return programCards[(c/10)-1]
+    });
+    var chopped = [];
+    var subArr = [];
+    for (var i = 0; i < arr.length; i++){
+      subArr.push(programCards[arr[i]/10 - 1]);
+      if(subArr.length === 3){
+        chopped.push(subArr);
+        subArr = [];
+      }
+    }
+    return chopped;
+  }
+});
+
+
+
 
 var programCards = [
                { name: 'u',  priority: 10 },

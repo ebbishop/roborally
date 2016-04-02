@@ -1,9 +1,9 @@
 <div class>
 	<div class="row" id="dealt">
-		<div class="col-md-5" id="left">
+		<div class="col-md-6" id="left">
 			<div class="panel lives-panel">
 				<div >
-					<h4>Lives Remaining</h4>
+					<h4>Lives Remaining:</h4>
 					<div>
 						<span class="life"></span>
 						<span class="life"></span>
@@ -11,45 +11,56 @@
 					</div>
 				</div>
 			</div>
-
-			<div>
-				<img id="myrobo" src="/img/robots/hammerbot.png"/ height="120" width="120">
-			</div><br>
-
-			<div>
-				<button type="button" class="btn-ready" ng-click="sendRegister()"><strong><larger>READY</larger></strong></button>
+			<div class="panel lives-panel" id="damage">
+				<h4>Damage Count:</h4>
+					<span class="glyphicon glyphicon-alert"></span>
+					<span class="glyphicon glyphicon-alert"></span>
+					<span class="glyphicon glyphicon-alert"></span>
+					<span class="glyphicon glyphicon-alert"></span>
+					<span class="glyphicon glyphicon-alert"></span>
+					<span class="glyphicon glyphicon-alert"></span>
+					<span class="glyphicon glyphicon-alert"></span>
+					<span class="glyphicon glyphicon-alert"></span>
+					<span class="glyphicon glyphicon-alert"></span>
+					<span class="glyphicon glyphicon-alert danger"></span>
+			</div>
+			<div class="btn-row row">
+				<div class="col-md-6">
+					<img id="myrobo" src={{robotImage(player.robot)}}>
+				</div>
+				<div class="col-md-6">
+					<div class="panel lives-panel flags">
+						<h4>Flags Captured:</h4>
+						<span class="glyphicon glyphicon-flag"></span>
+						<span class="glyphicon glyphicon-flag"></span>
+						<span class="glyphicon glyphicon-flag"></span>
+					</div>
+				</div>
 			</div>
 
 		</div>
 
-		<div class="col-md-7" id="right">
+		<div class="col-md-6" id="right">
 			<div ng-repeat="row in cards track by $index">
-				<span ng-repeat="card in row track by $index" carddata="{{card.priority}}" class="empty-card" draggable><img src="/img/cards/{{card.name}}.png" height="100" width="70"></span>
+				<span ng-repeat="card in row track by $index" carddata="{{card.priority}}" class="empty-card" draggable><img src="/img/cards/{{card.name}}.png"></span>
 			</div>
 		</div>
+
 	</div>
 	<br>
 
-
-
-	<div class="row" id="damage">
-		<span class="glyphicon glyphicon-alert"></span>
-		<span class="glyphicon glyphicon-alert"></span>
-		<span class="glyphicon glyphicon-alert"></span>
-		<span class="glyphicon glyphicon-alert"></span>
-		<span class="glyphicon glyphicon-alert"></span>
-		<span class="glyphicon glyphicon-alert"></span>
-		<span class="glyphicon glyphicon-alert"></span>
-		<span class="glyphicon glyphicon-alert"></span>
-		<span class="glyphicon glyphicon-alert"></span>
-		<span class="glyphicon glyphicon-alert danger"></span>
+	<div>
+		<div id="register">
+			<span class="register empty-card empty" droppable></span>
+			<span class="register empty-card empty" droppable></span>
+			<span class="register empty-card empty" droppable></span>
+			<span class="register empty-card empty" droppable></span>
+			<span class="register empty-card empty" droppable></span>
+			<button type="button" class="btn-ready-game vcenter" ng-click="sendRegister()"><strong><larger>READY</larger></strong></button>
+		</div>
 	</div>
 
-	<div class="row" id="register">
-		<span class="register empty-card empty" droppable></span>
-		<span class="register empty-card empty" droppable></span>
-		<span class="register empty-card empty" droppable></span>
-		<span class="register empty-card empty" droppable></span>
-		<span class="register empty-card empty" droppable></span>
-	</div>
+
+
+
 </div>

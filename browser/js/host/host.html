@@ -1,12 +1,13 @@
-<div class="game-container container">
-<div>
-  <h1 class="game-name"><strong>{{game.name | uppercase}}</strong></h1>
-</div>
-  <div class="row">
+<div class="game-container">
+  <div class="container">
+    <h1 class="game-name"><strong>{{game.name | uppercase}}</strong></h1>
+  </div>
+
+  <div class="row container">
     <div class="col-md-3">
       <h1 class="game-name">Your Board</h1>
       <div class="center">
-        <div class="game-board-thumb"><img src="{{game.board.thumbnail}}"></div>
+        <div><img class="game-board-thumb" src="{{game.board.thumbnail}}"></div>
         <div class="">{{game.board.name | uppercase }}</div>
       </div>
     </div>
@@ -24,7 +25,7 @@
       </div>
     </div>
     <div class="col-md-3">
-      <h1 class="game-name">Ready?</h1>
+      <h1 class="game-name-ready">Ready?</h1>
       <button type="button" class="btn-ready" ng-click="startGame()"><strong><larger>GO</larger></strong></button>
     </div>
   </div>
