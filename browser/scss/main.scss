@@ -12,7 +12,7 @@ body {
     linear-gradient(#1d1d1d 25%, #1a1a1a 25%, #1a1a1a 50%, transparent 50%, transparent 75%, #242424 75%, #242424);
     background-color: #131313;
     background-size: 20px 20px;
-  padding-top: 70px;
+  padding-top: 60px;
 }
 
 @mixin clearfix {
@@ -39,7 +39,7 @@ body {
   background-color: #CADBE0;
   margin: auto;
   margin-top: 10px;
-  padding: 20px;
+  padding: 0px;
   border-radius: 4px;
 }
 
@@ -68,15 +68,30 @@ img.game-board-thumb {
   width: 150px;
 }
 
-
-
-#damage {
+.lives-panel{
+  padding: 10px;
+  background: linear-gradient(45deg, #CDD6D4 12%, transparent 0, transparent 88%, #CDD6D4 0),
+    linear-gradient(135deg, transparent 37%, #D0D9D7 0, #D0D9D7 63%, transparent 0),
+    linear-gradient(45deg, transparent 37%, #CDD6D4 0, #CDD6D4 63%, transparent 0) #753;
+  background-size: 5px 5px;
+  background-color: #D0D9D7;
+  border: solid #211e1f 2px;
+  border-radius: 3px;
+  margin: 5px;
   width: 100%;
-  display: block;
   font-size: 20px;
-  margin-left: 39px
 }
 
+
+.lives-panel h4{
+  font-size: 20px;
+  font-weight: bold;
+  font-family: 'Roboto Slab', serif;
+  padding: 3px 3px 10px 3px;
+  margin: auto;
+  border-radius: 3px;
+
+}
 
 #main {
   margin: 0 auto;
@@ -120,8 +135,10 @@ img.game-board-thumb {
 }
 
 #myrobo{
+  height: 150px;
+  width: 150px;
   margin-top: 5px;
-  display: block;
+  display: inline-block;
   margin: auto auto;
   border: black solid 2px;
   border-radius: 75px;
@@ -145,29 +162,6 @@ img.robo-avatar {
 .page-header{
   font-family: 'Roboto Slab', serif;
   border-bottom: none;
-}
-
-.lives-panel{
-  padding: 10px;
-  background: linear-gradient(45deg, #CDD6D4 12%, transparent 0, transparent 88%, #CDD6D4 0),
-    linear-gradient(135deg, transparent 37%, #D0D9D7 0, #D0D9D7 63%, transparent 0),
-    linear-gradient(45deg, transparent 37%, #CDD6D4 0, #CDD6D4 63%, transparent 0) #753;
-  background-size: 5px 5px;
-  background-color: #D0D9D7;
-  border: solid #211e1f 2px;
-  border-radius: 3px;
-  margin: 5px;
-  width: 100%;
-}
-
-
-.lives-panel h4{
-  font-size: 1em;
-  font-weight: bold;
-  font-family: 'Roboto Slab', serif;
-  padding: 3px;
-  margin: auto;
-  border-radius: 3px;
 }
 
 .life{
@@ -205,16 +199,22 @@ img.robo-avatar {
   display: inline-block;
 }
 
+.btn-row{
+  margin-top: 20px;
+  padding: 10px;
+}
+
 .btn-ready-game{
-  height: 66px;
-  width: 66px !important;
+  margin-top: 21px;
+  height: 100px;
+  width: 100px !important;
   background-color: #ab0929;
   border: solid #211e1f 2px;
-  border-radius: 33px;
+  border-radius: 50px;
   color: white;
   vertical-align: center;
-  display: block;
-  margin: auto auto;
+  display: inline-block;
+  margin-left: 30px;
 }
 
 .btn-ready-sm{
@@ -231,8 +231,8 @@ img.robo-avatar {
 }
 
 .empty-card{
-  height: 110px;
-  width: 75px;
+  height: 145px;
+  width: 92px;
   border: solid 2px black;
   border-radius: 3px;
   display: inline-block;
@@ -240,9 +240,26 @@ img.robo-avatar {
   vertical-align: top
 }
 
+.empty-card > img{
+  height: 145px;
+  width: 92px;
+}
+
+header.caution{
+  margin-bottom: 10px;
+}
+
+footer.caution{
+  margin-top: 10px;
+}
+
 .caution{
   background-image: url("img/caution.png");
   border: solid #211e1f 1px;
+}
+
+#register{
+  float: left;
 }
 
 .create-game{
@@ -254,11 +271,6 @@ img.robo-avatar {
   display: inline-block;
   margin-left: 5px;
   margin-right: 5px;
-}
-
-
-#register {
-  margin-left: 10px;
 }
 
 .list-group-item-sm {
