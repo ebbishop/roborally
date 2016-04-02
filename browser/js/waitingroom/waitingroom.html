@@ -1,23 +1,25 @@
-<div class="game-container container">
+<section id="waitingroom">
+
+<div class="game-container container" id="waiting-room-container">
   <h1 class="center"><strong>Join {{game.name | uppercase}}</strong></h1>
-  	<div class="center"><small><uppercase>waiting for the host...</uppercase></small></div>
+  	<div class="center" id="waiting"><small><uppercase>waiting for the host...</uppercase></small></div>
   <div class="row">
   	<!-- <div class="col-md-4" ng-show="activated">{{player.name}}</div> -->
     <div class="col-md-4" ng-hide="activated">
       <form name="CreatePlayerForm" novalidate ng-submit="CreatePlayer(player)">
 
         <div class="form-group">
-          <label class="game-name">Your Name</label>
+          <label class="game-name" id="your-name">Your Name</label>
           <input type="text" class="form-control game-name-sm" id="playerName" placeholder="Player Name" ng-model="player.playerName" ng-required="true"></input>
         </div>
 
         <div class="form-group">
-          <label class="game-name">Select Your Robot</label>
+          <label class="game-name" id="select-robot">Select Your Robot</label>
           <div class="center" ng-repeat="robot in robots">
             <input type="radio" ng-model="player.robot" ng-value="{{robot}}" ng-required="true">
               <img height="150" width="150" src="{{robot.imgUrl}}">
             </input>
-            <div><label class="game-name-sm"><strong>{{robot.name | uppercase}}</strong></label></div>
+            <div class="robot-images"><label class="game-name-sm"><strong>{{robot.name | uppercase}}</strong></label></div>
           </div>
         </div>
 
@@ -28,18 +30,19 @@
     </div>
 
     <div class="col-md-4 center" ng-class="{'col-md-offset-2': activated}">
-      <h2 class="game-name">The Course</h2>
-      <div class="game-board-thumb"><img src="{{game.board.thumbnail}}"></div>
-      <div>{{game.board.name | uppercase}}</div>
+      <h2 class="game-name" id="game-info">The Course</h2>
+      <div class="game-board-thumb"><img class="waiting-room-board" src="{{game.board.thumbnail}}"></div>
+      <div class="board-name">{{game.board.name | uppercase}}</div>
     </div>
 
     <div class="col-md-4 center">
-      <h2 class="game-name">Active Players</h2>
+      <h2 class="game-name" id="game-info">Active Players</h2>
       <ul class="list-group">
-        <li class="list-group-item" ng-repeat="player in players">{{player.name}}</li>
+        <li class="list-group-item" id="active-players" ng-repeat="player in players">{{player.name}}</li>
       </ul>
     </div>
 
   </div>
 
 </div>
+</section>

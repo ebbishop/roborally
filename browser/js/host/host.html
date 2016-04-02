@@ -1,5 +1,7 @@
+<section id="host">
+
 <div class="game-container">
-  <div class="container">
+  <div class="container" id="game-title">
     <h1 class="game-name"><strong>{{game.name | uppercase}}</strong></h1>
   </div>
 
@@ -8,13 +10,13 @@
       <h1 class="game-name">Your Board</h1>
       <div class="center">
         <div><img class="game-board-thumb" src="{{game.board.thumbnail}}"></div>
-        <div class="">{{game.board.name | uppercase }}</div>
+        <div class="board-name">{{game.board.name | uppercase }}</div>
       </div>
     </div>
     <div class="col-md-3">
       <h1 class="game-name">Active Players</h1>
       <ul class="list-group">
-        <li class="list-group-item" ng-repeat="player in players">{{player.name}}</li>
+        <li class="list-group-item" id="active-players" ng-repeat="player in players">{{player.name}}</li>
       </ul>
 
     </div>
@@ -25,8 +27,10 @@
       </div>
     </div>
     <div class="col-md-3">
-      <h1 class="game-name-ready">Ready?</h1>
+      <h1 class="game-name" id="ready">Ready?</h1>
       <button type="button" class="btn-ready" ng-click="startGame()"><strong><larger>GO</larger></strong></button>
     </div>
   </div>
 </div>
+
+</section>

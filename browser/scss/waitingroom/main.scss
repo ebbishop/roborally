@@ -1,0 +1,56 @@
+#waitingroom {
+
+  #waiting-room-container {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+
+  h1 {
+    font-size: 48px;
+    font-family: 'Roboto Slab', serif;
+    text-shadow:  1px 1px #F2FF00;
+  }
+
+  #waiting {
+    font-size: 25px;
+    font-style: italic;
+  }
+
+  .game-name {
+    font-size: 2em;
+    text-align: center;
+  }
+
+  #your-name {
+    margin-left: 80px;
+
+  }
+
+  #select-robot {
+    margin-left: 50px;
+  }
+
+  #game-info {
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+
+  #active-players {
+    font-size: 20px;
+  }
+
+  .waiting-room-board {
+    width: 225px;
+    height: 225px;
+  }
+
+  .board-name {
+    font-size: 18px;
+    margin-top: 5px;
+  }
+
+  .robot-images {
+    margin-top: 10px;
+  }
+
+}
