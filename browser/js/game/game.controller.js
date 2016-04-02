@@ -174,24 +174,25 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 		});
 
 		function drawRobots(initial) {
-			initial.forEach(function(player, idx){
+			initial[0].players.forEach(function(player, idx){
 				if(robotHash[player.name] === undefined) createSprite();
 
 				function createSprite() {
+					console.log('creating sprite for', player)
 					var robotImg = robotImage(player.robot);
 					var robot = new Sprite(resources["img/spritesheet.json"].textures[robotImg])
 					// var robot = new Sprite(PIXI.Texture.fromImage(robotImg))
 					//anchoring the roation to the at the center of the sprite which is why we offset the position by 0.5 as well
 					robot.anchor.x = 0.5;
 					robot.anchor.y = 0.5;
-					robot.position.x = imgSize*(player.location[0] + 0.5);
-			        robot.position.y = imgSize*(player.location[1] + 0.5);
-			        robot.scale.set(1/imgScale, 1/imgScale);
+					robot.position.x = imgSize*(player.position[0] + 0.5);
+	        robot.position.y = imgSize*(11-player.position[1] + 0.5);
+	        robot.scale.set(1/imgScale, 1/imgScale);
 
 			      	stage.addChild(robot);
 			      	robotHash[player.name] = robot;
 			      	robotHash[player.name].bearing = player.bearing;
-			      	robotHash[player.name].location = player.location;
+			      	robotHash[player.name].location = player.position;
 			      	renderer.render(stage)
 				}
 			})
@@ -305,8 +306,6 @@ app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, Fire
 				function shootRobotLasers() {
 					var offset;
 					var myReq;
-
-					new Sprite(resources["img/spritesheet.json"].textures['robolaser-h.png'])
 
 					if(player.bearing[0] !== 0) particle = new Sprite(resources["img/spritesheet.json"].textures['robolaser-h.png'])
 					else particle = new Sprite(resources["img/spritesheet.json"].textures['robolaser-v.png'])

@@ -11,4 +11,4 @@ app.controller("HomeCtrl", function($scope, $state) {
 	$scope.stateTransfer = function() {
 		$state.go('lobby')
 	}
-})
+});
