@@ -4,6 +4,7 @@ app.controller("WaitingRoomController", function($scope, game, $stateParams, Pla
 	$scope.players = FirebaseFactory.getConnection($scope.gameID + '/game' + '/players')
 	$scope.localGame = FirebaseFactory.getConnection($scope.gameID + '/game' + '/state')
 	$scope.game = game
+	console.log('this is the game ', game)
 	$scope.robots = [{name: "Hammer Bot", imgUrl: "/img/robots/hammerbot.png"}, {name: "Spin Bot", imgUrl: "/img/robots/spinbot.png"}, {name: "Twonky", imgUrl: "/img/robots/twonky.png"}, {name: "Zoom Bot", imgUrl: "/img/robots/zoombot.png"}]
 
 	$scope.activated = false;

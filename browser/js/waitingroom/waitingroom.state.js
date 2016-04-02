@@ -5,7 +5,6 @@ app.config(function($stateProvider){
 		controller: 'WaitingRoomController',
 		resolve: {
 			game: function(GameFactory, $stateParams) {
-				console.log('this is the stateParams:', $stateParams)
 				return GameFactory.getGame($stateParams.id)
 			}
 		}
