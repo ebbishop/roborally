@@ -15,9 +15,10 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
 	var handArr = [];
 
 
-     var hand = new Firebase("https://resplendent-torch-4322.firebaseio.com/" + $scope.gameId + '/' + $scope.playerId)
+     var hand = new Firebase("https://gha-roborally.firebaseio.com/" + $scope.gameId + '/' + $scope.playerId)
      hand.on('value', function(data){
           var cards = data.val();
+          console.log('cards', cards)
           for(var i = 0; i < cards.length; i++) {
                handArr.push(cards[i])
           }
@@ -33,7 +34,7 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
 			return PlayerFactory.sendRegister(register, $scope.gameId, $scope.playerId)
 			.then(function(response) {
 			  console.log('send register response:' ,response)
-	    	})		
+	    	})
 		}
 	}
 })

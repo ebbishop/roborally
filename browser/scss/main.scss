@@ -3,8 +3,16 @@
 }
 
 body {
-  background: #211e1f;
-  padding-top: 70px;
+  background:
+    linear-gradient(27deg, #151515 5px, transparent 5px) 0 5px,
+    linear-gradient(207deg, #151515 5px, transparent 5px) 10px 0px,
+    linear-gradient(27deg, #222 5px, transparent 5px) 0px 10px,
+    linear-gradient(207deg, #222 5px, transparent 5px) 10px 5px,
+    linear-gradient(90deg, #1b1b1b 10px, transparent 10px),
+    linear-gradient(#1d1d1d 25%, #1a1a1a 25%, #1a1a1a 50%, transparent 50%, transparent 75%, #242424 75%, #242424);
+    background-color: #131313;
+    background-size: 20px 20px;
+  padding-top: 60px;
 }
 
 @mixin clearfix {
@@ -16,11 +24,22 @@ body {
 }
 
 .game-container {
+  background-image: url("http://www.transparenttextures.com/patterns/assault.png");
   width: 1100px;
-  background-color: #97a4a8;
+  background-color: #CADBE0;
   margin: auto;
   margin-top: 30px;
   padding: 20px;
+  border-radius: 4px;
+}
+
+.game-container-game {
+  background-image: url("http://www.transparenttextures.com/patterns/assault.png");
+  width: 1700px;
+  background-color: #CADBE0;
+  margin: auto;
+  margin-top: 10px;
+  padding: 0px;
   border-radius: 4px;
 }
 
@@ -31,27 +50,50 @@ body {
   border-radius: 2px;
 }
 
+.row{
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
 canvas {
   border: solid #211e1f 4px;
-  position:absolute;
   right:0;
+  margin: 10px;
 }
-.game-board-thumb img{
+
+img.game-board-thumb {
+  margin: 10px;
   border: solid #211e1f 2px;
-  height: 240px;
-  width: 240px;
+  height: 150px;
+  width: 150px;
 }
 
-#damage {
+.lives-panel{
+  padding: 10px;
+  background: linear-gradient(45deg, #CDD6D4 12%, transparent 0, transparent 88%, #CDD6D4 0),
+    linear-gradient(135deg, transparent 37%, #D0D9D7 0, #D0D9D7 63%, transparent 0),
+    linear-gradient(45deg, transparent 37%, #CDD6D4 0, #CDD6D4 63%, transparent 0) #753;
+  background-size: 5px 5px;
+  background-color: #D0D9D7;
+  border: solid #211e1f 2px;
+  border-radius: 3px;
+  margin: 5px;
   width: 100%;
-  display: block;
   font-size: 20px;
-  margin-left: 39px
 }
 
+
+.lives-panel h4{
+  font-size: 20px;
+  font-weight: bold;
+  font-family: 'Roboto Slab', serif;
+  padding: 3px 3px 10px 3px;
+  margin: auto;
+  border-radius: 3px;
+
+}
 
 #main {
-  padding-top: 60px;
   margin: 0 auto;
   padding-bottom: 60px;
 }
@@ -63,8 +105,16 @@ canvas {
 }
 
 .game-name{
+  font-family: 'Roboto Slab', serif;
   font-size: 2em;
   font-weight: bold;
+  padding: 5px;
+
+}
+
+.half{
+  width: 50%;
+  margin: auto;
 }
 
 .vcenter {
@@ -73,6 +123,7 @@ canvas {
     float: none;
 }
 .game-name-sm{
+  font-family: 'Roboto Slab', serif;
   font-size: 1.4em;
   font-weight: bold;
 }
@@ -83,33 +134,34 @@ canvas {
   text-align: center;
 }
 
-.game-name {
-  padding: 5px;
+#myrobo{
+  height: 150px;
+  width: 150px;
+  margin-top: 5px;
+  display: inline-block;
+  margin: auto auto;
+  border: black solid 2px;
+  border-radius: 75px;
 }
 
-#myrobo{
-  margin-top: 5px;
-  display: block;
-  margin: auto auto;
+img.robo-avatar {
+  margin: 10px;
+  border: black solid 1px;
+  border-radius: 75px;
+  height: 150px;
+  width: 150px;
 }
 
 .empty{
-  background-color: #d0d9d7
+  background: linear-gradient(45deg, #CDD6D4 12%, transparent 0, transparent 88%, #CDD6D4 0),
+    linear-gradient(135deg, transparent 37%, #D0D9D7 0, #D0D9D7 63%, transparent 0),
+    linear-gradient(45deg, transparent 37%, #CDD6D4 0, #CDD6D4 63%, transparent 0) #753;
+  background-size: 5px 5px;
+  background-color: #D0D9D7
 }
-
-.lives-panel{
-  padding: 10px;
-  background-color: #d0d9d7;
-  border: solid #211e1f 2px;
-  border-radius: 3px;
-  margin: 5px;
-  width: 100%;
-}
-
-.lives-panel h4{
-  padding: 3px;
-  margin: auto;
-  border-radius: 3px;
+.page-header{
+  font-family: 'Roboto Slab', serif;
+  border-bottom: none;
 }
 
 .life{
@@ -144,21 +196,25 @@ canvas {
   border-radius: 40px;
   color: white;
   margin: auto;
-  vertical-align: center;
   display: inline-block;
 }
 
+.btn-row{
+  margin-top: 20px;
+  padding: 10px;
+}
+
 .btn-ready-game{
-  height: 66px;
-  width: 66px !important;
+  margin-top: 21px;
+  height: 100px;
+  width: 100px !important;
   background-color: #ab0929;
   border: solid #211e1f 2px;
-  border-radius: 33px;
+  border-radius: 50px;
   color: white;
   vertical-align: center;
-  display: block;
-  margin: auto auto;
-  border-top: 5px;
+  display: inline-block;
+  margin-left: 30px;
 }
 
 .btn-ready-sm{
@@ -175,8 +231,8 @@ canvas {
 }
 
 .empty-card{
-  height: 110px;
-  width: 75px;
+  height: 145px;
+  width: 92px;
   border: solid 2px black;
   border-radius: 3px;
   display: inline-block;
@@ -184,9 +240,26 @@ canvas {
   vertical-align: top
 }
 
+.empty-card > img{
+  height: 145px;
+  width: 92px;
+}
+
+header.caution{
+  margin-bottom: 10px;
+}
+
+footer.caution{
+  margin-top: 10px;
+}
+
 .caution{
   background-image: url("img/caution.png");
   border: solid #211e1f 1px;
+}
+
+#register{
+  float: left;
 }
 
 .create-game{
@@ -198,11 +271,6 @@ canvas {
   display: inline-block;
   margin-left: 5px;
   margin-right: 5px;
-}
-
-
-#register {
-  margin-left: 10px;
 }
 
 .list-group-item-sm {
