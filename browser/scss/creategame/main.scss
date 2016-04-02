@@ -1,0 +1,36 @@
+#creategame {
+  
+  h1 {
+    font-size: 50px;
+  }
+
+  .game-name {
+    font-size: 2.5em;
+  }
+
+  .game-board-thumb {
+    width: 200px;
+    height: 200px;
+    border-top-width: 3px;
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    border-left-width: 3px;
+  }
+
+  .game-name-sm {
+  font-size: 1.7em;
+  }
+
+  .robo-avatar {
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+  }
+
+  .create-game-radio {
+    width: 15px;
+    height: 15px;
+  }
+
+}
