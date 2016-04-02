@@ -90,17 +90,16 @@ function setCardinal(row, col) {
   return cardinal;
 };
 
+// call when this.bearing is not relevant
 playerSchema.methods.boardMove = function (bearing) {
-  // call when self.bearing is not relevant
-  var newCol = this.position[0];
-  var newRow = this.position[1];
-  newCol += bearing[0];
-  newRow += bearing[1];
-  // check if move is possible
-  // if(this.checkMove()) {
+  var newRow = this.position[0];
+  var newCol = this.position[1];
+  newRow += bearing[0];
+  newCol += bearing[1];
+
+  // TODO check if move is possible
     if (newCol < 0 || newRow < 0 || newCol > 11 || newRow > 15) return this.loseLife();
-    else this.set('position', [newCol, newRow]);
-  // }
+    else this.set('position', [newRow, newCol]);
 };
 
 playerSchema.methods.loseLife = function() {
@@ -115,51 +114,26 @@ playerSchema.methods.killPlayer = function() {
   this.position = null;
 };
 
-// playerSchema.methods.checkMove = function() {
-//   var currentPosition = this.position;
-//   var nextPosition = [this.position[0] + this.bearing[0], this.position[1] + this.bearing[1]]
-
-//   var currentTile = this.game.getTileAt(currentPosition)
-//   var nextTile = this.game.getTileAt(nextPosition)
-
-//   if(currentTile[moveBlocked[this.bearing[2]]['exit']]) return false;
-//   else if(nextTile[moveBlocked[this.bearing[2]]['enter']]) return false;
-//   else return true;
-// }
-
 playerSchema.methods.cardMove = function (magnitude) {
   var newCol = this.position[1];
   var newRow = this.position[0];
 
-  // var checkMove = this.checkMove()
-
   // if (checkMove === true) {
-    while (magnitude > 0) {
+    while (Math.abs(magnitude) > 0) {
       newCol += this.bearing[1];
       newRow += this.bearing[0];
 
-      // var edgeOrPit = this.checkForEdgeOrPit(newRow, newCol)
-      // if (edgeOrPit === true) return this.loseLife();
-
-      magnitude--
+      magnitude += magnitude > 0 ? -1 : 1;
     }
 
     this.position = [newRow, newCol]
 
-  // }
 }
-
-// playerSchema.methods.checkForEdgeOrPit = function(row, col) {
-//   var tile = this.game.getTileAt(row, col)
-//   if (tile.floor === 'pit' || col < 0 || col > 11 || row < 0 || row > 15) return true;
-//   else return false;
-// }
 
 playerSchema.methods.touchFlag = function() {
   this.flagCount++;
 }
 
-// route? <--- player clicks ready and sends cards in order
 playerSchema.methods.iAmReady = function(cards) {
   this.ready = true;
   this.setRegister(cards);
@@ -181,8 +155,6 @@ playerSchema.methods.checkDamage = function() {
   }
 }
 
-// route?
-// after first round, assume that we call empty register before setRegister
 playerSchema.methods.setRegister = function(cards) {
   for (var i=0; i<5; i++) {
     if (this.register[i] === 0) {
@@ -206,27 +178,9 @@ playerSchema.methods.emptyRegister = function() {
 }
 
 
-//potentially use to deal with pushing adjacent players?
-// playerSchema.methods.oneCardMove = function(bearing) {
-//   var newRow, newCol, opponent;
-
-//   var checkMove = this.checkMove()
-
-//   if (checkMove === true) {
-//     var adjacentOpponent = this.game.getPlayerAt([this.position[0]+this.bearing[0], this.position[1]+this.bearing[1]])
-//     if (adjacentOpponent) return adjacentOpponent.boardMove(this.bearing)
-//     else return
-//   }
-// }
+//TODO deal with pushing adjacent players
 
 mongoose.model('Player', playerSchema);
-
-
-
-
-
-
-
 
 
 var programCards = [

@@ -80,24 +80,25 @@ gameSchema.methods.runOneRound = function () {
     this.touchRepairs();
     this.touchFlags();
     this.setWinStatus();
-    this.pushGameState()
+    this.pushGameState();
 
     if(!this.isWon){
       this.currentCard ++;
     }else{
       console.log('game is won');
-      break; //game over! is this a good idea?
+      break; //game over!
     }
   }
   console.log('finished running round');
   if(!this.isWon){
     this.currentCard = 0;
-    this.emptyRegisters()
+    this.emptyRegisters();
     this.dealCards();
     this.initiateDecisionState();
   }
 
-  this.sendGameStates()
+  this.savePlayers();
+  this.sendGameStates();
 }
 
 gameSchema.methods.setNotReady = function(){
@@ -120,13 +121,12 @@ gameSchema.methods.runOneRegister = function () {
 }
 
 gameSchema.methods.checkEdgeOrPit = function(){
-  var game = this;
   this.players.forEach(function(p){
-    var tile = game.getTileAt(p.position)
+    var tile = this.getTileAt(p.position)
     if(!tile || tile.floor === "pit"){
       p.loseLife();
     }
-  });
+  }, this);
 }
 
 gameSchema.methods.runBelts = function(type){
@@ -405,13 +405,19 @@ gameSchema.methods.pushGameState = function(){
   var state = {players: publicPlayerArray, isWon: this.isWon};
   if(!hashOfGames[this._id]){
     hashOfGames[this._id] = [state]
-  }else if(this.currentCard===0 && hashOfGames[this._id].length===10){
+  }else if(this.currentCard===0 && hashOfGames[this._id].length>=10){
     hashOfGames[this._id] = [state];
   }else{
     hashOfGames[this._id].push(state);
   }
   var len = hashOfGames[this._id].length
   console.log('current game state', len-1, hashOfGames[this._id][len-1].players)
+}
+
+gameSchema.methods.savePlayers = function(){
+  return Promise.map(this.players, function(p){
+    return p.save();
+  })
 }
 
 gameSchema.methods.sendGameStates = function(){
@@ -427,10 +433,6 @@ gameSchema.methods.sendGameStates = function(){
     p.hand = player.hand;
     return p;
   });
-
-  console.log('current deck has this many cards:', this.deck.length, this.deck);
-  console.log('current discard has this many cards:', this.discard.length, this.discard);
-  console.log('total cards', (this.deck.length + this.discard.length));
 
   privatePlayerArray.forEach(function(player){
     var playerId = player._id.toString();
