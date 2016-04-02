@@ -44,7 +44,7 @@ body {
 }
 
 .game-container li{
-  font-size: 1.2em;
+  font-size: 2em;
   border-color: #211e1f;
   background-color: #d0d9d7;
   border-radius: 2px;
@@ -100,8 +100,9 @@ img.game-board-thumb {
 
 .no-box-list{
   background-color: transparent !important;
-  font-size: 1em;
+  font-size: 2em;
   list-style: none;
+  font-family: 'Roboto Slab', serif;
 }
 
 .game-name{
@@ -162,6 +163,7 @@ img.robo-avatar {
 .page-header{
   font-family: 'Roboto Slab', serif;
   border-bottom: none;
+  font-size: 60px;
 }
 
 .life{
@@ -279,6 +281,121 @@ footer.caution{
   border-radius: 3px !important;
   padding: 3px 5px;
 }
+
+.orange-btn { 
+  outline: none;
+  position: relative;
+  color: rgba(255,255,255,1);
+  text-decoration: none;
+  background-color: rgba(219,87,5,1);
+  font-family: 'Roboto Slab', serif;
+  font-weight: 700;
+  font-size: 2em;
+  display: block;
+  padding: 4px;
+  border: solid 2px #DB5705;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+  -webkit-box-shadow: 0px 9px 0px rgba(219,31,5,1), 0px 9px 25px rgba(0,0,0,.7);
+  -moz-box-shadow: 0px 9px 0px rgba(219,31,5,1), 0px 9px 25px rgba(0,0,0,.7);
+  box-shadow: 0px 9px 0px rgba(219,31,5,1), 0px 9px 25px rgba(0,0,0,.7);
+  margin: 30px auto;
+  width: 300px;
+  text-align: center;
+  
+  -webkit-transition: all .1s ease;
+  -moz-transition: all .1s ease;
+  -ms-transition: all .1s ease;
+  -o-transition: all .1s ease;
+  transition: all .1s ease;
+}
+
+.orange-btn:active {
+    -webkit-box-shadow: 0px 3px 0px rgba(219,31,5,1), 0px 3px 6px rgba(0,0,0,.9);
+    -moz-box-shadow: 0px 3px 0px rgba(219,31,5,1), 0px 3px 6px rgba(0,0,0,.9);
+    box-shadow: 0px 3px 0px rgba(219,31,5,1), 0px 3px 6px rgba(0,0,0,.9);
+    position: relative;
+    outline: none;
+    top: 6px;
+}
+
+.orange-btn-lg {
+  font-size: 3em;
+}
+
+.orange-btn-sm {
+  width: 150px;
+  font-size: 2em;
+  margin-left: -8px;
+}
+
+.red-btn{
+  position:relative;
+  font-family: 'Roboto Slab', serif;
+  font-size: 20px;
+  width:150px;
+  color:#FFF;
+  display:block;
+  text-decoration:none;
+  margin:0 auto;
+  border-radius:5px;
+  border:solid 1px #D94E3B;
+  background:#cb3b27;
+  text-align:center;
+  margin-top: -10px;
+  margin-bottom: 10px;
+  
+  -webkit-transition: all 0.1s;
+  -moz-transition: all 0.1s;
+  transition: all 0.1s;
+  
+  -webkit-box-shadow: 0px 9px 0px #84261a;
+        -moz-box-shadow: 0px 9px 0px #84261a;
+        box-shadow: 0px 9px 0px #84261a;
+}
+
+.red-btn:active{
+    -webkit-box-shadow: 0px 2px 0px #84261a;
+    -moz-box-shadow: 0px 2px 0px #84261a;
+    box-shadow: 0px 2px 0px #84261a;
+    position:relative;
+    top:7px;
+}
+
+.panel-title {
+  font-family: 'Roboto Slab', serif;
+  font-size: 30px;
+}
+
+.panel-transparent {
+  background: none;
+}
+
+.panel-transparent .panel-heading{
+  border-style: dotted;
+  border-radius: 10px;
+  border-width: 3px;
+  background: rgba(242, 248, 242, .5)!important;
+}
+
+.panel-transparent .panel-body{
+  border-style: dotted;
+  border-width: 3px;
+  border-radius: 10px;
+  background: rgba(242, 248, 242, .3)!important;
+}  
+
+#current-players {
+  font-size: 25px;
+  font-family: 'Roboto Condensed', 'serif';
+}
+
+.sub-heading {
+  font-family: 'Roboto Condensed', 'serif';
+  font-size: 50px;
+}
+
 @import 'directives/main';
 @import 'home/main';
 @import 'about/main';

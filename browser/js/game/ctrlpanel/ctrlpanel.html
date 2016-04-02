@@ -10,7 +10,7 @@
 						<span class="dead"></span>
 					</div>
 				</div>
-			</div>
+			</div><br>
 			<div class="panel lives-panel" id="damage">
 				<h4>Damage Count:</h4>
 					<span class="glyphicon glyphicon-alert"></span>
@@ -23,7 +23,7 @@
 					<span class="glyphicon glyphicon-alert"></span>
 					<span class="glyphicon glyphicon-alert"></span>
 					<span class="glyphicon glyphicon-alert danger"></span>
-			</div>
+			</div><br>
 			<div class="btn-row row">
 				<div class="col-md-6">
 					<img id="myrobo" src={{robotImage(player.robot)}}>
@@ -50,13 +50,15 @@
 	<br>
 
 	<div>
-		<div id="register">
+		<div class="col-md-8" id="register">
 			<span class="register empty-card empty" droppable></span>
 			<span class="register empty-card empty" droppable></span>
 			<span class="register empty-card empty" droppable></span>
 			<span class="register empty-card empty" droppable></span>
 			<span class="register empty-card empty" droppable></span>
-			<button type="button" class="btn-ready-game vcenter" ng-click="sendRegister()"><strong><larger>READY</larger></strong></button>
+		</div>
+		<div class="col-md-4">
+			<button type="button" class="orange-btn orange-btn-sm" ng-click="sendRegister()"><strong><larger>READY</larger></strong></button>
 		</div>
 	</div>
 
