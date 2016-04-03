@@ -1,28 +1,35 @@
-app.controller('GameCtrl', function($scope, theGame, thePlayer, PixiFactory, RobotFactory, MoveFactory, $rootScope){
+app.controller('GameCtrl', function($scope, theGame, thePlayer, PixiFactory, UtilsFactory, RobotFactory, MoveFactory, $rootScope){
 
 	$rootScope.imgSizeActual = 150;
 	$rootScope.imgScale = 3;
 	$rootScope.imgSize = $rootScope.imgSizeActual/$rootScope.imgScale
-	$rootScope.cols = 12; 
+	$rootScope.cols = 12;
 	$rootScope.rows = 16;
 
 	$scope.game = theGame;
 	$scope.player = thePlayer;
-	
+
 	var pixi = PixiFactory.pixiInitializer();
 	var board = PixiFactory.createBoardArr($scope.game.board)
-	pixi.loader.load(setup) 
+	pixi.loader.load(setup)
 	var robotHash = {};
 
 	function setup() {
 		document.getElementById("board-container").appendChild(pixi.renderer.view);
 		PixiFactory.drawBoard(board, pixi.stage);
-		PixiFactory.drawDocks($scope.game.board.dockLocations, pixi.stage)
-		PixiFactory.drawDockLine(pixi.stage)
+		PixiFactory.drawDocks($scope.game.board.dockLocations, pixi.stage);
+		PixiFactory.drawDockLine(pixi.stage);
+
+		var gameStatesFromFb = new Firebase("https://gha-roborally.firebaseio.com/" + $scope.game._id + '/phases');
+		gameStatesFromFb.once('value', function(data){
+			var init = JSON.parse(data.val());
+			RobotFactory.createAllRobotSprites(init[0], robotHash, pixi);
+		});
 
 	}
 
 	function renderAnimations() {
+		// console.log('animating!');
 		pixi.renderer.render(pixi.stage);
 		requestAnimationFrame(renderAnimations);
 	}
@@ -31,27 +38,67 @@ app.controller('GameCtrl', function($scope, theGame, thePlayer, PixiFactory, Rob
 		renderAnimations();
 	}
 
-	var phases = new Firebase("https://gha-roborally.firebaseio.com/" + $scope.game._id + '/phases')
-	phases.on('value', function(data) {
+	var arrOfPlayerStates;
 
-		var phases = JSON.parse(data.val())
-		console.log('this is the data in phases ', phases)
-
-		if(Object.keys(robotHash).length === 0) RobotFactory.createAllRobotSprites(phases[0], robotHash, pixi);
-		else MoveFactory.runOneRegister(phases);
+	var gameStatesFromFb = new Firebase("https://gha-roborally.firebaseio.com/" + $scope.game._id + '/phases');
+	gameStatesFromFb.on('value', function(data) {
+		var gameStates = JSON.parse(data.val());
+		if(Object.keys(robotHash).length === 0) {
+			console.log('nothing in robotHash');
+			RobotFactory.createAllRobotSprites(gameStates[0], robotHash, pixi);
+		} else {
+			console.log('something in robotHash, lets play  moves');
+			arrOfPlayerStates = _.flatten(UtilsFactory.extractPlayerData(gameStates));
+			MoveFactory.playAllMoves(arrOfPlayerStates, robotHash, pixi);
+		}
 
 	});
 
 });
 
+app.factory('UtilsFactory', function(){
+	var UtilsFactory = {};
+
+	UtilsFactory.extractPlayerData = function(gameStatesFromFb){
+		var arrOfPlayerStates = [];
+		gameStatesFromFb.forEach(function(gameState){
+			arrOfPlayerStates.push(gameState.players);
+		});
+		return arrOfPlayerStates
+	}
+
+	UtilsFactory.arraysMatch = function (arr1, arr2){
+		if(arr1.length !== arr2.length) return false;
+		for (var i = 0; i < arr1.length; i ++){
+			if(arr1[i]!== arr2[i]) return false
+		};
+		return true;
+	}
+
+	UtilsFactory.getRotation = function (orig, next){
+		if(orig[0] + next[0] ===  0 || orig[1] + next[1] === 0) return Math.PI;
+		else {
+		  var dot = -orig[0]*next[1] + orig[1]*next[0];
+		  var rad = Math.asin(dot);
+	  	return rad;
+		}
+	}
+	return UtilsFactory;
+})
+
 app.factory('RobotFactory', function($rootScope) {
 	function getRobotImage(robotName) {
 		return robotName.toLowerCase().replace(/ /g,'') + 'Arrow.png';
 	};
-	
+
 	function createOneRobotSprite(player, robotHash, pixi) {
 		var robotImg = getRobotImage(player.robot);
-		var robot = new PIXI.Sprite(PIXI.loader.resources["img/spritesheet.json"].textures[robotImg]);
+		console.log('pixi.loader.resources', pixi.loader.resources);
+		console.log('pixi.loader.resources[spritesheet]', pixi.loader.resources["img/spritesheet.json"]);
+		console.log('keys for spritesheet.json', Object.keys(pixi.loader.resources['img/spritesheet.json']));
+		console.log('pixi.loader.resources[spritesheet].textures', pixi.loader.resources["img/spritesheet.json"].textures);
+		console.log('robotImg', robotImg);
+		var robot = new PIXI.Sprite(pixi.loader.resources["img/spritesheet.json"].textures[robotImg]);
 		robot.anchor.x = 0.5;
 		robot.anchor.y = 0.5;
 		robot.position.x = $rootScope.imgSize*(player.position[0] + 0.5);
@@ -83,7 +130,7 @@ app.factory('RobotFactory', function($rootScope) {
 // maybe only need to call requestAnimationFrame once ever??
 app.factory('PixiFactory', function($rootScope){
 	var PixiFactory = {};
-	/*columns rendered horizontally as the board orientation is: 
+	/*columns rendered horizontally as the board orientation is:
 		E
 	N 		S
 		W
@@ -116,7 +163,7 @@ app.factory('PixiFactory', function($rootScope){
 					stage.addChild(tile);
 				}
 			}
-		}	
+		}
 
 	PixiFactory.pixiInitializer = function() {
 			var stage = new PIXI.Container();
@@ -133,7 +180,7 @@ app.factory('PixiFactory', function($rootScope){
 		}
 	PixiFactory.createTileSprite = function(tileSrc) {
 			return new PIXI.Sprite(PIXI.loader.resources["img/spritesheet.json"].textures[tileSrc]);
-		}	
+		}
 
 	PixiFactory.drawDocks = function (docks, stage) {
 		console.log('inside drawDocks')
@@ -158,25 +205,95 @@ app.factory('PixiFactory', function($rootScope){
 });
 
 
+app.factory('MoveFactory', function(UtilsFactory){
+	var MoveFactory = {};
 
-app.factory('PlayFactory', function(){
-	return {
-		runOneRegister: function(){
 
+
+	MoveFactory.playAllMoves = function(playerStates, robotHash, pixi){
+		// array of player state objects:
+		// [player1inPhase1, player2inPhase1, player1inPhase2, player2inPhase2]
+		return playerStates.reduce(function(acc, playerState){
+			var robot = robotHash[playerState.name];
+
+			return acc.then(function(){
+				return MoveFactory.turnRobot(robot, player);
+			})
+			// .then(function(){
+			// 	return MoveFactory.moveRobot();
+			// })
+			// .then(function(){
+			// 	//sets robot location (and bearing?) so shooting will be from the right position
+			// 	robot.location = player.position;
+			// 	robot.bearing = player.bearing;
+			// 	return MoveFactory.shootRobotLasers();
+			// })
+			// .then(function(){
+			// 	//check out destroy later
+			// 	pixi.stage.removeChild(particle);
+			// 	pixi.renderer.render(pixi.stage)
+			// })
+
+		}, $q.resolve())
+
+	};
+
+	MoveFactory.turnRobot = function(robot, player){
+		var direction;
+		if(UtilsFactory.arraysMatch(player.bearing, robot.bearing)) return $q.resolve();
+		else{
+			var changeInRotation = UtilsFactory.getRotation(robot.bearing, player.bearing);
+			var endingRotation =  changeInRotation + robot.rotation;
+
+			if(changeInRotation > 0) direction = 'clockwise';
+			else direction = 'counterclockwise';
+
+			robot.bearing = player.bearing;
+			return MoveFactory.promiseForTurnRobot(robot, endingRotation, direction)
 		}
 	}
+
+	MoveFactory.promiseForTurnRobot = function(robot, endingRotation, direction){
+		return $q(function(resolve, reject){
+			if(robot.rotation <= endingRotation && !direction || robot.rotation <= endingRotation && direction == 'clockwise'){
+				robot.rotation += 0.03;
+
+			}else if(robot.rotation >= endingRotation){
+				robot.rotation -= 0.03;
+
+			}else{
+				resolve();
+			}
+		})
+	}
+
+	MoveFactory.moveRobot = function(){
+
+	}
+	MoveFactory.shootRobotLasers = function(){
+
+	}
+
+
+	return MoveFactory;
 });
 
-app.factory('MoveFactory', function(){
-	return {	
-		moveRobot: function(){
 
-		},
-		turnRobot: function(){
 
-		},
-		shootRobotLasers: function(){
 
-		}
-	}
-})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
