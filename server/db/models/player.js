@@ -49,8 +49,10 @@ var moveBlocked = {
 playerSchema.methods.playCard = function(i){
   var cardNum = this.register[i];
   var card = programCards[(cardNum/10)-1];
+  console.log('playing card', card.name, 'from:', this.position, this.bearing);
   this.rotate(card.rotation);
   this.cardMove(card.magnitude);
+  console.log('ending:',this.position, this.bearing);
 };
 
 playerSchema.methods.rotate = function (rotation){

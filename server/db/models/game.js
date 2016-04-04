@@ -134,6 +134,7 @@ gameSchema.methods.runBelts = function(type){
   var tile;
   console.log('running belt type', type);
   this.players.forEach(function(player){
+    console.log('player', player);
     console.log('player pos', player.position);
     tile = game.getTileAt(player.position);
     if(tile.conveyor && tile.conveyor[0].magnitude >= type) {

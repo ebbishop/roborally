@@ -120,7 +120,7 @@ app.factory('RobotFactory', function($rootScope, UtilsFactory) {
 		robot.position.x = $rootScope.imgSize*(player.position[0] + 0.5);
     robot.position.y = $rootScope.imgSize*(11-player.position[1] + 0.5);
     robot.scale.set(1/$rootScope.imgScale, 1/$rootScope.imgScale);
-
+    console.log('robot.rotation', robot.rotation, 'player.bearing', player.bearing);
     //check bearing of player
     if(player.bearing[2]!=='N') {
     	var newRotation = UtilsFactory.getRotation([-1,0], player.bearing)
@@ -241,12 +241,14 @@ app.factory('MoveFactory', function(UtilsFactory, $q){
 
 		return playerStates.reduce(function(acc, playerState, idx){
 			var robot = robotHash[playerState.name];
-			console.log('reduce idx', idx);
 
 			return acc.then(function(){
 				counter++;
-				console.log('counter', counter);
 				return MoveFactory.turnRobot(robot, playerState, pixi);
+			})
+			.then(function(){
+				robotHash[playerState.name] = playerState;
+				pixi.renderer.render(pixi.stage);
 			})
 			// .then(function(){
 			// 	return MoveFactory.moveRobot();
@@ -276,7 +278,6 @@ app.factory('MoveFactory', function(UtilsFactory, $q){
 			var changeInRotation = UtilsFactory.getRotation(robot.bearing, player.bearing);
 			var endingRotation =  changeInRotation + robot.rotation;
 
-			console.log('changeInRotation', changeInRotation, 'endingRotation', endingRotation);
 			if(changeInRotation > 0) direction = 'clockwise';
 			else direction = 'counterclockwise';
 
@@ -286,7 +287,6 @@ app.factory('MoveFactory', function(UtilsFactory, $q){
 	}
 
 	MoveFactory.promiseForTurnRobot = function(robot, endingRotation, direction){
-		console.log('promising robotTurn to:', endingRotation, direction);
 		return $q(function(resolve, reject){
 			MoveFactory.turn(robot, resolve, endingRotation, direction)
 		})
@@ -294,12 +294,10 @@ app.factory('MoveFactory', function(UtilsFactory, $q){
 
 	MoveFactory.turn = function(robot, resolve, endingRotation, direction){
 		if(robot.rotation < endingRotation && direction == 'clockwise'){
-
 			direction = 'clockwise';
 			robot.rotation += 0.03;
 			requestAnimationFrame(MoveFactory.turn.bind(null, robot, resolve, endingRotation, direction))
 		}else if(robot.rotation > endingRotation){
-
 			direction = 'counterclockwise';
 			robot.rotation -= 0.03;
 			requestAnimationFrame(MoveFactory.turn.bind(null, robot, resolve, endingRotation, direction))
