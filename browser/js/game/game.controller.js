@@ -22,7 +22,6 @@ app.controller('GameCtrl', function($scope, theGame, thePlayer, PixiFactory, Uti
 
 		var initStateFromFb = new Firebase("https://fiery-inferno-1350.firebaseio.com/" + $scope.game._id + '/phases');
 		initStateFromFb.once('value', function(data){
-			console.log("firebase once")
 			var init = JSON.parse(data.val());
 			RobotFactory.createAllRobotSprites(init[0], robotHash, pixi);
 		});
@@ -41,12 +40,14 @@ app.controller('GameCtrl', function($scope, theGame, thePlayer, PixiFactory, Uti
 
 	// listen for data in phases in firebase
 	var gameStatesFromFb = new Firebase("https://fiery-inferno-1350.firebaseio.com/" + $scope.game._id + '/phases');
+
 	gameStatesFromFb.on('value', function(data) {
-		console.log('firebase listener');
 		var gameStates = JSON.parse(data.val());
+
 		if(Object.keys(robotHash).length === 0) {
 			console.log('nothing in robotHash');
 			RobotFactory.createAllRobotSprites(gameStates[0], robotHash, pixi);
+
 		} else {
 			console.log('something in robotHash, lets play  moves');
 			arrOfPlayerStates = _.flatten(UtilsFactory.extractPlayerData(gameStates));
@@ -58,12 +59,13 @@ app.controller('GameCtrl', function($scope, theGame, thePlayer, PixiFactory, Uti
 	// watch for changes to firebase
 	$scope.arrOfPlayersFromFirebase = FirebaseFactory.getConnection($scope.game._id + '/game/players');
 	$scope.$watch('arrOfPlayersFromFirebase', function(players){
+
 		for(var key in players){ //loop through all items on firebase that are player objects (ignore fb extra info)
 			if(players.hasOwnProperty(key) && key[0] !=='$'){
-				console.log('player[key], player[key].ready', players[key], players[key].ready)
 				if(!players[key].ready) return;
 			}
 		}
+
 		if(players[0]){
 			console.log('all players are ready - run round');
 			return GameFactory.startRound($scope.game._id)
@@ -233,11 +235,18 @@ app.factory('MoveFactory', function(UtilsFactory, $q){
 	MoveFactory.playAllMoves = function(playerStates, robotHash, pixi){
 		// array of player state objects:
 		// [player1inPhase1, player2inPhase1, player1inPhase2, player2inPhase2]
-		return playerStates.reduce(function(acc, playerState){
+
+		console.log('running playAllMoves');
+		var counter = 0;
+
+		return playerStates.reduce(function(acc, playerState, idx){
 			var robot = robotHash[playerState.name];
+			console.log('reduce idx', idx);
 
 			return acc.then(function(){
-				return MoveFactory.turnRobot(robot, playerState);
+				counter++;
+				console.log('counter', counter);
+				return MoveFactory.turnRobot(robot, playerState, pixi);
 			})
 			// .then(function(){
 			// 	return MoveFactory.moveRobot();
@@ -259,12 +268,15 @@ app.factory('MoveFactory', function(UtilsFactory, $q){
 	};
 
 	MoveFactory.turnRobot = function(robot, player){
+		console.log('turning', player);
+
 		var direction;
 		if(UtilsFactory.arraysMatch(player.bearing, robot.bearing)) return $q.resolve();
 		else{
 			var changeInRotation = UtilsFactory.getRotation(robot.bearing, player.bearing);
 			var endingRotation =  changeInRotation + robot.rotation;
 
+			console.log('changeInRotation', changeInRotation, 'endingRotation', endingRotation);
 			if(changeInRotation > 0) direction = 'clockwise';
 			else direction = 'counterclockwise';
 
@@ -274,17 +286,26 @@ app.factory('MoveFactory', function(UtilsFactory, $q){
 	}
 
 	MoveFactory.promiseForTurnRobot = function(robot, endingRotation, direction){
+		console.log('promising robotTurn to:', endingRotation, direction);
 		return $q(function(resolve, reject){
-			if(robot.rotation <= endingRotation && !direction || robot.rotation <= endingRotation && direction == 'clockwise'){
-				robot.rotation += 0.03;
-
-			}else if(robot.rotation >= endingRotation){
-				robot.rotation -= 0.03;
-
-			}else{
-				resolve();
-			}
+			MoveFactory.turn(robot, resolve, endingRotation, direction)
 		})
+	};
+
+	MoveFactory.turn = function(robot, resolve, endingRotation, direction){
+		if(robot.rotation < endingRotation && direction == 'clockwise'){
+
+			direction = 'clockwise';
+			robot.rotation += 0.03;
+			requestAnimationFrame(MoveFactory.turn.bind(null, robot, resolve, endingRotation, direction))
+		}else if(robot.rotation > endingRotation){
+
+			direction = 'counterclockwise';
+			robot.rotation -= 0.03;
+			requestAnimationFrame(MoveFactory.turn.bind(null, robot, resolve, endingRotation, direction))
+		}else{
+			resolve();
+		}
 	}
 
 	MoveFactory.moveRobot = function(){

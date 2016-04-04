@@ -16,7 +16,6 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
      hand.on('value', function(data){
      	var handArr = [];
           var cards = data.val();
-          console.log('cards', cards)
           for(var i = 0; i < cards.length; i++) {
                handArr.push(cards[i])
           }
@@ -28,17 +27,12 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
 		var register = [getCardVal(0), getCardVal(1), getCardVal(2), getCardVal(3), getCardVal(4)];
 		if(register.indexOf(0) > -1) return;
 		else {
-			console.log('sending register', register, $scope.gameId, $scope.playerId);
-			return PlayerFactory.sendRegister(register, $scope.gameId, $scope.playerId)
-			.then(function(response) {
-			  console.log('send register response:' ,response)
-	    	})
+     		return PlayerFactory.sendRegister(register, $scope.gameId, $scope.playerId);
 		}
 	}
 })
 
 function getCardVal(registerNum) {
-	console.log('got in getCardVal')
 	return Number(document.getElementById("register").children[registerNum].getAttribute('carddata'));
 }
 
