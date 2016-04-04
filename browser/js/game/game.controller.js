@@ -227,7 +227,7 @@ app.factory('PixiFactory', function($rootScope){
 });
 
 
-app.factory('MoveFactory', function(UtilsFactory, $q){
+app.factory('MoveFactory', function(UtilsFactory, $q, $rootScope){
 	var MoveFactory = {};
 
 
@@ -244,15 +244,15 @@ app.factory('MoveFactory', function(UtilsFactory, $q){
 
 			return acc.then(function(){
 				counter++;
-				return MoveFactory.turnRobot(robot, playerState, pixi);
+				return MoveFactory.calcRobotTurn(robot, playerState);
+			})
+			.then(function(){
+				return MoveFactory.calcRobotMove(robot, playerState);
 			})
 			.then(function(){
 				robotHash[playerState.name] = playerState;
 				pixi.renderer.render(pixi.stage);
 			})
-			// .then(function(){
-			// 	return MoveFactory.moveRobot();
-			// })
 			// .then(function(){
 			// 	//sets robot location (and bearing?) so shooting will be from the right position
 			// 	robot.location = player.position;
@@ -269,9 +269,7 @@ app.factory('MoveFactory', function(UtilsFactory, $q){
 
 	};
 
-	MoveFactory.turnRobot = function(robot, player){
-		console.log('turning', player);
-
+	MoveFactory.calcRobotTurn = function(robot, player){
 		var direction;
 		if(UtilsFactory.arraysMatch(player.bearing, robot.bearing)) return $q.resolve();
 		else{
@@ -306,12 +304,49 @@ app.factory('MoveFactory', function(UtilsFactory, $q){
 		}
 	}
 
-	MoveFactory.moveRobot = function(){
+	MoveFactory.calcRobotMove = function(robot, playerState){
+		var endCol = 11 - playerState.position[1] + 0.5;
+		var endRow = playerState.position[0] + 0.5;
+		var compass;
 
-	}
+		// find direction player should move
+		// if(robot.location[0] > playerState.position[0]) compass = 'N';
+		// else if(robot.location[0] < playerState.position[0]) compass = 'S';
+		// else if(robot.location[1] < playerState.position[1]) compass = 'E';
+		// else if(robot.location[1] > playerState.position[1]) compass = 'W';
+
+		robot.location = playerState.position;
+		return MoveFactory.promiseForMoveRobot(robot, endRow, endCol);
+
+	};
+
+	MoveFactory.promiseForMoveRobot = function(robot, endRow, endCol){
+		return $q(function(resolve, reject){
+			MoveFactory.move(robot, resolve, endRow, endCol);
+		})
+	};
+
+	MoveFactory.move = function(robot, resolve, endRow, endCol){
+		if(robot.position.x >  $rootScope.imgSize * endRow){
+			robot.position.x -= 1;
+			requestAnimationFrame(MoveFactory.move.bind(null, robot, resolve, endRow, endCol));
+		} else if (robot.position.x < $rootScope.imgSize * endRow){
+			robot.position.x += 1;
+			requestAnimationFrame(MoveFactory.move.bind(null, robot, resolve, endRow, endCol));
+		} else if (robot.position.y > $rootScope.imgSize * endCol){
+			robot.position.y -= 1;
+			requestAnimationFrame(MoveFactory.move.bind(null, robot, resolve, endRow, endCol));
+		} else if (robot.position.y < $rootScope.imgSize * endCol){
+			robot.position.y += 1;
+			requestAnimationFrame(MoveFactory.move.bind(null, robot, resolve, endRow, endCol))
+		} else {
+			resolve();
+		}
+	};
+
 	MoveFactory.shootRobotLasers = function(){
 
-	}
+	};
 
 
 	return MoveFactory;
