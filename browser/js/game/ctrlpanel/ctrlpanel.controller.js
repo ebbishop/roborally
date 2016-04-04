@@ -7,16 +7,14 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
 
      $scope.robots = [{name: "Hammer Bot", imgUrl: "/img/robots/hammerbot.png"}, {name: "Spin Bot", imgUrl: "/img/robots/spinbot.png"}, {name: "Twonky", imgUrl: "/img/robots/twonky.png"}, {name: "Zoom Bot", imgUrl: "/img/robots/zoombot.png"}]
 
-     // $scope.player.imgUrl = robotImage($scope.player.robot)
      $scope.robotImage = function (robotName) {
           return '/img/robots/' + robotName.toLowerCase().replace(/ /g,'') + '.png';
      }
 
-	var handArr = [];
 
-
-     var hand = new Firebase("https://gha-roborally.firebaseio.com/" + $scope.gameId + '/' + $scope.playerId)
+     var hand = new Firebase("https://fiery-inferno-1350.firebaseio.com/" + $scope.gameId + '/' + $scope.playerId)
      hand.on('value', function(data){
+     	var handArr = [];
           var cards = data.val();
           console.log('cards', cards)
           for(var i = 0; i < cards.length; i++) {

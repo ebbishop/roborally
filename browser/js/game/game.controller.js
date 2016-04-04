@@ -1,4 +1,4 @@
-app.controller('GameCtrl', function($scope, theGame, thePlayer, PixiFactory, UtilsFactory, RobotFactory, MoveFactory, $rootScope){
+app.controller('GameCtrl', function($scope, theGame, thePlayer, PixiFactory, UtilsFactory, RobotFactory, MoveFactory, $rootScope, FirebaseFactory, GameFactory){
 
 	$rootScope.imgSizeActual = 150;
 	$rootScope.imgScale = 3;
@@ -20,16 +20,15 @@ app.controller('GameCtrl', function($scope, theGame, thePlayer, PixiFactory, Uti
 		PixiFactory.drawDocks($scope.game.board.dockLocations, pixi.stage);
 		PixiFactory.drawDockLine(pixi.stage);
 
-		var gameStatesFromFb = new Firebase("https://gha-roborally.firebaseio.com/" + $scope.game._id + '/phases');
-		gameStatesFromFb.once('value', function(data){
+		var initStateFromFb = new Firebase("https://fiery-inferno-1350.firebaseio.com/" + $scope.game._id + '/phases');
+		initStateFromFb.once('value', function(data){
+			console.log("firebase once")
 			var init = JSON.parse(data.val());
 			RobotFactory.createAllRobotSprites(init[0], robotHash, pixi);
 		});
-
 	}
 
 	function renderAnimations() {
-		// console.log('animating!');
 		pixi.renderer.render(pixi.stage);
 		requestAnimationFrame(renderAnimations);
 	}
@@ -40,8 +39,10 @@ app.controller('GameCtrl', function($scope, theGame, thePlayer, PixiFactory, Uti
 
 	var arrOfPlayerStates;
 
-	var gameStatesFromFb = new Firebase("https://gha-roborally.firebaseio.com/" + $scope.game._id + '/phases');
+	// listen for data in phases in firebase
+	var gameStatesFromFb = new Firebase("https://fiery-inferno-1350.firebaseio.com/" + $scope.game._id + '/phases');
 	gameStatesFromFb.on('value', function(data) {
+		console.log('firebase listener');
 		var gameStates = JSON.parse(data.val());
 		if(Object.keys(robotHash).length === 0) {
 			console.log('nothing in robotHash');
@@ -54,6 +55,23 @@ app.controller('GameCtrl', function($scope, theGame, thePlayer, PixiFactory, Uti
 
 	});
 
+	// watch for changes to firebase
+	$scope.arrOfPlayersFromFirebase = FirebaseFactory.getConnection($scope.game._id + '/game/players');
+	$scope.$watch('arrOfPlayersFromFirebase', function(players){
+		for(var key in players){ //loop through all items on firebase that are player objects (ignore fb extra info)
+			if(players.hasOwnProperty(key) && key[0] !=='$'){
+				console.log('player[key], player[key].ready', players[key], players[key].ready)
+				if(!players[key].ready) return;
+			}
+		}
+		if(players[0]){
+			console.log('all players are ready - run round');
+			return GameFactory.startRound($scope.game._id)
+		}else{
+			console.log('not all players ready yet!');
+		}
+	}, true);
+
 });
 
 app.factory('UtilsFactory', function(){
@@ -64,16 +82,16 @@ app.factory('UtilsFactory', function(){
 		gameStatesFromFb.forEach(function(gameState){
 			arrOfPlayerStates.push(gameState.players);
 		});
-		return arrOfPlayerStates
-	}
+		return arrOfPlayerStates;
+	};
 
 	UtilsFactory.arraysMatch = function (arr1, arr2){
 		if(arr1.length !== arr2.length) return false;
 		for (var i = 0; i < arr1.length; i ++){
 			if(arr1[i]!== arr2[i]) return false
-		};
+		}
 		return true;
-	}
+	};
 
 	UtilsFactory.getRotation = function (orig, next){
 		if(orig[0] + next[0] ===  0 || orig[1] + next[1] === 0) return Math.PI;
@@ -86,32 +104,33 @@ app.factory('UtilsFactory', function(){
 	return UtilsFactory;
 })
 
-app.factory('RobotFactory', function($rootScope) {
+app.factory('RobotFactory', function($rootScope, UtilsFactory) {
 	function getRobotImage(robotName) {
 		return robotName.toLowerCase().replace(/ /g,'') + 'Arrow.png';
 	};
 
 	function createOneRobotSprite(player, robotHash, pixi) {
 		var robotImg = getRobotImage(player.robot);
-		console.log('pixi.loader.resources', pixi.loader.resources);
-		console.log('pixi.loader.resources[spritesheet]', pixi.loader.resources["img/spritesheet.json"]);
-		console.log('keys for spritesheet.json', Object.keys(pixi.loader.resources['img/spritesheet.json']));
-		console.log('pixi.loader.resources[spritesheet].textures', pixi.loader.resources["img/spritesheet.json"].textures);
-		console.log('robotImg', robotImg);
 		var robot = new PIXI.Sprite(pixi.loader.resources["img/spritesheet.json"].textures[robotImg]);
+
 		robot.anchor.x = 0.5;
 		robot.anchor.y = 0.5;
 		robot.position.x = $rootScope.imgSize*(player.position[0] + 0.5);
-        robot.position.y = $rootScope.imgSize*(11-player.position[1] + 0.5);
-        robot.scale.set(1/$rootScope.imgScale, 1/$rootScope.imgScale);
+    robot.position.y = $rootScope.imgSize*(11-player.position[1] + 0.5);
+    robot.scale.set(1/$rootScope.imgScale, 1/$rootScope.imgScale);
 
-      	pixi.stage.addChild(robot);
-      	robotHash[player.name] = robot;
-      	robotHash[player.name].bearing = player.bearing;
-      	robotHash[player.name].location = player.position;
-      	pixi.renderer.render(pixi.stage)
+    //check bearing of player
+    if(player.bearing[2]!=='N') {
+    	var newRotation = UtilsFactory.getRotation([-1,0], player.bearing)
+    	robot.rotation = newRotation;
+    }
 
-      	//reminder to add in the rotation if the robots bearing is not north
+  	pixi.stage.addChild(robot);
+  	robotHash[player.name] = robot;
+  	robotHash[player.name].bearing = player.bearing;
+  	robotHash[player.name].location = player.position;
+  	pixi.renderer.render(pixi.stage)
+
 	};
 
 	var RobotFactory = {}
@@ -130,9 +149,10 @@ app.factory('RobotFactory', function($rootScope) {
 // maybe only need to call requestAnimationFrame once ever??
 app.factory('PixiFactory', function($rootScope){
 	var PixiFactory = {};
+
 	/*columns rendered horizontally as the board orientation is:
 		E
-	N 		S
+	N   S
 		W
 	*/
 
@@ -205,7 +225,7 @@ app.factory('PixiFactory', function($rootScope){
 });
 
 
-app.factory('MoveFactory', function(UtilsFactory){
+app.factory('MoveFactory', function(UtilsFactory, $q){
 	var MoveFactory = {};
 
 
@@ -217,7 +237,7 @@ app.factory('MoveFactory', function(UtilsFactory){
 			var robot = robotHash[playerState.name];
 
 			return acc.then(function(){
-				return MoveFactory.turnRobot(robot, player);
+				return MoveFactory.turnRobot(robot, playerState);
 			})
 			// .then(function(){
 			// 	return MoveFactory.moveRobot();

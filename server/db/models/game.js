@@ -424,7 +424,7 @@ gameSchema.methods.sendGameStates = function(){
   var gameId = this._id.toString();
 
   var roundToSend = hashOfGames[this._id];
-
+  console.log('sending to firebase:', hashOfGames[this._id])
   firebaseHelper.getConnection(gameId).child('phases').set(JSON.stringify(roundToSend));
 
   var privatePlayerArray = this.players.map(function(player){
