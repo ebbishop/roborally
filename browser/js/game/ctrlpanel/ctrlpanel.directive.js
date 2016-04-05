@@ -34,7 +34,8 @@ app.directive('draggable', function(){
 app.directive('droppable', function(){
   return {
     scope: {
-      register: '='
+      game: '=',
+      player: '='
     },
     link: function(scope, element, attrs){
       var el = element[0];

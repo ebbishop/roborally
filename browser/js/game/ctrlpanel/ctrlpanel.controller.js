@@ -2,7 +2,7 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
 
 	$scope.gameId = $stateParams.gameId;
 	$scope.playerId = $stateParams.playerId;
-	$scope.fbPlayer = FirebaseFactory.getConnection($scope.gameId + '/game/' + $scope.playerId);
+	// $scope.fbPlayer = FirebaseFactory.getConnection($scope.gameId + '/game/' + $scope.playerId);
 	$scope.playerHand = FirebaseFactory.getConnection($scope.gameId + '/' + $scope.playerId);
 
   $scope.robots = [{name: "Hammer Bot", imgUrl: "/img/robots/hammerbot.png"}, {name: "Spin Bot", imgUrl: "/img/robots/spinbot.png"}, {name: "Twonky", imgUrl: "/img/robots/twonky.png"}, {name: "Zoom Bot", imgUrl: "/img/robots/zoombot.png"}]
@@ -13,6 +13,25 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
 
 
   var hand = new Firebase("https://fiery-inferno-1350.firebaseio.com/" + $scope.gameId + '/' + $scope.playerId);
+
+
+  $scope.getFlagCt = function(){
+    var ct = 0;
+    var colstr;
+    for(var i = 0; i < 12; i ++){
+      colstr = 'col' + i.toString();
+      for(var j = 0; j < 16; j ++){
+        if($scope.game.board[colstr][j].flag!==null) ct++
+      }
+    }
+    return ct;
+  }
+
+  $scope.getNumber = function(num) {
+      return new Array(num);
+  }
+
+
 
 
   // listen for changes to hand, update scope
@@ -27,13 +46,16 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
   });
 
 	$scope.sendRegister = function() {
+    console.log('sendRegister')
 		var register = [getCardVal(0), getCardVal(1), getCardVal(2), getCardVal(3), getCardVal(4)];
 		if(register.indexOf(0) > -1) return;
 		else {
       emptyRegister();
+      console.log('register', register);
    		return PlayerFactory.sendRegister(register, $scope.gameId, $scope.playerId);
 		}
 	};
+
 
   function emptyRegister() {
     var registerSlots = document.getElementsByClassName('register');

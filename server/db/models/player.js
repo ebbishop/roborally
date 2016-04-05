@@ -108,6 +108,7 @@ playerSchema.methods.loseLife = function() {
   this.livesRemaining--;
   if (this.livesRemaining === 0) return this.killPlayer();
   else {
+    this.set('bearing', [-1, 0, 'N']);
     this.set('position', this.dock);
   }
 };
