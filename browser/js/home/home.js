@@ -6,9 +6,34 @@ app.config(function ($stateProvider) {
     });
 });
 
-app.controller("HomeCtrl", function($scope, $state) {
+app.controller("HomeCtrl", ['$scope', '$state', 'ModalService', function($scope, $state, ModalService) {
 
 	$scope.stateTransfer = function() {
 		$state.go('lobby')
 	}
-})
+
+	$scope.modalTransfer = function () {
+
+		ModalService.showModal({
+			templateUrl: 'js/home/instructions.html',
+			controller: 'InstructionsCtrl'
+		}).then(function(modal) {
+			// modal.element.modal();
+			modal.close.then(function(result) {
+				console.log(result);
+			})
+		})
+	}
+}]);
+
+app.controller("InstructionsCtrl", ['$scope', 'close', function($scope, close) {
+	$scope.close = close;
+}]);
+
+// app.factory('myModal', function (btfModal) {
+//   return btfModal({
+//     controller: 'InstructionsModalCtrl',
+//     controllerAs: 'modal',
+//     templateUrl: 'js/home/instructions.html'
+//   });
+// })

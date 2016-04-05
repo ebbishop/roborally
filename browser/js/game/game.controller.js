@@ -1,462 +1,343 @@
-app.controller('GameCtrl', function($scope, $state, theGame, $q, thePlayer, FirebaseFactory, GameFactory){
+app.controller('GameCtrl', function($scope, theGame, thePlayer, PixiFactory, UtilsFactory, RobotFactory, MoveFactory, $rootScope, FirebaseFactory, GameFactory){
+
+	$rootScope.imgSizeActual = 150;
+	$rootScope.imgScale = 3;
+	$rootScope.imgSize = $rootScope.imgSizeActual/$rootScope.imgScale
+	$rootScope.cols = 12;
+	$rootScope.rows = 16;
 
 	$scope.game = theGame;
-	$scope.player = thePlayer
+	$scope.player = thePlayer;
 
-	$scope.fbPlayers = FirebaseFactory.getConnection($scope.game._id + '/game' + '/players')
-	console.log('these are the players: ', $scope.fbPlayers)
+	var pixi = PixiFactory.pixiInitializer();
+	var board = PixiFactory.createBoardArr($scope.game.board)
+	pixi.loader.load(setup)
+	var robotHash = {};
 
-	$scope.$watch('fbPlayers', function(players) {
-		for(var key in players) {
-			if(players.hasOwnProperty(key) && key[0] !== '$'){
-				if (!players[key].ready) return
+	function setup() {
+		document.getElementById("board-container").appendChild(pixi.renderer.view);
+		PixiFactory.drawBoard(board, pixi.stage);
+		PixiFactory.drawDocks($scope.game.board.dockLocations, pixi.stage);
+		PixiFactory.drawDockLine(pixi.stage);
+
+		var initStateFromFb = new Firebase("https://fiery-inferno-1350.firebaseio.com/" + $scope.game._id + '/phases');
+		initStateFromFb.once('value', function(data){
+			var init = JSON.parse(data.val());
+			RobotFactory.createAllRobotSprites(init[0], robotHash, pixi);
+		});
+	}
+
+	function renderAnimations() {
+		pixi.renderer.render(pixi.stage);
+		requestAnimationFrame(renderAnimations);
+	}
+
+	if($scope.game) {
+		renderAnimations();
+	}
+
+	var arrOfPlayerStates;
+
+	// listen for data in phases in firebase
+	var gameStatesFromFb = new Firebase("https://fiery-inferno-1350.firebaseio.com/" + $scope.game._id + '/phases');
+
+	gameStatesFromFb.on('value', function(data) {
+		var gameStates = JSON.parse(data.val());
+
+		if(Object.keys(robotHash).length === 0) {
+			console.log('nothing in robotHash');
+			RobotFactory.createAllRobotSprites(gameStates[0], robotHash, pixi);
+
+		} else {
+			console.log('something in robotHash, lets play  moves');
+			arrOfPlayerStates = _.flatten(UtilsFactory.extractPlayerData(gameStates));
+			MoveFactory.playAllMoves(arrOfPlayerStates, robotHash, pixi);
+		}
+
+	});
+
+	// watch for changes to firebase
+	$scope.arrOfPlayersFromFirebase = FirebaseFactory.getConnection($scope.game._id + '/game/players');
+	$scope.$watch('arrOfPlayersFromFirebase', function(players){
+
+		for(var key in players){ //loop through all items on firebase that are player objects (ignore fb extra info)
+			if(players.hasOwnProperty(key) && key[0] !=='$'){
+				if(!players[key].ready) return;
 			}
 		}
-		if(players[0]) {
-			console.log("all players are ready - before startRound");
+
+		if(players[0]){
+			console.log('all players are ready - run round');
 			return GameFactory.startRound($scope.game._id)
-			.then(function(response) {
-				console.log('respone after startRound: ', response);
-			})
-		}
-		else {
-			console.log('NOT all players are ready');
+		} else {
+			console.log('not all players ready yet!');
 		}
 	}, true);
 
-	// $scope.fbPlayers.$loaded()
-	// .then(function() {
-	// 	$scope.readyArr = []
-	// 	for (var i=0; i<$scope.fbPlayers.players.length; i++) {
-	// 		if ($scope.fbPlayers.players[i].ready === false) $scope.readyArr.push($scope.fbPlayers.players[i].ready)
-	// 		// console.log($scope.fbPlayers.players[i].ready)
-	// 	}
-
-
-
-	$scope.boardObj = $scope.game.board
-	$scope.docks = $scope.game.board.dockLocations
-	$scope.lasers = $scope.game.board.laserLocations
-	function collectOneCol(n){
-	var key = 'col' + n.toString();
-	var idents = $scope.boardObj[key].map(function(tile){
-	  return tile.identifier;
-	});
-	return idents;
-	}
-
-
-	$scope.board = [];
-	for(var i = 0; i <= 11; i ++){
-		$scope.board.push(collectOneCol(i));
-	}
-
-	// console.log('board', $scope.board)
-
-	// function getWallsInRow(row) {
-	// 	var wallsArrPositions = [];
-	// 	var wallIdentifiers = [2, 8, 9, 37, 85, 90, 94, 98];
-	// 	for(var i = 0; i < $scope.board[row]; i++) {
-	// 		console.log('scopeboardrow', $scope.board[row])
-	// 		if(wallIdentifiers.indexOf($scope.board[row][i]) > -1) wallsArrPositions.push(i);
-	// 	}
-	// 	return wallsArrPositions;
-	// }
-
-	// console.log('walls in row2', getWallsInRow(2))
-
-	var Container = PIXI.Container,
-    autoDetectRenderer = PIXI.autoDetectRenderer,
-    loader = PIXI.loader,
-    resources = PIXI.loader.resources,
-    Sprite = PIXI.Sprite;
-
-	loader
-  	.add("img/spritesheet.json")
-  	.load(setup);
-
-	var id = PIXI.loader.resources["img/spritesheet.json"].textures;
-  var imgSizeActual = 150;
-	var imgScale = 3;
-	var imgSize = imgSizeActual/imgScale
-
-	function setup() {
-
-	    var stage = new Container();
-	    var renderer = autoDetectRenderer(imgSize*16,imgSize*12);
-	    document.getElementById("board-container").appendChild(renderer.view)
-
-
-		//factor to rescale images by. This number can be changed
-		var cols = 12;
-		var rows = 16;
-
-		function drawDockLine() {
-		  var line = new PIXI.Graphics;
-		  line.lineStyle(4, 0x000000, 1);
-		  line.moveTo(12*imgSizeActual/imgScale, 0)
-		  line.lineTo(12*imgSizeActual/imgScale, 12*imgSizeActual/imgScale)
-
-		  stage.addChild(line)
-		}
-
-		function buildTiles() {
-		  for (var col = 0; col < cols; col ++){
-		    for (var row = 0; row < rows; row ++){
-		      var tileSrc = $scope.board[col][row] + '.jpg';
-		                                                          //150x150 is the actual image size
-		      var tile = new Sprite(resources["img/spritesheet.json"].textures[tileSrc]);
-
-		      tile.position.x = imgSize*row
-		      tile.position.y = imgSize*cols - imgSize - imgSize * col;
-		      //rescales the 150px tile image to be 4 times smaller
-		      tile.scale.set(1/imgScale, 1/imgScale);
-
-		      stage.addChild(tile)
-		    }
-		  }
-		}
-		function drawDocks() {
-			for(var i = 0; i < $scope.docks.length; i++) {
-				var dockNum = i+1;
-				var dock = new PIXI.Text(dockNum.toString(), {font : '24px Arial', fill : 0x000000, align : 'center'})
-				dock.position.x = $scope.docks[i][0]*imgSize + 13;
-				dock.position.y = $scope.docks[i][1]*imgSize + 5;
-				stage.addChild(dock);
-			}
-		}
-
-		function drawLasers() {
-      if(!$scope.lasers) return;
-			for(var i = 0; i < $scope.lasers.length; i++) {
-				var line = new PIXI.Graphics;
-				var xFrom, yFrom, xTo, yTo;
-				if($scope.lasers[i][3] === "h" && $scope.lasers[i][0][0] > $scope.lasers[i][i][1][0]) {
-					xFrom = $scope.lasers[i][0][0]
-					yFrom = $scope.lasers[i][0][1] + 0.5
-					xTo = $scope.lasers[i][1][0]
-					yTo = $scope.lasers[i][1][1] + 0.5
-				}
-				else if($scope.lasers[i][3] === "h") {
-					xFrom = $scope.lasers[i][0][0]
-					yFrom = $scope.lasers[i][0][1] + 0.5
-					xTo = $scope.lasers[i][1][0]
-					yTo = $scope.lasers[i][1][1] + 0.5
-				}
-				else if($scope.lasers[i][3] === "v" && $scope.lasers[i][0][1] > $scope.lasers[i][1][1]) {
-					xFrom = $scope.lasers[i][0][0] + 0.5
-					yFrom = $scope.lasers[i][0][1]
-					xTo = $scope.lasers[i][1][0] + 0.5
-					yTo = $scope.lasers[i][1][1]
-				}
-				else {
-					xFrom = $scope.lasers[i][0][0] + 0.5
-					yFrom = $scope.lasers[i][0][1]
-					xTo = $scope.lasers[i][1][0] + 0.5
-					yTo = $scope.lasers[i][1][1]
-				}
-
-				line.lineStyle(1, 0xff0000)
-				line.moveTo(xFrom*imgSize, yFrom*imgSize)
-				line.lineTo(xTo*imgSize, yTo*imgSize)
-
-				stage.addChild(line)
-
-			}
-		}
-
-
-		var player1, player2, player3;
-		//seed for original location
-		var players = [
-		  { name: "player3", location: [14,3], bearing: [-1, 0], robot: "Twonky", priorityVal: null },
-		  { name: "player1", location: [15,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: null },
-		  { name: "player2", location: [14,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: null }
-		]
-
-		var oneRegister = [
-			[ //cardmove1,
-			  { name: "player3", location: [15,3], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
-			  { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			  { name: "player2", location: [11,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
-			],
-
-			[// boardmove1,
-				{ name: "player3", location: [15,4], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
-				{ name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-				{ name: "player2", location: [10,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
-			],
-
-			[ //cardmove2,
-			  { name: "player3", location: [15,4], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-			  { name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
-			  { name: "player2", location: [8,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 },
-			],
-
-			[ //boardmove2
-				{ name: "player3", location: [15,5], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-				{ name: "player1", location: [12,5], bearing: [0, -1], robot: "Hammer Bot", priorityVal: 500 },
-				{ name: "player2", location: [8,8], bearing: [0, -1], robot: "Spin Bot", priorityVal: 200 }
-			],
-			[ //cardmove3,
-			  { name: "player3", location: [15,3], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-			  { name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			  { name: "player2", location: [8,8], bearing: [0, 1], robot: "Spin Bot", priorityVal: 200 },
-			],
-
-			[ //boardmove3
-				{ name: "player3", location: [15,4], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-				{ name: "player1", location: [12,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-				{ name: "player2", location: [8,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
-			],
-			[ //cardmove4
-				{ name: "player3", location: [15,5], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-				{ name: "player1", location: [10,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-				{ name: "player2", location: [6,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
-			],
-			[ //boardmove4,
-			  { name: "player3", location: [15,3], bearing: [0, 1], robot: "Twonky", priorityVal: 800 },
-			  { name: "player1", location: [9,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			  { name: "player2", location: [6,7], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
-			],
-			[ //cardmove5
-				{ name: "player3", location: [15,3], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
-				{ name: "player1", location: [7,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-				{ name: "player2", location: [5,7], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
-			],
-			[ //boardmove5,
-			  { name: "player3", location: [15,4], bearing: [-1, 0], robot: "Twonky", priorityVal: 800 },
-			  { name: "player1", location: [6,5], bearing: [-1, 0], robot: "Hammer Bot", priorityVal: 500 },
-			  { name: "player2", location: [5,8], bearing: [-1, 0], robot: "Spin Bot", priorityVal: 200 }
-			]
-		]
-
-				/* bearings
-
-				[-1,0] N
-				[0, 1] E
-				[0, -1] W
-				[1, 0] S
-
-				*/
-
-		var robotHash = {};
-
-
-		function drawRobots(initial) {
-			initial.forEach(function(player, idx){
-				if(robotHash[player.name] === undefined) createSprite();
-
-				function createSprite() {
-					var robotImg = robotImage(player.robot);
-					var robot = new Sprite(resources["img/spritesheet.json"].textures[robotImg])
-					// var robot = new Sprite(PIXI.Texture.fromImage(robotImg))
-					//anchoring the roation to the at the center of the sprite which is why we offset the position by 0.5 as well
-					robot.anchor.x = 0.5;
-					robot.anchor.y = 0.5;
-					robot.position.x = imgSize*(player.location[0] + 0.5);
-			        robot.position.y = imgSize*(player.location[1] + 0.5);
-			        robot.scale.set(1/imgScale, 1/imgScale);
-
-			      	stage.addChild(robot);
-			      	robotHash[player.name] = robot;
-			      	robotHash[player.name].bearing = player.bearing;
-			      	robotHash[player.name].location = player.location;
-			      	renderer.render(stage)
-				}
-			})
-		}
-
-		function runOneRegister (register) {
-			move(_.flatten(register));
-		}
-
-		function move(playerObjs) {
-			return playerObjs.reduce(function(acc, player, idx){
-				var robot = robotHash[player.name];
-				var turn = false;
-				var compass;
-				var particle;
-
-				return acc.then(function() {
-					return turnRobot()
-				})
-				.then(function() {
-					return promiseForMoveRobot();
-				})
-				.then(function() {
-					robot.location = player.location;
-					return shootRobotLasers();
-				})
-				.then(function() {
-					// console.log(robotHash)
-					stage.removeChild(particle);
-					renderer.render(stage)
-				})
-
-				function turnRobot() {
-					if(player.bearing[0] !== robot.bearing[0] || player.bearing[1] !== robot.bearing[1]) {
-						var radians = getRotation(robot.bearing, player.bearing);
-						var amtToRotate = radians + robot.rotation
-						robot.bearing = player.bearing;
-						var direction; //clockwise or counterclockwise
-
-						turn = true;
-						return promiseForRotate();
-
-						function promiseForRotate () {
-							return $q(function(resolve, reject){
-								rotate(resolve);
-							})
-						}
-
-						function rotate(resolve) {
-							if(robot.rotation <= amtToRotate && direction == "clockwise" || direction == undefined) {
-								direction = "clockwise";
-								robot.rotation += 0.03;
-								requestAnimationFrame(rotate.bind(null, resolve));
-							}
-							else if(robot.rotation >= amtToRotate) {
-								direction = "counterclockwise";
-								robot.rotation -= 0.03;
-								requestAnimationFrame(rotate.bind(null, resolve));
-							}
-							else {
-								resolve();
-							}
-						}
-					}
-
-					else {
-						return $q.resolve();
-					}
-				}
-
-				function promiseForMoveRobot(){
-					return $q(function(resolve, reject){
-						moveRobot(resolve);
-					});
-				}
-
-				function moveRobot(resolve) {
-					var row = player.location[0] + 0.5;
-					var col = player.location[1] + 0.5;
-					if(robot.location[0] > player.location[0]) compass = 'north';
-					else if(robot.location[0] < player.location[0]) compass = 'south';
-					else if(robot.location[1] > player.location[1]) compass = 'east';
-					else if(robot.location[1] < player.location[1]) compass = 'west'
-
-					if(!turn && robot.position.x >= imgSize * row && compass == 'north') {
-				        requestAnimationFrame(moveRobot.bind(null, resolve));
-				        robot.position.x -= 1;
-				  	}
-				  	else if(!turn && robot.position.x <= imgSize * row && compass == 'south') {
-				  		requestAnimationFrame(moveRobot.bind(null, resolve));
-				  		robot.position.x += 1;
-				  	}
-				  	else if(!turn && robot.position.y >= imgSize * col && compass == 'east') {
-				  		requestAnimationFrame(moveRobot.bind(null, resolve));
-				  		robot.position.y -= 1;
-				  	}
-				  	else if(!turn && robot.position.y <= imgSize * col && compass == 'west') {
-				  		requestAnimationFrame(moveRobot.bind(null, resolve));
-				  		robot.position.y += 1;
-				  	}
-				  	else {
-				  		resolve();
-				  	}
-				}
-
-				function shootRobotLasers() {
-					// var particle;
-					var offset;
-					var myReq;
-
-					new Sprite(resources["img/spritesheet.json"].textures['robolaser-h.png'])
-
-					if(player.bearing[0] !== 0) particle = new Sprite(resources["img/spritesheet.json"].textures['robolaser-h.png'])
-					else particle = new Sprite(resources["img/spritesheet.json"].textures['robolaser-v.png'])
-
-					// if(player.bearing[0] !== 0) particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-h.png'))
-					// else particle = new Sprite(PIXI.Texture.fromImage('/img/robolaser-v.png'))
-
-
-					particle.position.x = imgSize*(player.location[0] + 0.5 + player.bearing[0]) - 5;
-			        particle.position.y = imgSize*(player.location[1] + 0.5 - player.bearing[1]) - 5;
-			        particle.scale.set(1/imgScale, 1/imgScale);
-
-			      	stage.addChild(particle);
-			      	renderer.render(stage)
-
-
-			      	return promiseForShooting()
-
-
-					function promiseForShooting () {
-						return $q(function(resolve, reject){
-							shoot(resolve)
-						})
-						// .then(function() {
-						// 	particle.destroy();
-						// })
-					}
-
-					function shoot(resolve) {
-						if(!particle) return;
-						if(player.bearing[0] === -1 && particle.position.x >= 30) {
-					        requestAnimationFrame(shoot.bind(null, resolve));
-					        particle.position.x -= 10;
-					  	}
-					  	else if(player.bearing[0] === 1 && particle.position.x <= imgSize*rows) {
-					  		requestAnimationFrame(shoot.bind(null, resolve));
-					  		particle.position.x += 10;
-					  	}
-					  	else if(player.bearing[1] === 1 && particle.position.y >= 0) {
-					  		requestAnimationFrame(shoot.bind(null, resolve));
-					  		particle.position.y -= 10;
-					  	}
-					  	else if(player.bearing[1] === -1 && particle.position.y <= imgSize*cols) {
-					  		requestAnimationFrame(shoot.bind(null, resolve));
-					  		particle.position.y += 10;
-					  	} else  {
-					  		resolve();
-					  	}
-					}
-				}
-
-			}, $q.resolve())
-		}
-
-		buildTiles();
-		drawDocks();
-		drawDockLine();
-		drawLasers();
-		drawRobots(players);
-		runOneRegister(oneRegister)
-
-		function buildMap(){
-		  renderer.render(stage);
-		  requestAnimationFrame(buildMap);
-		}
-
-		if($scope.game) {
-			buildMap();
-		}
-	}
-
-
 });
 
-function robotImage (robotName) {
-	return robotName.toLowerCase().replace(/ /g,'') + 'Arrow.png';
-}
+app.factory('UtilsFactory', function(){
+	var UtilsFactory = {};
 
-function getRotation (orig, next){
-	if(orig[0] + next[0] ===  0 || orig[1] + next[1] === 0) return Math.PI;
-	else {
-	  var dot = -orig[0]*next[1] + orig[1]*next[0];
-	  var rad = Math.asin(dot);
-  	return rad;
+	UtilsFactory.extractPlayerData = function(gameStatesFromFb){
+		var arrOfPlayerStates = [];
+		gameStatesFromFb.forEach(function(gameState){
+			arrOfPlayerStates.push(gameState.players);
+		});
+		return arrOfPlayerStates;
+	};
+
+	UtilsFactory.arraysMatch = function (arr1, arr2){
+		if(arr1.length !== arr2.length) return false;
+		for (var i = 0; i < arr1.length; i ++){
+			if(arr1[i]!== arr2[i]) return false
+		}
+		return true;
+	};
+
+	UtilsFactory.getRotation = function (orig, next){
+		if(orig[0] + next[0] ===  0 || orig[1] + next[1] === 0) return Math.PI;
+		else {
+		  var dot = -orig[0]*next[1] + orig[1]*next[0];
+		  var rad = Math.asin(dot);
+	  	return rad;
+		}
 	}
-}
+	return UtilsFactory;
+})
+
+app.factory('RobotFactory', function($rootScope, UtilsFactory) {
+	function getRobotImage(robotName) {
+		return robotName.toLowerCase().replace(/ /g,'') + 'Arrow.png';
+	};
+
+	function createOneRobotSprite(player, robotHash, pixi) {
+		var robotImg = getRobotImage(player.robot);
+		var robot = new PIXI.Sprite(pixi.loader.resources["img/spritesheet.json"].textures[robotImg]);
+
+		robot.anchor.x = 0.5;
+		robot.anchor.y = 0.5;
+		robot.position.x = $rootScope.imgSize*(player.position[0] + 0.5);
+    robot.position.y = $rootScope.imgSize*(11-player.position[1] + 0.5);
+    robot.scale.set(1/$rootScope.imgScale, 1/$rootScope.imgScale);
+    console.log('robot.rotation', robot.rotation, 'player.bearing', player.bearing);
+    //check bearing of player
+    if(player.bearing[2]!=='N') {
+    	var newRotation = UtilsFactory.getRotation([-1,0], player.bearing)
+    	robot.rotation = newRotation;
+    }
+
+  	pixi.stage.addChild(robot);
+  	robotHash[player.name] = robot;
+  	robotHash[player.name].bearing = player.bearing;
+  	robotHash[player.name].location = player.position;
+  	pixi.renderer.render(pixi.stage)
+
+	};
+
+	var RobotFactory = {}
+
+	RobotFactory.createAllRobotSprites = function(phase, robotHash, pixi) {
+		phase.players.forEach(function(player){
+			if(robotHash[player.name] === undefined) createOneRobotSprite(player, robotHash, pixi);
+		})
+	}
+
+	return RobotFactory;
+});
+
+app.factory('PixiFactory', function($rootScope){
+	var PixiFactory = {};
+
+	/*columns rendered horizontally as the board orientation is:
+		E
+	N   S
+		W
+	*/
+
+	function collectOneCol(colNum, boardObj){
+		var key = 'col' + colNum.toString();
+		var idents = boardObj[key].map(function(tile){
+		  return tile.identifier;
+		});
+		return idents;
+	}
+
+	PixiFactory.createBoardArr = function(boardObj){
+			var board = [];
+			for(var i = 0; i < $rootScope.cols; i++) {
+				board.push(collectOneCol(i, boardObj))
+			}
+			return board;
+		}
+
+	PixiFactory.drawBoard = function(board, stage) {
+			for(var col = 0; col < $rootScope.cols; col++) {
+				for(var row = 0; row < $rootScope.rows; row++) {
+					var tileSrc = board[col][row] + '.jpg';
+					var tile = PixiFactory.createTileSprite(tileSrc);
+					tile.position.x = $rootScope.imgSize * row;
+					tile.position.y = $rootScope.imgSize * ($rootScope.cols - 1 - col);
+					tile.scale.set(1/$rootScope.imgScale, 1/$rootScope.imgScale);
+					stage.addChild(tile);
+				}
+			}
+		}
+
+	PixiFactory.pixiInitializer = function() {
+		var stage = new PIXI.Container();
+		var renderer = PIXI.autoDetectRenderer($rootScope.imgSize * $rootScope.rows,  $rootScope.imgSize * $rootScope.cols)
+
+		var loader = PIXI.loader;
+		loader.add("img/spritesheet.json");
+
+		return {
+			stage: stage,
+			renderer: renderer,
+			loader: loader
+		}
+	};
+
+	PixiFactory.createTileSprite = function(tileSrc) {
+		return new PIXI.Sprite(PIXI.loader.resources["img/spritesheet.json"].textures[tileSrc]);
+	}
+
+	PixiFactory.drawDocks = function (docks, stage) {
+		console.log('inside drawDocks')
+		for(var i = 0; i < docks.length; i++) {
+			var dockNum = i+1;
+			var dock = new PIXI.Text(dockNum.toString(), {font : '24px Arial', fill : 0x000000, align : 'center'});
+			dock.position.x = docks[i][0]* $rootScope.imgSize + 18;
+			dock.position.y = docks[i][1]* $rootScope.imgSize + 9;
+			stage.addChild(dock);
+		}
+	}
+
+	PixiFactory.drawDockLine = function (stage) {
+		var line = new PIXI.Graphics;
+		line.lineStyle(4, 0x000000, 1);
+		line.moveTo(12* $rootScope.imgSizeActual/$rootScope.imgScale, 0)
+		line.lineTo(12* $rootScope.imgSizeActual/$rootScope.imgScale, 12* $rootScope.imgSizeActual/$rootScope.imgScale)
+		stage.addChild(line);
+	}
+
+	return PixiFactory;
+});
+
+app.factory('MoveFactory', function(UtilsFactory, $q, $rootScope){
+	var MoveFactory = {};
+
+	MoveFactory.playAllMoves = function(playerStates, robotHash, pixi){
+
+		return playerStates.reduce(function(acc, playerState, idx){
+			var robot = robotHash[playerState.name];
+
+			return acc.then(function(){
+				return MoveFactory.calcRobotTurn(robot, playerState);
+			})
+			.then(function(){
+				return MoveFactory.calcRobotMove(robot, playerState);
+			})
+			.then(function(){
+				robotHash[playerState.name] = playerState;
+				pixi.renderer.render(pixi.stage);
+			})
+		}, $q.resolve());
+
+	};
+
+	MoveFactory.calcRobotTurn = function(robot, player){
+		var direction;
+		if(UtilsFactory.arraysMatch(player.bearing, robot.bearing)) return $q.resolve();
+		else{
+			var changeInRotation = UtilsFactory.getRotation(robot.bearing, player.bearing);
+			var endingRotation =  changeInRotation + robot.rotation;
+
+			if(changeInRotation > 0) direction = 'clockwise';
+			else direction = 'counterclockwise';
+
+			robot.bearing = player.bearing;
+			return MoveFactory.promiseForTurnRobot(robot, endingRotation, direction)
+		}
+	};
+
+	MoveFactory.promiseForTurnRobot = function(robot, endingRotation, direction){
+		return $q(function(resolve, reject){
+			MoveFactory.turn(robot, resolve, endingRotation, direction)
+		})
+	};
+
+	MoveFactory.turn = function(robot, resolve, endingRotation, direction){
+		if(robot.rotation < endingRotation && direction == 'clockwise'){
+			direction = 'clockwise';
+			robot.rotation += 0.03;
+			requestAnimationFrame(MoveFactory.turn.bind(null, robot, resolve, endingRotation, direction))
+		}else if(robot.rotation > endingRotation){
+			direction = 'counterclockwise';
+			robot.rotation -= 0.03;
+			requestAnimationFrame(MoveFactory.turn.bind(null, robot, resolve, endingRotation, direction))
+		}else{
+			resolve();
+		}
+	};
+
+	MoveFactory.calcRobotMove = function(robot, playerState){
+		var endCol = 11 - playerState.position[1] + 0.5;
+		var endRow = playerState.position[0] + 0.5;
+		var compass;
+
+		robot.location = playerState.position;
+		return MoveFactory.promiseForMoveRobot(robot, endRow, endCol);
+
+	};
+
+	MoveFactory.promiseForMoveRobot = function(robot, endRow, endCol){
+		return $q(function(resolve, reject){
+			MoveFactory.move(robot, resolve, endRow, endCol);
+		})
+	};
+
+	MoveFactory.move = function(robot, resolve, endRow, endCol){
+		if(robot.position.x >  $rootScope.imgSize * endRow){
+			robot.position.x -= 1;
+			requestAnimationFrame(MoveFactory.move.bind(null, robot, resolve, endRow, endCol));
+		} else if (robot.position.x < $rootScope.imgSize * endRow){
+			robot.position.x += 1;
+			requestAnimationFrame(MoveFactory.move.bind(null, robot, resolve, endRow, endCol));
+		} else if (robot.position.y > $rootScope.imgSize * endCol){
+			robot.position.y -= 1;
+			requestAnimationFrame(MoveFactory.move.bind(null, robot, resolve, endRow, endCol));
+		} else if (robot.position.y < $rootScope.imgSize * endCol){
+			robot.position.y += 1;
+			requestAnimationFrame(MoveFactory.move.bind(null, robot, resolve, endRow, endCol))
+		} else {
+			resolve();
+		}
+	};
+
+	MoveFactory.shootRobotLasers = function(){
+
+	};
+
+	return MoveFactory;
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

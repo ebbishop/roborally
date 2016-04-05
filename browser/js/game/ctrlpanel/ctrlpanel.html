@@ -5,24 +5,15 @@
 				<div >
 					<h4>Lives Remaining:</h4>
 					<div>
-						<span class="life"></span>
-						<span class="life"></span>
-						<span class="dead"></span>
+						<span class="life" ng-repeat="life in getNumber(player.livesRemaining) track by $index"></span>
+						<span class="dead" ng-repeat="dead in getNumber(3-player.livesRemaining) track by $index"></span>
 					</div>
 				</div>
 			</div><br>
 			<div class="panel lives-panel" id="damage">
 				<h4>Damage Count:</h4>
-					<span class="glyphicon glyphicon-alert"></span>
-					<span class="glyphicon glyphicon-alert"></span>
-					<span class="glyphicon glyphicon-alert"></span>
-					<span class="glyphicon glyphicon-alert"></span>
-					<span class="glyphicon glyphicon-alert"></span>
-					<span class="glyphicon glyphicon-alert"></span>
-					<span class="glyphicon glyphicon-alert"></span>
-					<span class="glyphicon glyphicon-alert"></span>
-					<span class="glyphicon glyphicon-alert"></span>
-					<span class="glyphicon glyphicon-alert danger"></span>
+					<span class="glyphicon glyphicon-alert" ng-repeat="undamaged in getNumber(9-player.damage) track by $index"></span>
+					<span class="glyphicon glyphicon-alert danger" ng-repeat="damage in getNumber(player.damage) track by $index"></span>
 			</div><br>
 			<div class="btn-row row">
 				<div class="col-md-6">
@@ -31,9 +22,8 @@
 				<div class="col-md-6">
 					<div class="panel lives-panel flags">
 						<h4>Flags Captured:</h4>
-						<span class="glyphicon glyphicon-flag"></span>
-						<span class="glyphicon glyphicon-flag"></span>
-						<span class="glyphicon glyphicon-flag"></span>
+						<span class="glyphicon glyphicon-flag captured" ng-repeat="flag in getNumber(player.flagCount) track by $index"></span>
+						<span class="glyphicon glyphicon-flag" ng-repeat="uncaptured in getNumber(getFlagCt() - player.flags) track by $index"></span>
 					</div>
 				</div>
 			</div>
@@ -41,8 +31,8 @@
 		</div>
 
 		<div class="col-md-6" id="right">
-			<div ng-repeat="row in cards track by $index">
-				<span ng-repeat="card in row track by $index" carddata="{{card.priority}}" class="empty-card" draggable><img src="/img/cards/{{card.name}}.png"></span>
+			<div ng-repeat="row in cards">
+				<span ng-repeat="card in row" carddata="{{card.priority}}" class="empty-card" draggable droppable><img src="/img/cards/{{card.name}}.png"></span>
 			</div>
 		</div>
 
@@ -51,14 +41,14 @@
 
 	<div>
 		<div class="col-md-8" id="register">
-			<span class="register empty-card empty" droppable></span>
-			<span class="register empty-card empty" droppable></span>
-			<span class="register empty-card empty" droppable></span>
-			<span class="register empty-card empty" droppable></span>
-			<span class="register empty-card empty" droppable></span>
+			<span class="register empty-card empty" draggable droppable></span>
+			<span class="register empty-card empty" draggable droppable></span>
+			<span class="register empty-card empty" draggable droppable></span>
+			<span class="register empty-card empty" draggable droppable></span>
+			<span class="register empty-card empty" draggable droppable></span>
 		</div>
-		<div class="col-md-4">
-			<button type="button" class="orange-btn orange-btn-sm" ng-click="sendRegister()"><strong><larger>READY</larger></strong></button>
+		<div class="col-md-4" ng-click="sendRegister()">
+			<button type="button" class="orange-btn orange-btn-sm" ><strong><larger>READY</larger></strong></button>
 		</div>
 	</div>
 

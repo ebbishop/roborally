@@ -134,14 +134,14 @@ gameSchema.methods.runBelts = function(type){
   var tile;
   console.log('running belt type', type);
   this.players.forEach(function(player){
-    console.log('player pos', player.position);
     tile = game.getTileAt(player.position);
+
     if(tile.conveyor && tile.conveyor[0].magnitude >= type) {
       var c = tile.conveyor[0];
       var nextPosition = [player.position[0] + c.bearing[0], player.position[1] + c.bearing[1]];
       var nextTile = game.getTileAt(nextPosition);
 
-      if(nextTile.conveyor) {
+      if(nextTile && nextTile.conveyor) {
         var deg = getRotation(c.bearing, nextTile.conveyor[0].bearing);
         player.rotate(deg);
       }
@@ -155,6 +155,7 @@ gameSchema.methods.runBelts = function(type){
 
 gameSchema.methods.getTileAt = function (position) {
   // position is array = [row, col]
+  console.log('position passed to getTileAt', position);
   var colStr = 'col' + position[1].toString();
   if(this.board[colStr] && this.board[colStr][position[0]]){
     return this.board[colStr][position[0]];
@@ -287,7 +288,9 @@ gameSchema.methods.touchRepairs = function(){
   this.players.forEach(function(player){
     tile = game.getTileAt(player.position);
     if (tile.floor === 'wrench1' || tile.floor === 'wrench2') {
-      player.applyDamage(-1);
+      if(player.damage > 0){
+        player.applyDamage(-1);
+      }
     }
   });
   console.log('touched repairs');
@@ -405,7 +408,7 @@ gameSchema.methods.pushGameState = function(){
   var state = {players: publicPlayerArray, isWon: this.isWon};
   if(!hashOfGames[this._id]){
     hashOfGames[this._id] = [state]
-  }else if(this.currentCard===0 && hashOfGames[this._id].length>=10){
+  }else if(hashOfGames[this._id].length>=10){
     hashOfGames[this._id] = [state];
   }else{
     hashOfGames[this._id].push(state);
@@ -424,7 +427,7 @@ gameSchema.methods.sendGameStates = function(){
   var gameId = this._id.toString();
 
   var roundToSend = hashOfGames[this._id];
-
+  console.log('sending to firebase:', hashOfGames[this._id])
   firebaseHelper.getConnection(gameId).child('phases').set(JSON.stringify(roundToSend));
 
   var privatePlayerArray = this.players.map(function(player){

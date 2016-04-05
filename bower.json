@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "firebase": "^2.4.1",
-    "angularfire": "^1.1.4"
+    "angularfire": "^1.1.4",
+    "angular-animate": "^1.5.3"
   }
 }
