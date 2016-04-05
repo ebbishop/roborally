@@ -25,3 +25,64 @@
 } 
 
 
+#overlay {
+  overflow: auto;
+  position: fixed;
+  left: 25%;
+  top: 25%;
+  padding: 25px;
+  border: 10px solid white;
+  background:
+  radial-gradient(black 15%, transparent 16%) 0 0,
+  radial-gradient(black 15%, transparent 16%) 8px 8px,
+  radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 0 1px,
+  radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 8px 9px;
+  background-color:#282828;
+  background-size:16px 16px;
+  width: 50%;
+  height: 50%;
+  z-index: 100;
+  font-size: 2em;
+  font-family: 'Roboto Slab', serif;
+  color: white;
+}
+
+#fade {
+    position: fixed;
+    left: 0%;
+    top: 0%;
+    background-color: black;
+    -moz-opacity: 0.7;
+    opacity: .70;
+    filter: alpha(opacity=70);
+    width: 100%;
+    height: 100%;
+    z-index: 90;
+}
+
+#custom-modal.ng-enter {
+  transition: opacity .5s ease-out;
+  opacity: 0;
+}
+#custom-modal.ng-enter.ng-enter-active {
+  opacity: 1;
+}
+#custom-modal.ng-leave {
+  transition: opacity .5s ease-out;
+  opacity: 1;
+}
+#custom-modal.ng-leave.ng-leave-active {
+  opacity: 0;
+}
+
+#close-btn {
+  float: right;
+}
+
+#close-btn:hover {
+  text-decoration: none;
+}  
+
+#close-btn a:hover{
+  text-decoration: none;
+} 
