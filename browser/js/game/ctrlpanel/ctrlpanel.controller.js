@@ -46,12 +46,14 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
   });
 
 	$scope.sendRegister = function() {
-    console.log('sendRegister')
 		var register = [getCardVal(0), getCardVal(1), getCardVal(2), getCardVal(3), getCardVal(4)];
+    var reg = register.map(function(e){
+      return getCard(e)
+    })
+    console.log('register:', reg);
 		if(register.indexOf(0) > -1) return;
 		else {
       emptyRegister();
-      console.log('register', register);
    		return PlayerFactory.sendRegister(register, $scope.gameId, $scope.playerId);
 		}
 	};
@@ -72,14 +74,15 @@ function getCardVal(registerNum) {
 	return Number(document.getElementById("register").children[registerNum].getAttribute('carddata'));
 }
 
+function getCard(cardNum) {
+  return programCards[(cardNum/10)-1];
+}
+
 function chop(arr){
-	var cards = arr.map(function(c){
-	  return programCards[(c/10)-1]
-	});
 	var chopped = [];
 	var subArr = [];
 	for (var i = 0; i < arr.length; i++){
-	  subArr.push(programCards[arr[i]/10 - 1]);
+	  subArr.push(getCard(arr[i]));
 	  if(subArr.length === 3){
 	    chopped.push(subArr);
 	    subArr = [];

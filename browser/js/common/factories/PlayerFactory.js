@@ -3,7 +3,6 @@ app.factory('PlayerFactory', function($http) {
 	var PlayerFactory = {};
 
 	PlayerFactory.getPlayer = function(playerId) {
-		console.log('getting player', playerId)
 		return $http.get('/api/player/' + playerId)
 		.then(function(res) {
 			return res.data

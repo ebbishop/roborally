@@ -23,7 +23,7 @@
 					<div class="panel lives-panel flags">
 						<h4>Flags Captured:</h4>
 						<span class="glyphicon glyphicon-flag captured" ng-repeat="flag in getNumber(player.flagCount) track by $index"></span>
-						<span class="glyphicon glyphicon-flag" ng-repeat="uncaptured in getNumber(getFlagCt() - player.flags) track by $index"></span>
+						<span class="glyphicon glyphicon-flag" ng-repeat="uncaptured in getNumber(getFlagCt() - player.flagCount) track by $index"></span>
 					</div>
 				</div>
 			</div>
