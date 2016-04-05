@@ -67,6 +67,7 @@ function getRotation (orig, next){
 
 gameSchema.methods.runOneRound = function () {
   this.setNotReady();
+  this.currentState = 0;
   while (this.currentCard < 5){
     this.runOneRegister();
     this.checkEdgeOrPit();
@@ -155,7 +156,6 @@ gameSchema.methods.runBelts = function(type){
 
 gameSchema.methods.getTileAt = function (position) {
   // position is array = [row, col]
-  console.log('position passed to getTileAt', position);
   var colStr = 'col' + position[1].toString();
   if(this.board[colStr] && this.board[colStr][position[0]]){
     return this.board[colStr][position[0]];
@@ -393,6 +393,7 @@ gameSchema.methods.initializeGame = function (){
 };
 
 gameSchema.methods.pushGameState = function(){
+  if(!this.currentState) this.currentState = 0;
   var publicPlayerArray = this.players.map(function(player){
     var p = {};
     p._id = player._id;
@@ -408,13 +409,14 @@ gameSchema.methods.pushGameState = function(){
   var state = {players: publicPlayerArray, isWon: this.isWon};
   if(!hashOfGames[this._id]){
     hashOfGames[this._id] = [state]
-  }else if(hashOfGames[this._id].length>=10){
+  }else if(this.currentCard === 0 && this.currentState > 1){
     hashOfGames[this._id] = [state];
   }else{
     hashOfGames[this._id].push(state);
   }
   var len = hashOfGames[this._id].length
-  console.log('current game state', len-1, hashOfGames[this._id][len-1].players)
+  console.log('current game state', len-1, hashOfGames[this._id][len-1].players);
+  this.currentState ++;
 }
 
 gameSchema.methods.savePlayers = function(){

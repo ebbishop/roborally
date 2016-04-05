@@ -16,18 +16,12 @@ app.directive('draggable', function(){
   return function(scope, element){
     var el = element[0];
     el.draggable = true;
-
     el.addEventListener('dragstart', function(ev){
       ev.dataTransfer.effectAllowed = 'move';
       ev.dataTransfer.setData('Text', this.attributes['carddata'].value);
       this.classList.add('drag');
       return false;
     }, false);
-
-    // el.addEventListener('dragend', function(ev){
-    //   this.classList.remove('drag');
-    //   return false;
-    // }, false);
   }
 });
 
@@ -39,7 +33,6 @@ app.directive('droppable', function(){
     },
     link: function(scope, element, attrs){
       var el = element[0];
-
       el.addEventListener('dragover', function(ev){
         ev.dataTransfer.dropEffect = 'move';
         if(ev.preventDefault) ev.preventDefault();
@@ -58,7 +51,6 @@ app.directive('droppable', function(){
       }, false);
 
       el.addEventListener('drop', function(ev){
-        console.log('trying to drop:', ev.dataTransfer.getData('Text'));
         if(!this.hasChildNodes()){
           if(ev.stopPropagation) ev.stopPropagation();
 
