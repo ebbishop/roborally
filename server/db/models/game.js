@@ -123,7 +123,7 @@ gameSchema.methods.runOneRegister = function () {
 
 gameSchema.methods.checkEdgeOrPit = function(){
   this.players.forEach(function(p){
-    var tile = this.getTileAt(p.position)
+    var tile = this.getTileAt(p.location)
     if(!tile || tile.floor === "pit"){
       p.loseLife();
     }
@@ -135,12 +135,12 @@ gameSchema.methods.runBelts = function(type){
   var tile;
   console.log('running belt type', type);
   this.players.forEach(function(player){
-    tile = game.getTileAt(player.position);
+    tile = game.getTileAt(player.location);
 
     if(tile.conveyor && tile.conveyor[0].magnitude >= type) {
       var c = tile.conveyor[0];
-      var nextPosition = [player.position[0] + c.bearing[0], player.position[1] + c.bearing[1]];
-      var nextTile = game.getTileAt(nextPosition);
+      var nextLocation = [player.location[0] + c.bearing[0], player.location[1] + c.bearing[1]];
+      var nextTile = game.getTileAt(nextLocation);
 
       if(nextTile && nextTile.conveyor) {
         var deg = getRotation(c.bearing, nextTile.conveyor[0].bearing);
@@ -166,7 +166,7 @@ gameSchema.methods.getTileAt = function (position) {
 gameSchema.methods.runGears = function(){
   var game = this;
   this.players.forEach(function(p){
-    var tile = game.getTileAt(p.position);
+    var tile = game.getTileAt(p.location);
     if (tile.floor === 'gearCW') {
       p.rotate(90);
     } else if (tile.floor === 'gearCCW') {
@@ -180,7 +180,7 @@ gameSchema.methods.runPushers = function(){
   var game = this;
   var pushType = (this.currentCard % 2) + 1;
   this.players.forEach(function(p){
-    var tile = game.getTileAt(p.position);
+    var tile = game.getTileAt(p.location);
     if(tile.edgeN === 'push' + pushType.toString()) {
       p.boardMove([1, 0]);
     }
@@ -199,7 +199,7 @@ gameSchema.methods.runPushers = function(){
 
 gameSchema.methods.getPlayerAt = function(position){
   return this.players.filter(function(p){
-    if (p.position[0] === position[0] && p.position[1] === position[1]) return true
+    if (p.location[0] === position[0] && p.location[1] === position[1]) return true
     return false;
   })
 }
@@ -208,7 +208,7 @@ gameSchema.methods.fireRobotLasers = function (){
   var game = this;
   this.players.forEach(function(p){
     game.fireOneLaser({
-      start: [p.position[0]+ p.bearing[0], p.position[1]+p.bearing[1]],
+      start: [p.location[0]+ p.bearing[0], p.location[1]+p.bearing[1]],
       qty: 1,
       bearing: p.bearing,
     })
@@ -286,7 +286,7 @@ gameSchema.methods.touchRepairs = function(){
   var game = this;
   var tile;
   this.players.forEach(function(player){
-    tile = game.getTileAt(player.position);
+    tile = game.getTileAt(player.location);
     if (tile.floor === 'wrench1' || tile.floor === 'wrench2') {
       if(player.damage > 0){
         player.applyDamage(-1);
@@ -300,7 +300,7 @@ gameSchema.methods.touchFlags = function(){
   var game = this;
   var tile;
   this.players.forEach(function(player){
-    tile = game.getTileAt(player.position);
+    tile = game.getTileAt(player.location);
     if (tile.flag === player.flagCount + 1) {
       player.touchFlag(tile.flag);
       player.applyDamage(-1);
@@ -379,7 +379,7 @@ gameSchema.methods.assignDocks = function() {
     var playerKey = player._id.toString()
     var i = _.sample(docks);
     player.dock = game.board.dockLocations[i];
-    player.position = game.board.dockLocations[i];
+    player.location = game.board.dockLocations[i];
     docks.splice(docks.indexOf(i),1);
   });
 }
@@ -397,7 +397,7 @@ gameSchema.methods.pushGameState = function(){
   var publicPlayerArray = this.players.map(function(player){
     var p = {};
     p._id = player._id;
-    p.position = player.position;
+    p.location = player.location;
     p.robot = player.robot;
     p.bearing = player.bearing;
     p.damage = player.damage;

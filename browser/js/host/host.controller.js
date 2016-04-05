@@ -26,7 +26,7 @@ app.controller("HostController", function($scope, game, $stateParams, FirebaseFa
 			console.log('this is the response', response)
 			//we need to call intialize game function here to set the docks
 			//initial position should also be the dock position
-			$state.go('game', {gameId: response, playerId: hostID})
+			$state.go('game', {gameId: gameID, playerId: hostID})
 		});
 	};
 
