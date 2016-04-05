@@ -69,7 +69,7 @@ app.controller('GameCtrl', function($scope, theGame, thePlayer, PixiFactory, Uti
 		if(players[0]){
 			console.log('all players are ready - run round');
 			return GameFactory.startRound($scope.game._id)
-		}else{
+		} else {
 			console.log('not all players ready yet!');
 		}
 	}, true);
@@ -146,9 +146,6 @@ app.factory('RobotFactory', function($rootScope, UtilsFactory) {
 	return RobotFactory;
 });
 
-
-
-// maybe only need to call requestAnimationFrame once ever??
 app.factory('PixiFactory', function($rootScope){
 	var PixiFactory = {};
 
@@ -188,21 +185,22 @@ app.factory('PixiFactory', function($rootScope){
 		}
 
 	PixiFactory.pixiInitializer = function() {
-			var stage = new PIXI.Container();
-			var renderer = PIXI.autoDetectRenderer($rootScope.imgSize * $rootScope.rows,  $rootScope.imgSize * $rootScope.cols)
+		var stage = new PIXI.Container();
+		var renderer = PIXI.autoDetectRenderer($rootScope.imgSize * $rootScope.rows,  $rootScope.imgSize * $rootScope.cols)
 
-			var loader = PIXI.loader;
-			loader.add("img/spritesheet.json");
+		var loader = PIXI.loader;
+		loader.add("img/spritesheet.json");
 
-			return {
-				stage: stage,
-				renderer: renderer,
-				loader: loader
-			}
+		return {
+			stage: stage,
+			renderer: renderer,
+			loader: loader
 		}
+	};
+
 	PixiFactory.createTileSprite = function(tileSrc) {
-			return new PIXI.Sprite(PIXI.loader.resources["img/spritesheet.json"].textures[tileSrc]);
-		}
+		return new PIXI.Sprite(PIXI.loader.resources["img/spritesheet.json"].textures[tileSrc]);
+	}
 
 	PixiFactory.drawDocks = function (docks, stage) {
 		console.log('inside drawDocks')
@@ -220,30 +218,21 @@ app.factory('PixiFactory', function($rootScope){
 		line.lineStyle(4, 0x000000, 1);
 		line.moveTo(12* $rootScope.imgSizeActual/$rootScope.imgScale, 0)
 		line.lineTo(12* $rootScope.imgSizeActual/$rootScope.imgScale, 12* $rootScope.imgSizeActual/$rootScope.imgScale)
-		stage.addChild(line)
+		stage.addChild(line);
 	}
 
 	return PixiFactory;
 });
 
-
 app.factory('MoveFactory', function(UtilsFactory, $q, $rootScope){
 	var MoveFactory = {};
 
-
-
 	MoveFactory.playAllMoves = function(playerStates, robotHash, pixi){
-		// array of player state objects:
-		// [player1inPhase1, player2inPhase1, player1inPhase2, player2inPhase2]
-
-		console.log('running playAllMoves');
-		var counter = 0;
 
 		return playerStates.reduce(function(acc, playerState, idx){
 			var robot = robotHash[playerState.name];
 
 			return acc.then(function(){
-				counter++;
 				return MoveFactory.calcRobotTurn(robot, playerState);
 			})
 			.then(function(){
@@ -253,19 +242,7 @@ app.factory('MoveFactory', function(UtilsFactory, $q, $rootScope){
 				robotHash[playerState.name] = playerState;
 				pixi.renderer.render(pixi.stage);
 			})
-			// .then(function(){
-			// 	//sets robot location (and bearing?) so shooting will be from the right position
-			// 	robot.location = player.position;
-			// 	robot.bearing = player.bearing;
-			// 	return MoveFactory.shootRobotLasers();
-			// })
-			// .then(function(){
-			// 	//check out destroy later
-			// 	pixi.stage.removeChild(particle);
-			// 	pixi.renderer.render(pixi.stage)
-			// })
-
-		}, $q.resolve())
+		}, $q.resolve());
 
 	};
 
@@ -282,7 +259,7 @@ app.factory('MoveFactory', function(UtilsFactory, $q, $rootScope){
 			robot.bearing = player.bearing;
 			return MoveFactory.promiseForTurnRobot(robot, endingRotation, direction)
 		}
-	}
+	};
 
 	MoveFactory.promiseForTurnRobot = function(robot, endingRotation, direction){
 		return $q(function(resolve, reject){
@@ -302,18 +279,12 @@ app.factory('MoveFactory', function(UtilsFactory, $q, $rootScope){
 		}else{
 			resolve();
 		}
-	}
+	};
 
 	MoveFactory.calcRobotMove = function(robot, playerState){
 		var endCol = 11 - playerState.position[1] + 0.5;
 		var endRow = playerState.position[0] + 0.5;
 		var compass;
-
-		// find direction player should move
-		// if(robot.location[0] > playerState.position[0]) compass = 'N';
-		// else if(robot.location[0] < playerState.position[0]) compass = 'S';
-		// else if(robot.location[1] < playerState.position[1]) compass = 'E';
-		// else if(robot.location[1] > playerState.position[1]) compass = 'W';
 
 		robot.location = playerState.position;
 		return MoveFactory.promiseForMoveRobot(robot, endRow, endCol);
@@ -347,7 +318,6 @@ app.factory('MoveFactory', function(UtilsFactory, $q, $rootScope){
 	MoveFactory.shootRobotLasers = function(){
 
 	};
-
 
 	return MoveFactory;
 });

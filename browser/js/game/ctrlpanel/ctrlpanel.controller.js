@@ -1,36 +1,50 @@
-app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, PlayerFactory){
+app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, PlayerFactory, $firebaseArray){
 
 	$scope.gameId = $stateParams.gameId;
 	$scope.playerId = $stateParams.playerId;
 	$scope.fbPlayer = FirebaseFactory.getConnection($scope.gameId + '/game/' + $scope.playerId);
 	$scope.playerHand = FirebaseFactory.getConnection($scope.gameId + '/' + $scope.playerId);
 
-     $scope.robots = [{name: "Hammer Bot", imgUrl: "/img/robots/hammerbot.png"}, {name: "Spin Bot", imgUrl: "/img/robots/spinbot.png"}, {name: "Twonky", imgUrl: "/img/robots/twonky.png"}, {name: "Zoom Bot", imgUrl: "/img/robots/zoombot.png"}]
+  $scope.robots = [{name: "Hammer Bot", imgUrl: "/img/robots/hammerbot.png"}, {name: "Spin Bot", imgUrl: "/img/robots/spinbot.png"}, {name: "Twonky", imgUrl: "/img/robots/twonky.png"}, {name: "Zoom Bot", imgUrl: "/img/robots/zoombot.png"}]
 
-     $scope.robotImage = function (robotName) {
-          return '/img/robots/' + robotName.toLowerCase().replace(/ /g,'') + '.png';
-     }
+  $scope.robotImage = function (robotName) {
+    return '/img/robots/' + robotName.toLowerCase().replace(/ /g,'') + '.png';
+  }
 
 
-     var hand = new Firebase("https://fiery-inferno-1350.firebaseio.com/" + $scope.gameId + '/' + $scope.playerId)
-     hand.on('value', function(data){
-     	var handArr = [];
-          var cards = data.val();
-          for(var i = 0; i < cards.length; i++) {
-               handArr.push(cards[i])
-          }
-          $scope.cards = chop(handArr);
+  var hand = new Firebase("https://fiery-inferno-1350.firebaseio.com/" + $scope.gameId + '/' + $scope.playerId);
 
-     })
+
+  // listen for changes to hand, update scope
+  hand.on('value', function(data){
+    var handArr = [];
+    var cards = data.val();
+    for(var i = 0; i < cards.length; i++) {
+      handArr.push(cards[i]);
+    }
+    $scope.cards = chop(handArr);
+    $scope.$digest();
+  });
 
 	$scope.sendRegister = function() {
 		var register = [getCardVal(0), getCardVal(1), getCardVal(2), getCardVal(3), getCardVal(4)];
 		if(register.indexOf(0) > -1) return;
 		else {
-     		return PlayerFactory.sendRegister(register, $scope.gameId, $scope.playerId);
+      emptyRegister();
+   		return PlayerFactory.sendRegister(register, $scope.gameId, $scope.playerId);
 		}
-	}
-})
+	};
+
+  function emptyRegister() {
+    var registerSlots = document.getElementsByClassName('register');
+    for(var i = 0; i < registerSlots.length; i++){
+      registerSlots[i].removeChild(registerSlots[i].childNodes[0]);
+      registerSlots[i].classList.add('empty');
+      registerSlots[i].setAttribute('carddata', '0');
+    }
+  }
+
+});
 
 function getCardVal(registerNum) {
 	return Number(document.getElementById("register").children[registerNum].getAttribute('carddata'));
@@ -51,8 +65,6 @@ function chop(arr){
 	}
 	return chopped;
 }
-
-
 
 var programCards = [
                { name: 'u',  priority: 10 },
