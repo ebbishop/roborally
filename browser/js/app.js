@@ -1,5 +1,5 @@
 'use strict';
-window.app = angular.module('RoboApp', ['fsaPreBuilt', 'ui.router', 'ui.bootstrap', 'ngAnimate', 'firebase']);
+window.app = angular.module('RoboApp', ['fsaPreBuilt', 'ui.router', 'ui.bootstrap', 'ngAnimate', 'firebase', 'angularModalService']);
 
 
 app.config(function ($urlRouterProvider, $locationProvider) {
