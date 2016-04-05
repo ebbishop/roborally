@@ -15,8 +15,8 @@ var playerSchema = new mongoose.Schema({
   name: String,
   robot: {type: String, enum:robots},
 
-  dock: [{type: Number, default:[15,0]}], //dock number will be assigned a position on the front-end
-  position: [Number], //row & col location
+  dock: [{type: Number, default:[15,0]}], //dock number will be assigned a location on the front-end
+  location: [Number], //row, col location
   compassDirection: String, // N E S W
   bearing: {
     type: Array,
@@ -49,10 +49,10 @@ var moveBlocked = {
 playerSchema.methods.playCard = function(i){
   var cardNum = this.register[i];
   var card = programCards[(cardNum/10)-1];
-  console.log('playing card', card.name, 'from:', this.position, this.bearing);
+  console.log('playing card', card.name, 'from:', this.location, this.bearing);
   this.rotate(card.rotation);
   this.cardMove(card.magnitude);
-  console.log('ending:',this.position, this.bearing);
+  console.log('ending:',this.location, this.bearing);
 };
 
 playerSchema.methods.rotate = function (rotation){
@@ -94,14 +94,14 @@ function setCardinal(row, col) {
 
 // call when this.bearing is not relevant
 playerSchema.methods.boardMove = function (bearing) {
-  var newRow = this.position[0];
-  var newCol = this.position[1];
+  var newRow = this.location[0];
+  var newCol = this.location[1];
   newRow += bearing[0];
   newCol += bearing[1];
 
   // TODO check if move is possible
     if (newCol < 0 || newRow < 0 || newCol > 11 || newRow > 15) return this.loseLife();
-    else this.set('position', [newRow, newCol]);
+    else this.set('location', [newRow, newCol]);
 };
 
 playerSchema.methods.loseLife = function() {
@@ -109,17 +109,17 @@ playerSchema.methods.loseLife = function() {
   if (this.livesRemaining === 0) return this.killPlayer();
   else {
     this.set('bearing', [-1, 0, 'N']);
-    this.set('position', this.dock);
+    this.set('location', this.dock);
   }
 };
 
 playerSchema.methods.killPlayer = function() {
-  this.position = null;
+  this.location = null;
 };
 
 playerSchema.methods.cardMove = function (magnitude) {
-  var newCol = this.position[1];
-  var newRow = this.position[0];
+  var newCol = this.location[1];
+  var newRow = this.location[0];
 
   // if (checkMove === true) {
     while (Math.abs(magnitude) > 0) {
@@ -129,7 +129,7 @@ playerSchema.methods.cardMove = function (magnitude) {
       magnitude += magnitude > 0 ? -1 : 1;
     }
 
-    this.position = [newRow, newCol]
+    this.location = [newRow, newCol]
 
 }
 

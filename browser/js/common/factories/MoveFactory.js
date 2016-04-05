@@ -13,7 +13,9 @@ app.factory('MoveFactory', function(UtilsFactory, $q, $rootScope){
         return MoveFactory.calcRobotMove(robot, playerState);
       })
       .then(function(){
-        robotHash[playerState.name] = playerState;
+        robotHash[playerState.name].bearing = playerState.bearing;
+        robotHash[playerState.name].location = playerState.location;
+
         pixi.renderer.render(pixi.stage);
       })
     }, $q.resolve());
@@ -56,13 +58,16 @@ app.factory('MoveFactory', function(UtilsFactory, $q, $rootScope){
   };
 
   MoveFactory.calcRobotMove = function(robot, playerState){
-    var endCol = 11 - playerState.position[1] + 0.5;
-    var endRow = playerState.position[0] + 0.5;
-    if(UtilsFactory.arraysMatch(robot.location, playerState.position)) return $q.resolve();
+    var endCol = 11 - playerState.location[1] + 0.5;
+    var endRow = playerState.location[0] + 0.5;
+    console.log('robot', robot)
+    // console.log('rob loc and ps loc', robot.position.x, robot.position.y, playerState.location)
+    console.log('robo pos arr', [robot.position.x/$rootScope.imgSize, robot.position.y/$rootScope.imgSize], playerState.location)
+    if(UtilsFactory.arraysMatch([robot.position.x/$rootScope.imgSize, robot.position.y/$rootScope.imgSize], playerState.location.slice(0,2))) return $q.resolve();
 
-    console.log('moving from', robot.location, 'to', playerState.position);
+    console.log('moving from', robot.location, 'to', playerState.location);
 
-    robot.location = playerState.position;
+    robot.location = playerState.location;
     return MoveFactory.promiseForMoveRobot(robot, endRow, endCol);
 
   };
