@@ -25,3 +25,65 @@
 } 
 
 
+#overlay {
+  overflow: auto;
+  position: fixed;
+  left: 25%;
+  top: 25%;
+  padding: 25px;
+  border-style: outset;
+  border-width: 4px;
+  border-radius: 10px;
+  border-color: #c2c2c2;
+  // background: rgba(242, 248, 242, .3)!important;
+
+
+  background-color: #131313;
+  width: 50%;
+  height: 43%;
+  z-index: 100;
+  font-size: 2em;
+  font-family: 'Roboto Slab', serif;
+  color: #c2c2c2;
+}
+
+#fade {
+    position: fixed;
+    left: 0%;
+    top: 0%;
+    background-color: black;
+    -moz-opacity: 0.7;
+    opacity: .70;
+    filter: alpha(opacity=70);
+    width: 100%;
+    height: 100%;
+    z-index: 90;
+}
+
+#custom-modal.ng-enter {
+  transition: opacity .5s ease-out;
+  opacity: 0;
+}
+#custom-modal.ng-enter.ng-enter-active {
+  opacity: 1;
+}
+#custom-modal.ng-leave {
+  transition: opacity .5s ease-out;
+  opacity: 1;
+}
+#custom-modal.ng-leave.ng-leave-active {
+  opacity: 0;
+}
+
+#close-btn {
+  float: right;
+  background: rgba(242, 248, 242, .6);
+}
+
+#close-btn:hover {
+  text-decoration: none;
+}  
+
+#close-btn a:hover{
+  text-decoration: none;
+} 
