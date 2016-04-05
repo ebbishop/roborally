@@ -60,9 +60,7 @@ app.factory('MoveFactory', function(UtilsFactory, $q, $rootScope){
   MoveFactory.calcRobotMove = function(robot, playerState){
     var endCol = 11 - playerState.location[1] + 0.5;
     var endRow = playerState.location[0] + 0.5;
-    console.log('robot', robot)
     // console.log('rob loc and ps loc', robot.position.x, robot.position.y, playerState.location)
-    console.log('robo pos arr', [robot.position.x/$rootScope.imgSize, robot.position.y/$rootScope.imgSize], playerState.location)
     if(UtilsFactory.arraysMatch([robot.position.x/$rootScope.imgSize, robot.position.y/$rootScope.imgSize], playerState.location.slice(0,2))) return $q.resolve();
 
     console.log('moving from', robot.location, 'to', playerState.location);
