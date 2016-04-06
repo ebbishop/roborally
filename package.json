@@ -6,7 +6,7 @@
   "scripts": {
     "test": "./node_modules/.bin/mocha tests/server/models/gamelogic-test.js",
     "start": "nodemon --watch server -e js,html server/start.js",
-    "postinstall": "gulp build && node seedData/seed"
+    "postinstall": "gulp build"
   },
   "engines": {
     "node": ">=4.0.0"
