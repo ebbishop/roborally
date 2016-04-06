@@ -20,3 +20,5 @@ Robo Mayhem is game of strategy, destruction and chaos. Pit robots against each 
 emma.b.bishop@gmail.com
 <br>
 pdpatel2@gmail.com
+<br>
+jisooxshin@gmail.com
