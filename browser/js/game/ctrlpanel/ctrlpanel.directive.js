@@ -2,7 +2,7 @@ app.directive('ctrlpanel', function (PlayerFactory) {
 
     return {
         restrict: 'E',
-        templateUrl: '/js/game/ctrlPanel/ctrlpanel.html',
+        templateUrl: '/js/game/ctrlpanel/ctrlpanel.html',
         scope: {
         	game: '=',
           player: '='
