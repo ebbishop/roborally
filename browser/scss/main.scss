@@ -29,12 +29,16 @@ body {
 
 .card-priority{
   position: absolute;
-  /*width: inherit;*/
+  width: inherit;
   color: green;
   font-family: 'Roboto Slab', serif;
   font-weight: bolder;
   text-align: right;
   padding: 11px 17px 0 0;
+}
+
+.over{
+  background-color:
 }
 
 .game-container {
