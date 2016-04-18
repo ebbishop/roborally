@@ -2,8 +2,11 @@ app.controller('CtrlPanelCtrl', function($scope, $stateParams, FirebaseFactory, 
 
 	$scope.gameId = $stateParams.gameId;
 	$scope.playerId = $stateParams.playerId;
-	// $scope.fbPlayer = FirebaseFactory.getConnection($scope.gameId + '/game/' + $scope.playerId);
 	$scope.playerHand = FirebaseFactory.getConnection($scope.gameId + '/' + $scope.playerId);
+
+  $scope.cards = [[{ name: 'l', priority: 250 }, { name: 'u',  priority: 30 }, { name: 'f1', priority: 590 }],
+  [{ name: 'f1', priority: 520 }, { name: 'f1', priority: 490 }, { name: 'l', priority: 330 }],
+  [{ name: 'l', priority: 170 }, { name: 'f3', priority: 800 }, { name: 'f1', priority: 580 }]];
 
   $scope.robots = [{name: "Hammer Bot", imgUrl: "/img/robots/hammerbot.png"}, {name: "Spin Bot", imgUrl: "/img/robots/spinbot.png"}, {name: "Twonky", imgUrl: "/img/robots/twonky.png"}, {name: "Zoom Bot", imgUrl: "/img/robots/zoombot.png"}]
 

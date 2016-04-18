@@ -408,7 +408,7 @@ gameSchema.methods.pushGameState = function(){
   });
   var state = {players: publicPlayerArray, isWon: this.isWon};
   if(!hashOfGames[this._id]){
-    hashOfGames[this._id] = [state]
+    hashOfGames[this._id] = [state];
   }else if(this.currentCard === 0 && this.currentState > 1){
     hashOfGames[this._id] = [state];
   }else{

@@ -61,15 +61,22 @@ app.directive('droppable', function(){
 
           //add image to register
           var item = document.createElement('img');
+          var prior = document.createElement('span');
           item.src = "/img/cards/" + programCards[cardId/10-1].name + ".png"
-          item.height = 110;
-          item.width = 75;
+          // item.height = 110;
+          // item.width = 75;
+
+          prior.classList.add('card-priority');
+          prior.appendChild(document.createTextNode(cardId));
 
           attrs.$set('carddata', cardId);
+
           this.appendChild(item);
+          this.appendChild(prior);
 
           handCard.setAttribute('carddata', '0');
           handCard.removeChild(handCard.childNodes[0]);
+          handCard.removeChild(handCard.childNodes[1]);
           handCard.classList.add('empty');
           return false;
         }

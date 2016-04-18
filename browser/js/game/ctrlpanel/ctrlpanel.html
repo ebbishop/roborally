@@ -32,7 +32,10 @@
 
 		<div class="col-md-6" id="right">
 			<div ng-repeat="row in cards">
-				<span ng-repeat="card in row" carddata="{{card.priority}}" class="empty-card" draggable droppable><img src="/img/cards/{{card.name}}.png"></span>
+				<div ng-repeat="card in row" carddata="{{card.priority}}" class="empty-card" draggable droppable>
+					<span class="card-priority">{{card.priority}}</span>
+					<img src="/img/cards/{{card.name}}.png">
+				</div>
 			</div>
 		</div>
 
@@ -41,11 +44,11 @@
 
 	<div>
 		<div class="col-md-8" id="register">
-			<span class="register empty-card empty" draggable droppable></span>
-			<span class="register empty-card empty" draggable droppable></span>
-			<span class="register empty-card empty" draggable droppable></span>
-			<span class="register empty-card empty" draggable droppable></span>
-			<span class="register empty-card empty" draggable droppable></span>
+			<div class="register empty-card empty" draggable droppable></div>
+			<div class="register empty-card empty" draggable droppable></div>
+			<div class="register empty-card empty" draggable droppable></div>
+			<div class="register empty-card empty" draggable droppable></div>
+			<div class="register empty-card empty" draggable droppable></div>
 		</div>
 		<div class="col-md-4" ng-click="sendRegister()">
 			<button type="button" class="orange-btn orange-btn-sm" ><strong><larger>READY</larger></strong></button>
